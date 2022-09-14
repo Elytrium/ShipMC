@@ -27,9 +27,10 @@ namespace Ship {
   const ProtocolVersion ProtocolVersion::MINECRAFT_1_18 = ProtocolVersion(17, 6, 757, "1.18 - 1.18.1");
   const ProtocolVersion ProtocolVersion::MINECRAFT_1_18_2 = ProtocolVersion(18, 7, 758, "1.18.2");
   const ProtocolVersion ProtocolVersion::MINECRAFT_1_19 = ProtocolVersion(19, 8, 759, "1.19");
+  const ProtocolVersion ProtocolVersion::MINECRAFT_1_19_1 = ProtocolVersion(20, 9, 760, "1.19.1 - 1.19.2");
 
   const ProtocolVersion ProtocolVersion::MINIMUM_VERSION = ProtocolVersion::MINECRAFT_1_12_2;
-  const ProtocolVersion ProtocolVersion::MAXIMUM_VERSION = ProtocolVersion::MINECRAFT_1_19;
+  const ProtocolVersion ProtocolVersion::MAXIMUM_VERSION = ProtocolVersion::MINECRAFT_1_19_1;
 
   const uint32_t MINIMUM_PROTOCOL_VERSION = ProtocolVersion::MINIMUM_VERSION.GetProtocolID();
   const uint32_t MAXIMUM_PROTOCOL_VERSION = ProtocolVersion::MAXIMUM_VERSION.GetProtocolID();
@@ -41,7 +42,7 @@ namespace Ship {
     ProtocolVersion::MINECRAFT_1_14_3, ProtocolVersion::MINECRAFT_1_14_4, ProtocolVersion::MINECRAFT_1_15, ProtocolVersion::MINECRAFT_1_15_1,
     ProtocolVersion::MINECRAFT_1_15_2, ProtocolVersion::MINECRAFT_1_16_2, ProtocolVersion::MINECRAFT_1_16_3, ProtocolVersion::MINECRAFT_1_16_4,
     ProtocolVersion::MINECRAFT_1_17, ProtocolVersion::MINECRAFT_1_17_1, ProtocolVersion::MINECRAFT_1_18, ProtocolVersion::MINECRAFT_1_18_2,
-    ProtocolVersion::MINECRAFT_1_19, ProtocolVersion::UNKNOWN};
+    ProtocolVersion::MINECRAFT_1_19, ProtocolVersion::MINECRAFT_1_19_1, ProtocolVersion::UNKNOWN};
   ProtocolVersion* idToVersionMap;
 
   ProtocolVersion::ProtocolVersion(const uint32_t ordinal, const uint32_t packet_id_ordinal, const uint32_t protocol_id, std::string display_version)
