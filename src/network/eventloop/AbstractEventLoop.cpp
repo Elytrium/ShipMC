@@ -1,4 +1,5 @@
 #include "EventLoop.hpp"
+#include <ctime>
 #include <utility>
 
 namespace Ship {
@@ -10,7 +11,7 @@ namespace Ship {
   }
 
   void EventLoop::Delay(const std::function<void()>& function, time_t millis) {
-    delayedTasks.emplace(time(nullptr) + millis, function);
+    delayedTasks.emplace(std::time(nullptr) + millis, function);
   }
 
   Connection* EventLoop::NewConnection(ReadWriteCloser* writer) {
@@ -24,7 +25,7 @@ namespace Ship {
     }
 
     if (!delayedTasks.empty()) {
-      time_t currentTime = time(nullptr);
+      time_t currentTime = std::time(nullptr);
 
       for (const auto& i : delayedTasks) {
         if (i.first <= currentTime) {

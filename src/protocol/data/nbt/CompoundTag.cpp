@@ -6,7 +6,7 @@ namespace Ship {
   CompoundTag::CompoundTag(const std::string& name) : NBT(name) {
   }
 
-  CompoundTag::CompoundTag(const std::string& name, std::list<NBT*> list) : NBT(name), list(std::move(list)) {
+  CompoundTag::CompoundTag(const std::string& name, std::map<std::string, NBT*> map) : NBT(name), map(std::move(map)) {
   }
 
   void CompoundTag::Write(ByteBuffer* buffer) {

@@ -1,3 +1,4 @@
+#include "../../../utils/exceptions/Exception.hpp"
 #include "World.hpp"
 #include <string>
 
@@ -115,5 +116,6 @@ namespace Ship {
   }
 
   Dimension Dimension::FromLegacyID(uint32_t id) {
+    throw Exception("Not implemented"); // TODO:
   }
 }

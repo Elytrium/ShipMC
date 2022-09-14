@@ -45,6 +45,8 @@ namespace Ship {
     for (const GameProfileProperty& property : properties) {
       size += StringBytes(property.GetName()) + StringBytes(property.GetValue()) + StringBytes(property.GetSignature()) + (INT8_WIDTH / INT8_WIDTH);
     }
+
+    return size;
   }
 
   uint32_t ByteBuffer::ArrayBytes(uint32_t arrayLength) {

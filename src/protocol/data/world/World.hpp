@@ -231,6 +231,8 @@ namespace Ship {
 
     ~ChunkSection();
 
+    [[nodiscard]] uint32_t GetBlockCount() const;
+
     Block* GetBlocks();
     Biome** GetBiomes();
 
@@ -267,6 +269,11 @@ namespace Ship {
     uint32_t GetBlockLight(int32_t posX, int32_t posY, int32_t posZ);
     Block GetBlock(int32_t posX, int32_t posY, int32_t posZ);
     Biome* GetBiome(int32_t posX, int32_t posY, int32_t posZ);
+
+    [[nodiscard]] uint32_t GetChunkPosX() const;
+    [[nodiscard]] uint32_t GetChunkPosZ() const;
+    [[nodiscard]] uint32_t GetSectionsAmount() const;
+    [[nodiscard]] Dimension* GetDimension() const;
   };
 
   class World {

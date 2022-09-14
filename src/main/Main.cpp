@@ -13,7 +13,7 @@ namespace Ship {
       [](ReadWriteCloser* writer) {
         return new Connection(
           new MinecraftFramedBytePacketPipe(&BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, 65536,
-            SERVERBOUND, CLIENTBOUND), 1024, 1024,writer);
+            SERVERBOUND, CLIENTBOUND, 1024), 1024, 1024, writer);
       },
       64, -1, 1024);
 

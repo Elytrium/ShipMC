@@ -239,7 +239,7 @@ namespace Ship {
     }
 
     explicit CompoundTag(const std::string& name);
-    CompoundTag(const std::string& name, std::list<NBT*> list);
+    CompoundTag(const std::string& name, std::map<std::string, NBT*> list);
 
     void Write(ByteBuffer* buffer) override;
     void Read(ByteBuffer* buffer) override;

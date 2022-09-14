@@ -179,7 +179,7 @@ namespace Ship {
           auto* tag = new CompoundTag("");
           auto* dimensionRegistryContainer = new ListTag("value");
           for (const auto& item : dimensionRegistry) {
-            dimensionRegistryContainer->GetList().emplace(item.second.Serialize());
+            dimensionRegistryContainer->GetList().emplace_back(item.second.Serialize());
           }
 
           auto* dimensionRegistryEntry = new CompoundTag("minecraft:dimension_type");

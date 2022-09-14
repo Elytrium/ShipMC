@@ -74,6 +74,10 @@ namespace Ship {
     return biomes;
   }
 
+  uint32_t ChunkSection::GetBlockCount() const {
+    return blockCount;
+  }
+
   inline uint32_t GetSectionIndex(int32_t posY) {
     // TODO: negative Y
     return posY >> 4;
@@ -129,5 +133,17 @@ namespace Ship {
     }
 
     return sections[index];
+  }
+  uint32_t Chunk::GetChunkPosX() const {
+    return chunkPosX;
+  }
+  uint32_t Chunk::GetChunkPosZ() const {
+    return chunkPosZ;
+  }
+  uint32_t Chunk::GetSectionsAmount() const {
+    return sectionsAmount;
+  }
+  Dimension* Chunk::GetDimension() const {
+    return dimension;
   }
 }
