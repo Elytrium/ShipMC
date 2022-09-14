@@ -3,6 +3,7 @@
 *.iml
 
 cmake-build*
+CMakeFiles
 
 # Compiled class file
 *.class
