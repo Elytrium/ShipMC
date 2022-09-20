@@ -8,6 +8,7 @@
 #include "../Packet.hpp"
 #include <set>
 #include <string>
+#include <utility>
 
 namespace Ship {
 
@@ -39,6 +40,19 @@ namespace Ship {
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
+
+    JoinGame(uint32_t entityId, Gamemode gamemode, uint64_t partialHashedSeed, Difficulty difficulty, bool isHardcore, uint32_t maxPlayers,
+      uint32_t viewDistance, bool reducedDebugInfo, bool showRespawnScreen, std::set<std::string> levelNames,
+      std::map<std::string, Dimension> dimensionRegistry, std::string registryIdentifier, std::string levelName, bool isFlat, bool isDebugType,
+      Dimension dimension, Gamemode previousGamemode, CompoundTag* biomeRegistry, uint32_t simulationDistance, bool hasLastDeathPosition,
+      std::pair<std::string, uint64_t> lastDeathPosition, CompoundTag* chatTypeRegistry, CompoundTag* registryContainer)
+      : entityId(entityId), gamemode(gamemode), partialHashedSeed(partialHashedSeed), difficulty(difficulty), isHardcore(isHardcore),
+        maxPlayers(maxPlayers), viewDistance(viewDistance), reducedDebugInfo(reducedDebugInfo), showRespawnScreen(showRespawnScreen),
+        levelNames(std::move(levelNames)), dimensionRegistry(std::move(dimensionRegistry)), registryIdentifier(std::move(registryIdentifier)),
+        levelName(std::move(levelName)), isFlat(isFlat), isDebugType(isDebugType), dimension(std::move(dimension)), previousGamemode(previousGamemode),
+        biomeRegistry(biomeRegistry), simulationDistance(simulationDistance), hasLastDeathPosition(hasLastDeathPosition),
+        lastDeathPosition(std::move(lastDeathPosition)), chatTypeRegistry(chatTypeRegistry), registryContainer(registryContainer) {
+    }
 
     ~JoinGame() override {
       delete registryContainer;
@@ -260,6 +274,98 @@ namespace Ship {
 
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
+    }
+
+    [[nodiscard]] uint32_t GetEntityId() const {
+      return entityId;
+    }
+    
+    [[nodiscard]] Gamemode GetGamemode() const {
+      return gamemode;
+    }
+    
+    [[nodiscard]] uint64_t GetPartialHashedSeed() const {
+      return partialHashedSeed;
+    }
+    
+    [[nodiscard]] Difficulty GetDifficulty() const {
+      return difficulty;
+    }
+    
+    [[nodiscard]] bool IsHardcore() const {
+      return isHardcore;
+    }
+    
+    [[nodiscard]] uint32_t GetMaxPlayers() const {
+      return maxPlayers;
+    }
+    
+    [[nodiscard]] uint32_t GetViewDistance() const {
+      return viewDistance;
+    }
+    
+    [[nodiscard]] bool IsReducedDebugInfo() const {
+      return reducedDebugInfo;
+    }
+    
+    [[nodiscard]] bool IsShowRespawnScreen() const {
+      return showRespawnScreen;
+    }
+    
+    [[nodiscard]] const std::set<std::string>& GetLevelNames() const {
+      return levelNames;
+    }
+    
+    [[nodiscard]] const std::map<std::string, Dimension>& GetDimensionRegistry() const {
+      return dimensionRegistry;
+    }
+    
+    [[nodiscard]] const std::string& GetRegistryIdentifier() const {
+      return registryIdentifier;
+    }
+    
+    [[nodiscard]] const std::string& GetLevelName() const {
+      return levelName;
+    }
+    
+    [[nodiscard]] bool IsFlat() const {
+      return isFlat;
+    }
+    
+    [[nodiscard]] bool IsDebugType() const {
+      return isDebugType;
+    }
+    
+    [[nodiscard]] const Dimension& GetDimension() const {
+      return dimension;
+    }
+    
+    [[nodiscard]] Gamemode GetPreviousGamemode() const {
+      return previousGamemode;
+    }
+    
+    [[nodiscard]] CompoundTag* GetBiomeRegistry() const {
+      return biomeRegistry;
+    }
+    
+    [[nodiscard]] uint32_t GetSimulationDistance() const {
+      return simulationDistance;
+    }
+    
+    [[nodiscard]] bool IsHasLastDeathPosition() const {
+      return hasLastDeathPosition;
+    }
+    
+    [[nodiscard]] const std::pair<std::string, uint64_t>& GetLastDeathPosition() const {
+      return lastDeathPosition;
+    }
+    
+    [[nodiscard]] CompoundTag* GetChatTypeRegistry() const {
+      return chatTypeRegistry;
+    }
+    
+    [[nodiscard]] CompoundTag* GetRegistryContainer() const {
+      return registryContainer;
     }
   };
 }

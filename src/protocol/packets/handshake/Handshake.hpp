@@ -37,7 +37,7 @@ namespace Ship {
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::VarIntBytes(protocolVersion) + ByteBuffer::StringBytes(serverAddress) + (INT16_WIDTH / INT8_WIDTH)
+      return ByteBuffer::VarIntBytes(protocolVersion) + ByteBuffer::StringBytes(serverAddress) + ByteBuffer::SHORT_SIZE
            + ByteBuffer::VarIntBytes(nextStatus);
     }
 

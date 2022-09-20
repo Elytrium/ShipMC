@@ -19,7 +19,7 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    LoginSuccess(const UUID& uuid, std::string username, std::vector<GameProfileProperty>  properties)
+    LoginSuccess(const UUID& uuid, std::string username, std::vector<GameProfileProperty> properties)
       : uuid(uuid), username(std::move(username)), properties(std::move(properties)) {
     }
 
@@ -56,7 +56,7 @@ namespace Ship {
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return (INT64_WIDTH / INT8_WIDTH) + (INT64_WIDTH / INT8_WIDTH) + ByteBuffer::StringBytes(username) + ByteBuffer::PropertiesBytes(properties);
+      return ByteBuffer::UUID_SIZE + ByteBuffer::StringBytes(username) + ByteBuffer::PropertiesBytes(properties);
     }
 
     uint32_t GetOrdinal() override {

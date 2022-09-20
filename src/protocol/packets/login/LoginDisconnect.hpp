@@ -35,7 +35,7 @@ namespace Ship {
       return PACKET_ORDINAL;
     }
 
-    [[nodiscard]] const std::string& getReason() const {
+    [[nodiscard]] const std::string& GetReason() const {
       return reason;
     }
   };

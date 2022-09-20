@@ -7,6 +7,14 @@
 
 namespace Ship {
 
+  const uint32_t ByteBuffer::BYTE_SIZE = INT8_WIDTH / INT_FAST8_WIDTH;
+  const uint32_t ByteBuffer::SHORT_SIZE = INT16_WIDTH / INT_FAST8_WIDTH;
+  const uint32_t ByteBuffer::INT_SIZE = INT32_WIDTH / INT_FAST8_WIDTH;
+  const uint32_t ByteBuffer::LONG_SIZE = INT64_WIDTH / INT_FAST8_WIDTH;
+  const uint32_t ByteBuffer::FLOAT_SIZE = INT_SIZE;
+  const uint32_t ByteBuffer::DOUBLE_SIZE = LONG_SIZE;
+  const uint32_t ByteBuffer::UUID_SIZE = LONG_SIZE * 2;
+  
   ByteBuffer::ByteBuffer(size_t cap) {
     singleCapacity = cap;
     auto* buffer = new uint8_t[singleCapacity];

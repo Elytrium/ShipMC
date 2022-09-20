@@ -76,10 +76,10 @@ namespace Ship {
     uint32_t Size(const ProtocolVersion* version) override {
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         if (hasSigData) {
-          return ByteBuffer::StringBytes(username) + (INT8_WIDTH / INT_FAST8_WIDTH) + (INT64_WIDTH / INT_FAST8_WIDTH)
-               + ByteBuffer::ArrayBytes(publicKeyLength) + ByteBuffer::ArrayBytes(signatureLength);
+          return ByteBuffer::StringBytes(username) + ByteBuffer::BYTE_SIZE + ByteBuffer::LONG_SIZE + ByteBuffer::ArrayBytes(publicKeyLength)
+               + ByteBuffer::ArrayBytes(signatureLength);
         } else {
-          return ByteBuffer::StringBytes(username) + (INT8_WIDTH / INT_FAST8_WIDTH);
+          return ByteBuffer::StringBytes(username) + ByteBuffer::BYTE_SIZE;
         }
       } else {
         return ByteBuffer::StringBytes(username);

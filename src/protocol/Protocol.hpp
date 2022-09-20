@@ -167,5 +167,13 @@ namespace Ship {
     static uint32_t StringBytes(const std::string& string);
     static uint32_t PropertiesBytes(const std::vector<GameProfileProperty> &properties);
     static uint32_t ArrayBytes(uint32_t arrayLength);
+    
+    static const uint32_t BYTE_SIZE;
+    static const uint32_t SHORT_SIZE;
+    static const uint32_t INT_SIZE;
+    static const uint32_t LONG_SIZE;
+    static const uint32_t FLOAT_SIZE;
+    static const uint32_t DOUBLE_SIZE;
+    static const uint32_t UUID_SIZE;
   };
 }

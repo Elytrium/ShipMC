@@ -1,22 +1,11 @@
 #pragma once
 
-#include "../Protocol.hpp"
 #include "../packets/Packet.hpp"
+#include "VersionRegistry.hpp"
 #include <functional>
 #include <vector>
 
 namespace Ship {
-
-  class VersionRegistry {
-   private:
-    std::vector<uint32_t> ordinalToIDMap = std::vector<uint32_t>(128);
-    std::vector<uint32_t> idToOrdinalMap = std::vector<uint32_t>(128);
-
-   public:
-    void RegisterPacket(uint32_t ordinal, uint32_t id);
-    [[nodiscard]] uint32_t GetOrdinalByID(uint32_t id) const;
-    [[nodiscard]] uint32_t GetIDByOrdinal(uint32_t ordinal) const;
-  };
 
   class DirectionRegistry {
    private:
@@ -32,6 +21,7 @@ namespace Ship {
 
     explicit DirectionRegistry(VersionRegistry* version_registry);
 
+    void RegisterPacketConstructor(uint32_t ordinal, const std::function<Packet*()>& constructor);
     Packet* GetPacketByID(const ProtocolVersion* version, uint32_t ordinal) const;
     uint32_t GetIDByPacket(const ProtocolVersion* version, Packet* packet) const;
   };

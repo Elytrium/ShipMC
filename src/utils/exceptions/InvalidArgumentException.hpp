@@ -10,17 +10,21 @@ namespace Ship {
    private:
     std::string text;
     uint32_t argument;
-    const char** check {};
+    const char** check = new const char*[1];
 
    public:
     InvalidArgumentException(std::string text, uint32_t argument) : text(std::move(text)), argument(argument) {
+    }
+
+    ~InvalidArgumentException() override {
+      delete[] check;
     }
 
     std::string GetText() {
       return this->text;
     }
 
-    uint32_t GetArgument() const {
+    [[nodiscard]] uint32_t GetArgument() const {
       return this->argument;
     }
 
