@@ -5,6 +5,7 @@ namespace Ship {
   OrdinalRegistry OrdinalRegistry::PacketRegistry = OrdinalRegistry();
   OrdinalRegistry OrdinalRegistry::PacketHandlerRegistry = OrdinalRegistry();
   OrdinalRegistry OrdinalRegistry::ParticleRegistry = OrdinalRegistry();
+  OrdinalRegistry OrdinalRegistry::MetadataEntryRegistry = OrdinalRegistry();
 
   uint32_t OrdinalRegistry::RegisterOrdinal() {
     mtx.lock();

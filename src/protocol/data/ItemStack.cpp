@@ -28,6 +28,7 @@ namespace Ship {
 
   void ItemStack::Read(ByteBuffer* buffer) {
     present = buffer->ReadBoolean();
+    delete nbt;
     if (present) {
       itemID = buffer->ReadVarInt();
       itemCount = buffer->ReadByte();

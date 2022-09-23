@@ -10,6 +10,15 @@
 
 namespace Ship {
 
+  enum class Direction {
+    DOWN = 0,
+    UP = 1,
+    NORTH = 2,
+    SOUTH = 3,
+    WEST = 4,
+    EAST = 5,
+  };
+
   class ProtocolVersion {
    private:
     uint32_t ordinal;
