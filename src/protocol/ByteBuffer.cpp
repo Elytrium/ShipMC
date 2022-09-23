@@ -13,6 +13,8 @@ namespace Ship {
   const uint32_t ByteBuffer::LONG_SIZE = INT64_WIDTH / INT_FAST8_WIDTH;
   const uint32_t ByteBuffer::FLOAT_SIZE = INT_SIZE;
   const uint32_t ByteBuffer::DOUBLE_SIZE = LONG_SIZE;
+  const uint32_t ByteBuffer::BOOLEAN_SIZE = BYTE_SIZE;
+  const uint32_t ByteBuffer::POSITION_SIZE = LONG_SIZE;
   const uint32_t ByteBuffer::UUID_SIZE = LONG_SIZE * 2;
   
   ByteBuffer::ByteBuffer(size_t cap) {
@@ -205,6 +207,10 @@ namespace Ship {
     }
   }
 
+  void ByteBuffer::WritePosition(int x, int y, int z) {
+    WriteLong(((x & 0x3FFFFFFULL) << 38) | ((z & 0x3FFFFFFULL) << 12) | (y & 0xFFF));
+  }
+
   bool ByteBuffer::ReadBoolean() {
     if (readableBytes < 1) {
       throw Exception("Tried to read boolean, but not enough readable bytes");
@@ -349,6 +355,25 @@ namespace Ship {
     }
 
     return properties;
+  }
+
+  void ByteBuffer::ReadPosition(int& x, int& y, int& z) {
+    uint64_t value = ReadLong();
+    x = (int) (value >> 38);
+    y = (int) (value & 0xFFF);
+    z = (int) (value >> 12) & 0x3FFFFFF;
+
+    if (x >= 1 << 25) {
+      x -= 1 << 26;
+    }
+
+    if (y >= 1 << 11) {
+      y -= 1 << 12;
+    }
+
+    if (z >= 1 << 25) {
+      z -= 1 << 26;
+    }
   }
 
   ByteBuffer::~ByteBuffer() {

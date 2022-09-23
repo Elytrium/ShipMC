@@ -111,6 +111,7 @@ namespace Ship {
     void WriteFloat(float input);
     void WriteString(const std::string& input);
     void WriteProperties(const std::vector<GameProfileProperty> &properties);
+    void WritePosition(int x, int y, int z);
 
     bool ReadBoolean();
     uint8_t ReadByte();
@@ -128,6 +129,7 @@ namespace Ship {
     std::string ReadString();
     std::string ReadString(uint32_t max_size);
     std::vector<GameProfileProperty> ReadProperties();
+    void ReadPosition(int& x, int& y, int& z);
 
     friend ByteBuffer& operator<<(ByteBuffer& buffer, bool input);
     friend ByteBuffer& operator<<(ByteBuffer& buffer, uint8_t input);
@@ -174,6 +176,8 @@ namespace Ship {
     static const uint32_t LONG_SIZE;
     static const uint32_t FLOAT_SIZE;
     static const uint32_t DOUBLE_SIZE;
+    static const uint32_t BOOLEAN_SIZE;
+    static const uint32_t POSITION_SIZE;
     static const uint32_t UUID_SIZE;
   };
 }

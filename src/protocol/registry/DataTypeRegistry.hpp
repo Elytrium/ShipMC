@@ -5,6 +5,13 @@
 
 namespace Ship {
 
+  template<typename T, typename... A>
+  inline std::function<T*()> CreateConstructor(const A&... args) {
+    return [=]() {
+      return new T(args...);
+    };
+  }
+
   template<typename T>
   class DataTypeRegistry {
    private:

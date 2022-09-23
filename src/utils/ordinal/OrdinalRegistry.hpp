@@ -14,10 +14,11 @@ namespace Ship {
     static OrdinalRegistry ByteBytePipeRegistry;
     static OrdinalRegistry PacketRegistry;
     static OrdinalRegistry PacketHandlerRegistry;
+    static OrdinalRegistry ParticleRegistry;
 
     uint32_t RegisterOrdinal();
 
-    uint32_t GetLastOrdinal() const;
+    [[nodiscard]] uint32_t GetLastOrdinal() const;
   };
 
 } // Ship

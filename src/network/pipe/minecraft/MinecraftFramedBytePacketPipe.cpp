@@ -1,7 +1,6 @@
 #include "../../../protocol/packets/prepared/PreparedPacket.hpp"
 #include "../../../protocol/packets/prepared/SingleVersionPreparedPacket.hpp"
 #include "../../../protocol/registry/PacketRegistry.hpp"
-#include "../../../utils/exceptions/InvalidArgumentException.hpp"
 #include "MinecraftPipe.hpp"
 
 namespace Ship {
