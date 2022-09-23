@@ -13,6 +13,9 @@ namespace Ship {
 
     static NBT* ReadNBT(ByteBuffer* buffer);
     static AbstractParticle* ReadParticle(const ProtocolVersion* version, ByteBuffer* buffer);
+
+    static uint32_t NBTSize(NBT* nbt);
+    static uint32_t ParticleSize(const ProtocolVersion* version, AbstractParticle* particle);
   };
 
 } // Ship

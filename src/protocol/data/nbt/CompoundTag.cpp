@@ -37,7 +37,7 @@ namespace Ship {
   uint32_t CompoundTag::GetSize() {
     uint32_t size_sum = 1;
     for (const auto& item : map) {
-      size_sum += item.second->GetSize();
+      size_sum += ProtocolUtils::NBTSize(item.second);
     }
 
     return size_sum;

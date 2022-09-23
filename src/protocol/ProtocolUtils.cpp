@@ -29,4 +29,12 @@ namespace Ship {
     particle->Read(version, buffer);
     return particle;
   }
+
+  uint32_t ProtocolUtils::NBTSize(NBT* nbt) {
+    return ByteBuffer::BYTE_SIZE + ByteBuffer::StringBytes(nbt->GetName()) + nbt->GetSize();
+  }
+
+  uint32_t ProtocolUtils::ParticleSize(const ProtocolVersion* version, AbstractParticle* particle) {
+    return ByteBuffer::VarIntBytes(PARTICLE_REGISTRY.GetIDByOrdinal(version, particle->GetOrdinal())) + particle->Size(version);
+  }
 } // Ship

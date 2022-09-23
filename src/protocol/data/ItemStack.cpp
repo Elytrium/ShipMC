@@ -41,7 +41,7 @@ namespace Ship {
   uint32_t ItemStack::Size() const {
     if (present) {
       if (nbt) {
-        return ByteBuffer::BOOLEAN_SIZE + ByteBuffer::VarIntBytes(itemID) + ByteBuffer::BYTE_SIZE + nbt->GetSize();
+        return ByteBuffer::BOOLEAN_SIZE + ByteBuffer::VarIntBytes(itemID) + ByteBuffer::BYTE_SIZE + ProtocolUtils::NBTSize(nbt);
       } else {
         return ByteBuffer::BOOLEAN_SIZE + ByteBuffer::VarIntBytes(itemID) + ByteBuffer::BYTE_SIZE * 2;
       }
