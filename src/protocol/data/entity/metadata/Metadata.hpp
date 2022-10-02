@@ -29,17 +29,17 @@ namespace Ship {
   };
 
   enum class CatVariant {
-    TABBY,
-    BLACK,
-    RED,
-    SIAMESE,
-    BRITISH_SHORTHAIR,
-    CALICO,
-    PERSIAN,
-    RAGDOLL,
-    WHITE,
-    JELLIE,
-    ALL_BLACK,
+    TABBY = 0,
+    BLACK = 1,
+    RED = 2,
+    SIAMESE = 3,
+    BRITISH_SHORTHAIR = 4,
+    CALICO = 5,
+    PERSIAN = 6,
+    RAGDOLL = 7,
+    WHITE = 8,
+    JELLIE = 9,
+    ALL_BLACK = 10,
   };
 
   enum class FrogVariant {
@@ -628,8 +628,41 @@ namespace Ship {
     void Write(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const;
 
-    MetadataEntry* Get(uint8_t index);
     void Set(uint8_t index, MetadataEntry* value);
+
+    template<typename T = MetadataEntry>
+    T* Get(uint8_t index) const {
+      auto it = entries.find(index);
+      if (it == entries.end()) {
+        return nullptr;
+      }
+
+      return (T*) it->second;
+    }
+
+    [[nodiscard]] std::optional<uint8_t> GetByte(uint8_t index) const;
+    [[nodiscard]] std::optional<uint32_t> GetVarInt(uint8_t index) const;
+    [[nodiscard]] std::optional<float> GetFloat(uint8_t index) const;
+    [[nodiscard]] std::optional<std::string> GetString(uint8_t index) const;
+    [[nodiscard]] std::optional<std::string> GetChat(uint8_t index) const;
+    [[nodiscard]] std::optional<std::optional<std::string>> GetOptChat(uint8_t index) const;
+    [[nodiscard]] std::optional<ItemStack> GetItemStack(uint8_t index) const;
+    [[nodiscard]] std::optional<bool> GetBoolean(uint8_t index) const;
+    bool GetRotation(uint8_t index, float& x, float& y, float& z) const;
+    bool GetPosition(uint8_t index, int& x, int& y, int& z) const;
+    bool GetOptPosition(uint8_t index, bool& present, int& x, int& y, int& z) const;
+    [[nodiscard]] std::optional<Direction> GetDirection(uint8_t index) const;
+    [[nodiscard]] std::optional<std::optional<UUID>> GetOptUUID(uint8_t index) const;
+    [[nodiscard]] std::optional<uint32_t> GetBlockID(uint8_t index) const;
+    [[nodiscard]] std::optional<NBT*> GetNBT(uint8_t index) const;
+    [[nodiscard]] std::optional<AbstractParticle*> GetParticle(uint8_t index) const;
+    bool GetVillagerData(uint8_t index, VillagerType& type, VillagerProfession& profession, uint32_t& level) const;
+    [[nodiscard]] std::optional<std::optional<uint32_t>> GetOptVarInt(uint8_t index) const;
+    [[nodiscard]] std::optional<Pose> GetPose(uint8_t index) const;
+    [[nodiscard]] std::optional<CatVariant> GetCatVariant(uint8_t index) const;
+    [[nodiscard]] std::optional<FrogVariant> GetFrogVariant(uint8_t index) const;
+    bool GetGlobalPos(uint8_t index, std::string& dimension, int& x, int& y, int& z) const;
+    [[nodiscard]] std::optional<PaintingVariant> GetPaintingVariant(uint8_t index) const;
   };
 
   extern const DataTypeRegistry<MetadataEntry> METADATA_ENTRY_REGISTRY;
