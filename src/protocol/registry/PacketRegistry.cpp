@@ -14,7 +14,14 @@ namespace Ship {
   }
 
   Packet* DirectionRegistry::GetPacketByID(const ProtocolVersion* version, uint32_t id) const {
-    uint32_t ordinal = versionRegistry[version->GetPacketIDOrdinal()].GetOrdinalByID(id);
+    uint32_t packetOrdinal;
+    if (version == &ProtocolVersion::UNKNOWN) {
+      packetOrdinal = 0;
+    } else {
+      packetOrdinal = version->GetPacketIDOrdinal();
+    }
+
+    uint32_t ordinal = versionRegistry[packetOrdinal].GetOrdinalByID(id);
     if (ordinal >= ordinalToPacketMap.size()) {
       return nullptr;
     }
@@ -31,26 +38,26 @@ namespace Ship {
     return versionRegistry[version->GetPacketIDOrdinal()].GetIDByOrdinal(packet->GetOrdinal());
   }
 
-  PacketRegistry::PacketRegistry(const DirectionRegistry& clientbound_registry, const DirectionRegistry& serverbound_registry)
+  PacketRegistry::PacketRegistry(const DirectionRegistry* clientbound_registry, const DirectionRegistry* serverbound_registry)
     : clientboundRegistry(clientbound_registry), serverboundRegistry(serverbound_registry) {
   }
 
   const DirectionRegistry* PacketRegistry::GetRegistry(PacketDirection direction) const {
     switch (direction) {
       case CLIENTBOUND:
-        return &clientboundRegistry;
+        return clientboundRegistry;
       case SERVERBOUND:
-        return &serverboundRegistry;
+        return serverboundRegistry;
       default:
         return nullptr;
     }
   }
 
   const DirectionRegistry* PacketRegistry::GetClientboundRegistry() const {
-    return &clientboundRegistry;
+    return clientboundRegistry;
   }
 
   const DirectionRegistry* PacketRegistry::GetServerboundRegistry() const {
-    return &serverboundRegistry;
+    return serverboundRegistry;
   }
 }

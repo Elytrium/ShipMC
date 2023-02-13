@@ -6,45 +6,44 @@
 
 namespace Ship {
 
-  class BlockDestroyStage : public Packet {
+  class AcknowledgePlayerDigging : public Packet {
    private:
-    uint32_t entityId;
     int locationX;
     int locationY;
     int locationZ;
-    uint8_t destroyStage;
+    uint32_t block;
+    uint32_t status;
+    bool successful;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    BlockDestroyStage(uint32_t entityId, int locationX, int locationY, int locationZ, uint8_t destroyStage)
-      : entityId(entityId), locationX(locationX), locationY(locationY), locationZ(locationZ), destroyStage(destroyStage) {
+    AcknowledgePlayerDigging(int locationX, int locationY, int locationZ, uint32_t block, uint32_t status, bool successful)
+      : locationX(locationX), locationY(locationY), locationZ(locationZ), block(block), status(status), successful(successful) {
     }
 
-    ~BlockDestroyStage() override = default;
+    ~AcknowledgePlayerDigging() override = default;
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      entityId = buffer->ReadVarInt();
       buffer->ReadPosition(locationX, locationY, locationZ);
-      destroyStage = buffer->ReadByte();
+      block = buffer->ReadVarInt();
+      status = buffer->ReadVarInt();
+      successful = buffer->ReadBoolean();
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteVarInt(entityId);
       buffer->WritePosition(locationX, locationY, locationZ);
-      buffer->WriteByte(destroyStage);
+      buffer->WriteVarInt(block);
+      buffer->WriteVarInt(status);
+      buffer->WriteBoolean(successful);
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::VarIntBytes(entityId) + ByteBuffer::POSITION_SIZE + ByteBuffer::BYTE_SIZE;
+      return ByteBuffer::POSITION_SIZE + ByteBuffer::VarIntBytes(block) + ByteBuffer::VarIntBytes(status) + ByteBuffer::BOOLEAN_SIZE;
     }
 
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
-    }
-
-    [[nodiscard]] uint32_t GetEntityId() const {
-      return entityId;
     }
 
     [[nodiscard]] int GetLocationX() const {
@@ -59,8 +58,16 @@ namespace Ship {
       return locationZ;
     }
 
-    [[nodiscard]] uint8_t GetDestroyStage() const {
-      return destroyStage;
+    [[nodiscard]] uint32_t GetBlock() const {
+      return block;
+    }
+
+    [[nodiscard]] uint32_t GetStatus() const {
+      return status;
+    }
+
+    [[nodiscard]] bool IsSuccessful() const {
+      return successful;
     }
   };
 }

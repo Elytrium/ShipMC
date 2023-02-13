@@ -6,36 +6,24 @@
 
 namespace Ship {
 
-  class KeepAlive : public Packet {
-   private:
-    uint64_t id;
-
+  class EnterCombatEvent : public Packet {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    explicit KeepAlive(uint64_t id) : id(id) {
-    }
-
-    ~KeepAlive() override = default;
+    ~EnterCombatEvent() override = default;
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      id = buffer->ReadLong();
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteLong(id);
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::LONG_SIZE;
+      return 0;
     }
 
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
-    }
-
-    [[nodiscard]] uint64_t GetId() const {
-      return id;
     }
   };
 }

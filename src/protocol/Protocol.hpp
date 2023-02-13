@@ -111,6 +111,7 @@ namespace Ship {
     void WriteInt(uint32_t input);
     void WriteVarInt(uint32_t input);
     void WriteLong(uint64_t input);
+    void WriteVarLong(uint64_t input);
     void WriteBytes(uint8_t* input, size_t size);
     void WriteBytesAndDelete(uint8_t* input, size_t size);
     void WriteBytes(ByteBuffer* input, size_t size);
@@ -121,6 +122,7 @@ namespace Ship {
     void WriteString(const std::string& input);
     void WriteProperties(const std::vector<GameProfileProperty> &properties);
     void WritePosition(int x, int y, int z);
+    void WriteAngle(float input);
 
     bool ReadBoolean();
     uint8_t ReadByte();
@@ -130,6 +132,7 @@ namespace Ship {
     uint32_t ReadInt();
     uint32_t ReadVarInt();
     uint64_t ReadLong();
+    uint64_t ReadVarLong();
     uint8_t* ReadBytes(size_t size);
     double ReadDouble();
     float ReadFloat();
@@ -139,6 +142,7 @@ namespace Ship {
     std::string ReadString(uint32_t max_size);
     std::vector<GameProfileProperty> ReadProperties();
     void ReadPosition(int& x, int& y, int& z);
+    float ReadAngle();
 
     friend ByteBuffer& operator<<(ByteBuffer& buffer, bool input);
     friend ByteBuffer& operator<<(ByteBuffer& buffer, uint8_t input);
@@ -175,6 +179,7 @@ namespace Ship {
     uint8_t* GetDirectWriteAddress();
 
     static uint32_t VarIntBytes(uint32_t varInt);
+    static uint32_t VarLongBytes(uint64_t varLong);
     static uint32_t StringBytes(const std::string& string);
     static uint32_t PropertiesBytes(const std::vector<GameProfileProperty> &properties);
     static uint32_t ArrayBytes(uint32_t arrayLength);
@@ -187,6 +192,7 @@ namespace Ship {
     static const uint32_t DOUBLE_SIZE;
     static const uint32_t BOOLEAN_SIZE;
     static const uint32_t POSITION_SIZE;
+    static const uint32_t ANGLE_SIZE;
     static const uint32_t UUID_SIZE;
   };
 }

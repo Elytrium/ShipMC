@@ -33,11 +33,16 @@ namespace Ship {
 
   class PacketRegistry {
    private:
-    const DirectionRegistry clientboundRegistry;
-    const DirectionRegistry serverboundRegistry;
+    const DirectionRegistry* clientboundRegistry;
+    const DirectionRegistry* serverboundRegistry;
 
    public:
-    PacketRegistry(const DirectionRegistry& clientbound_registry, const DirectionRegistry& serverbound_registry);
+    ~PacketRegistry() {
+      delete clientboundRegistry;
+      delete serverboundRegistry;
+    }
+
+    PacketRegistry(const DirectionRegistry* clientbound_registry, const DirectionRegistry* serverbound_registry);
 
     [[nodiscard]] const DirectionRegistry* GetRegistry(PacketDirection direction) const;
 

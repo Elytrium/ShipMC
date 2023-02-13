@@ -6,46 +6,39 @@
 
 namespace Ship {
 
-  class OpenHorseInventory : public Packet {
+  class EndCombatEvent : public Packet {
    private:
-    uint8_t windowId;
-    uint32_t slotCount;
+    uint32_t duration;
     uint32_t entityId;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    OpenHorseInventory(uint8_t windowId, uint32_t slotCount, uint32_t entityId) : windowId(windowId), slotCount(slotCount), entityId(entityId) {
+    EndCombatEvent(uint32_t duration, uint32_t entityId) : duration(duration), entityId(entityId) {
     }
 
-    ~OpenHorseInventory() override = default;
+    ~EndCombatEvent() override = default;
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      windowId = buffer->ReadByte();
-      slotCount = buffer->ReadVarInt();
+      duration = buffer->ReadVarInt();
       entityId = buffer->ReadInt();
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteByte(windowId);
-      buffer->WriteVarInt(slotCount);
+      buffer->WriteVarInt(duration);
       buffer->WriteInt(entityId);
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::BYTE_SIZE + ByteBuffer::VarIntBytes(slotCount) + ByteBuffer::INT_SIZE;
+      return ByteBuffer::VarIntBytes(duration) + ByteBuffer::INT_SIZE;
     }
 
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }
 
-    [[nodiscard]] uint8_t GetWindowId() const {
-      return windowId;
-    }
-
-    [[nodiscard]] uint32_t GetSlotCount() const {
-      return slotCount;
+    [[nodiscard]] uint32_t GetDuration() const {
+      return duration;
     }
 
     [[nodiscard]] uint32_t GetEntityId() const {

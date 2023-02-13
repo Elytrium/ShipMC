@@ -8,6 +8,7 @@
 #include "../packets/login/LoginSuccess.hpp"
 #include "../packets/login/SetCompression.hpp"
 #include "../packets/play/AcknowledgeBlockChange.hpp"
+#include "../packets/play/AcknowledgePlayerDigging.hpp"
 #include "../packets/play/ActionBar.hpp"
 #include "../packets/play/Advancements.hpp"
 #include "../packets/play/AwardStatistics.hpp"
@@ -26,6 +27,7 @@
 #include "../packets/play/BossBar.hpp"
 #include "../packets/play/Camera.hpp"
 #include "../packets/play/ChangeRecipeBookSettings.hpp"
+#include "../packets/play/ChatSuggestions.hpp"
 #include "../packets/play/ChunkData.hpp"
 #include "../packets/play/ChunkLight.hpp"
 #include "../packets/play/ClearTitle.hpp"
@@ -33,6 +35,9 @@
 #include "../packets/play/ClickSlot.hpp"
 #include "../packets/play/ClientAction.hpp"
 #include "../packets/play/ClientChangeDifficulty.hpp"
+#include "../packets/play/ClientChatPreview.hpp"
+#include "../packets/play/ClientPlayerAbilities.hpp"
+#include "../packets/play/ClientPlayerChat.hpp"
 #include "../packets/play/ClientSettings.hpp"
 #include "../packets/play/CloseInventory.hpp"
 #include "../packets/play/CombatEvent.hpp"
@@ -46,6 +51,7 @@
 #include "../packets/play/CraftRecipeResponse.hpp"
 #include "../packets/play/CreativeSlot.hpp"
 #include "../packets/play/CustomSoundEffect.hpp"
+#include "../packets/play/DeathCombatEvent.hpp"
 #include "../packets/play/DeclareCommands.hpp"
 #include "../packets/play/DefaultSpawnPosition.hpp"
 #include "../packets/play/Digging.hpp"
@@ -53,6 +59,8 @@
 #include "../packets/play/DisplayObjective.hpp"
 #include "../packets/play/EditBook.hpp"
 #include "../packets/play/EditSign.hpp"
+#include "../packets/play/EndCombatEvent.hpp"
+#include "../packets/play/EnterCombatEvent.hpp"
 #include "../packets/play/EntityAction.hpp"
 #include "../packets/play/EntityAnimation.hpp"
 #include "../packets/play/EntityEffect.hpp"
@@ -78,6 +86,7 @@
 #include "../packets/play/HardcodedSoundEffect.hpp"
 #include "../packets/play/Health.hpp"
 #include "../packets/play/HeldSlot.hpp"
+#include "../packets/play/HideMessage.hpp"
 #include "../packets/play/InitializeWorldBorder.hpp"
 #include "../packets/play/InventoryContent.hpp"
 #include "../packets/play/InventoryProperty.hpp"
@@ -86,12 +95,14 @@
 #include "../packets/play/KeepAlive.hpp"
 #include "../packets/play/LeadEntities.hpp"
 #include "../packets/play/LegacyChat.hpp"
+#include "../packets/play/LegacyCraftRecipeResponse.hpp"
 #include "../packets/play/LegacyEnchant.hpp"
 #include "../packets/play/LegacyRecipeBook.hpp"
 #include "../packets/play/LegacyTitle.hpp"
 #include "../packets/play/LegacyWorldBorder.hpp"
 #include "../packets/play/LockDifficulty.hpp"
 #include "../packets/play/MapData.hpp"
+#include "../packets/play/MessageHeader.hpp"
 #include "../packets/play/Move.hpp"
 #include "../packets/play/MoveGroundOnly.hpp"
 #include "../packets/play/MovePositionOnly.hpp"
@@ -108,7 +119,6 @@
 #include "../packets/play/PickupItem.hpp"
 #include "../packets/play/Ping.hpp"
 #include "../packets/play/PlaceBlock.hpp"
-#include "../packets/play/PlayerAbilities.hpp"
 #include "../packets/play/PlayerFace.hpp"
 #include "../packets/play/PlayerInput.hpp"
 #include "../packets/play/PlayerListItem.hpp"
@@ -129,7 +139,10 @@
 #include "../packets/play/SelectAdvancementsTab.hpp"
 #include "../packets/play/SelectTrade.hpp"
 #include "../packets/play/ServerChangeDifficulty.hpp"
+#include "../packets/play/ServerChatPreview.hpp"
 #include "../packets/play/ServerData.hpp"
+#include "../packets/play/ServerPlayerAbilities.hpp"
+#include "../packets/play/ServerPlayerChat.hpp"
 #include "../packets/play/SimulationDistance.hpp"
 #include "../packets/play/SpawnEntity.hpp"
 #include "../packets/play/SpawnExperienceOrb.hpp"
@@ -155,6 +168,7 @@
 #include "../packets/play/UseItem.hpp"
 #include "../packets/play/ViewDistance.hpp"
 #include "../packets/play/ViewPosition.hpp"
+#include "../packets/play/WorldEvent.hpp"
 #include "../packets/play/WorldTime.hpp"
 #include "../packets/status/StatusPing.hpp"
 #include "../packets/status/StatusRequest.hpp"
@@ -169,11 +183,11 @@ namespace Ship {
       serverboundRegistry[i].Register(Handshake::PACKET_ORDINAL, 0x00);
     }
 
-    DirectionRegistry serverbound(serverboundRegistry);
+    auto* serverbound = new DirectionRegistry(serverboundRegistry);
 
-    serverbound.RegisterPacketConstructor(Handshake::PACKET_ORDINAL, CreateConstructor<Handshake>());
+    serverbound->RegisterPacketConstructor(Handshake::PACKET_ORDINAL, CreateConstructor<Handshake>());
 
-    return {DirectionRegistry(nullptr), serverbound};
+    return {nullptr, serverbound};
   }
 
   PacketRegistry GetStatusRegistry() {
@@ -191,15 +205,15 @@ namespace Ship {
       serverboundRegistry[i].Register(StatusPing::PACKET_ORDINAL, 0x01);
     }
 
-    DirectionRegistry clientbound(clientboundRegistry);
+    auto* clientbound = new DirectionRegistry(clientboundRegistry);
 
-    clientbound.RegisterPacketConstructor(StatusResponse::PACKET_ORDINAL, CreateConstructor<StatusResponse>(std::string {}));
-    clientbound.RegisterPacketConstructor(StatusPing::PACKET_ORDINAL, CreateConstructor<StatusPing>(0));
+    clientbound->RegisterPacketConstructor(StatusResponse::PACKET_ORDINAL, CreateConstructor<StatusResponse>(std::string {}));
+    clientbound->RegisterPacketConstructor(StatusPing::PACKET_ORDINAL, CreateConstructor<StatusPing>(0));
 
-    DirectionRegistry serverbound(serverboundRegistry);
+    auto* serverbound = new DirectionRegistry(serverboundRegistry);
 
-    serverbound.RegisterPacketConstructor(StatusRequest::PACKET_ORDINAL, CreateConstructor<StatusRequest>());
-    serverbound.RegisterPacketConstructor(StatusPing::PACKET_ORDINAL, CreateConstructor<StatusPing>(0));
+    serverbound->RegisterPacketConstructor(StatusRequest::PACKET_ORDINAL, CreateConstructor<StatusRequest>());
+    serverbound->RegisterPacketConstructor(StatusPing::PACKET_ORDINAL, CreateConstructor<StatusPing>(0));
 
     return {clientbound, serverbound};
   }
@@ -223,20 +237,20 @@ namespace Ship {
       serverboundRegistry[i].Register(LoginPluginResponse::PACKET_ORDINAL, 0x02);
     }
 
-    DirectionRegistry clientbound(clientboundRegistry);
+    auto* clientbound = new DirectionRegistry(clientboundRegistry);
 
-    clientbound.RegisterPacketConstructor(Disconnect::PACKET_ORDINAL, CreateConstructor<Disconnect>());
-    clientbound.RegisterPacketConstructor(EncryptionRequest::PACKET_ORDINAL, CreateConstructor<EncryptionRequest>());
-    clientbound.RegisterPacketConstructor(
+    clientbound->RegisterPacketConstructor(Disconnect::PACKET_ORDINAL, CreateConstructor<Disconnect>(std::string {}));
+    clientbound->RegisterPacketConstructor(EncryptionRequest::PACKET_ORDINAL, CreateConstructor<EncryptionRequest>());
+    clientbound->RegisterPacketConstructor(
       LoginSuccess::PACKET_ORDINAL, CreateConstructor<LoginSuccess>(UUID {}, std::string {}, std::vector<GameProfileProperty> {}));
-    clientbound.RegisterPacketConstructor(SetCompression::PACKET_ORDINAL, CreateConstructor<SetCompression>(0));
-    clientbound.RegisterPacketConstructor(LoginPluginMessage::PACKET_ORDINAL, CreateConstructor<LoginPluginMessage>());
+    clientbound->RegisterPacketConstructor(SetCompression::PACKET_ORDINAL, CreateConstructor<SetCompression>(0));
+    clientbound->RegisterPacketConstructor(LoginPluginMessage::PACKET_ORDINAL, CreateConstructor<LoginPluginMessage>());
 
-    DirectionRegistry serverbound(serverboundRegistry);
+    auto* serverbound = new DirectionRegistry(serverboundRegistry);
 
-    serverbound.RegisterPacketConstructor(LoginStart::PACKET_ORDINAL, CreateConstructor<LoginStart>(std::string {}, false, 0, 0, nullptr, 0, nullptr));
-    serverbound.RegisterPacketConstructor(EncryptionResponse::PACKET_ORDINAL, CreateConstructor<EncryptionResponse>());
-    serverbound.RegisterPacketConstructor(LoginPluginResponse::PACKET_ORDINAL, CreateConstructor<LoginPluginResponse>());
+    serverbound->RegisterPacketConstructor(LoginStart::PACKET_ORDINAL, CreateConstructor<LoginStart>(std::string {}, false, 0, 0, nullptr, 0, nullptr));
+    serverbound->RegisterPacketConstructor(EncryptionResponse::PACKET_ORDINAL, CreateConstructor<EncryptionResponse>());
+    serverbound->RegisterPacketConstructor(LoginPluginResponse::PACKET_ORDINAL, CreateConstructor<LoginPluginResponse>());
 
     return {clientbound, serverbound};
   }
@@ -278,7 +292,7 @@ namespace Ship {
     clientbound1_12_2->Register(GameEvent::PACKET_ORDINAL, 0x1E);
     clientbound1_12_2->Register(KeepAlive::PACKET_ORDINAL, 0x1F);
     clientbound1_12_2->Register(ChunkData::PACKET_ORDINAL, 0x20);
-    clientbound1_12_2->Register(EntitySoundEffect::PACKET_ORDINAL, 0x21);
+    clientbound1_12_2->Register(WorldEvent::PACKET_ORDINAL, 0x21);
     clientbound1_12_2->Register(Particle::PACKET_ORDINAL, 0x22);
     clientbound1_12_2->Register(JoinGame::PACKET_ORDINAL, 0x23);
     clientbound1_12_2->Register(MapData::PACKET_ORDINAL, 0x24);
@@ -288,8 +302,8 @@ namespace Ship {
     clientbound1_12_2->Register(EntityRotation::PACKET_ORDINAL, 0x28);
     clientbound1_12_2->Register(MoveVehicle::PACKET_ORDINAL, 0x29);
     clientbound1_12_2->Register(OpenSignEditor::PACKET_ORDINAL, 0x2A);
-    clientbound1_12_2->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x2B);
-    clientbound1_12_2->Register(PlayerAbilities::PACKET_ORDINAL, 0x2C);
+    clientbound1_12_2->Register(LegacyCraftRecipeResponse::PACKET_ORDINAL, 0x2B);
+    clientbound1_12_2->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x2C);
     clientbound1_12_2->Register(CombatEvent::PACKET_ORDINAL, 0x2D);
     clientbound1_12_2->Register(PlayerListItem::PACKET_ORDINAL, 0x2E);
     clientbound1_12_2->Register(PositionRotation::PACKET_ORDINAL, 0x2F);
@@ -362,7 +376,7 @@ namespace Ship {
     clientbound1_13->Register(GameEvent::PACKET_ORDINAL, 0x20);
     clientbound1_13->Register(KeepAlive::PACKET_ORDINAL, 0x21);
     clientbound1_13->Register(ChunkData::PACKET_ORDINAL, 0x22);
-    clientbound1_13->Register(EntitySoundEffect::PACKET_ORDINAL, 0x23);
+    clientbound1_13->Register(WorldEvent::PACKET_ORDINAL, 0x23);
     clientbound1_13->Register(Particle::PACKET_ORDINAL, 0x24);
     clientbound1_13->Register(JoinGame::PACKET_ORDINAL, 0x25);
     clientbound1_13->Register(MapData::PACKET_ORDINAL, 0x26);
@@ -373,7 +387,7 @@ namespace Ship {
     clientbound1_13->Register(MoveVehicle::PACKET_ORDINAL, 0x2B);
     clientbound1_13->Register(OpenSignEditor::PACKET_ORDINAL, 0x2C);
     clientbound1_13->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x2D);
-    clientbound1_13->Register(PlayerAbilities::PACKET_ORDINAL, 0x2E);
+    clientbound1_13->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x2E);
     clientbound1_13->Register(CombatEvent::PACKET_ORDINAL, 0x2F);
     clientbound1_13->Register(PlayerListItem::PACKET_ORDINAL, 0x30);
     clientbound1_13->Register(PlayerFace::PACKET_ORDINAL, 0x31);
@@ -449,7 +463,7 @@ namespace Ship {
     clientbound1_14->Register(KeepAlive::PACKET_ORDINAL, 0x1F);
     clientbound1_14->Register(OpenHorseInventory::PACKET_ORDINAL, 0x20);
     clientbound1_14->Register(ChunkData::PACKET_ORDINAL, 0x21);
-    clientbound1_14->Register(EntitySoundEffect::PACKET_ORDINAL, 0x22);
+    clientbound1_14->Register(WorldEvent::PACKET_ORDINAL, 0x22);
     clientbound1_14->Register(Particle::PACKET_ORDINAL, 0x23);
     clientbound1_14->Register(ChunkLight::PACKET_ORDINAL, 0x24);
     clientbound1_14->Register(JoinGame::PACKET_ORDINAL, 0x25);
@@ -464,7 +478,7 @@ namespace Ship {
     clientbound1_14->Register(OpenInventory::PACKET_ORDINAL, 0x2E);
     clientbound1_14->Register(OpenSignEditor::PACKET_ORDINAL, 0x2F);
     clientbound1_14->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x30);
-    clientbound1_14->Register(PlayerAbilities::PACKET_ORDINAL, 0x31);
+    clientbound1_14->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x31);
     clientbound1_14->Register(CombatEvent::PACKET_ORDINAL, 0x32);
     clientbound1_14->Register(PlayerListItem::PACKET_ORDINAL, 0x33);
     clientbound1_14->Register(PlayerFace::PACKET_ORDINAL, 0x34);
@@ -507,7 +521,7 @@ namespace Ship {
     clientbound1_14->Register(EntityEffect::PACKET_ORDINAL, 0x59);
     clientbound1_14->Register(Recipes::PACKET_ORDINAL, 0x5A);
     clientbound1_14->Register(Tags::PACKET_ORDINAL, 0x5B);
-    clientbound1_14->Register(AcknowledgeBlockChange::PACKET_ORDINAL, 0x5C);
+    clientbound1_14->Register(AcknowledgePlayerDigging::PACKET_ORDINAL, 0x5C);
 
     VersionRegistry* clientbound1_15 = clientboundRegistry + ProtocolVersion::MINECRAFT_1_15.GetPacketIDOrdinal();
     clientbound1_15->Register(SpawnEntity::PACKET_ORDINAL, 0x00);
@@ -518,7 +532,7 @@ namespace Ship {
     clientbound1_15->Register(SpawnPlayer::PACKET_ORDINAL, 0x05);
     clientbound1_15->Register(EntityAnimation::PACKET_ORDINAL, 0x06);
     clientbound1_15->Register(AwardStatistics::PACKET_ORDINAL, 0x07);
-    clientbound1_15->Register(AcknowledgeBlockChange::PACKET_ORDINAL, 0x08);
+    clientbound1_15->Register(AcknowledgePlayerDigging::PACKET_ORDINAL, 0x08);
     clientbound1_15->Register(BlockDestroyStage::PACKET_ORDINAL, 0x09);
     clientbound1_15->Register(BlockEntityData::PACKET_ORDINAL, 0x0A);
     clientbound1_15->Register(BlockAction::PACKET_ORDINAL, 0x0B);
@@ -545,7 +559,7 @@ namespace Ship {
     clientbound1_15->Register(KeepAlive::PACKET_ORDINAL, 0x20);
     clientbound1_15->Register(OpenHorseInventory::PACKET_ORDINAL, 0x21);
     clientbound1_15->Register(ChunkData::PACKET_ORDINAL, 0x22);
-    clientbound1_15->Register(EntitySoundEffect::PACKET_ORDINAL, 0x23);
+    clientbound1_15->Register(WorldEvent::PACKET_ORDINAL, 0x23);
     clientbound1_15->Register(Particle::PACKET_ORDINAL, 0x24);
     clientbound1_15->Register(ChunkLight::PACKET_ORDINAL, 0x25);
     clientbound1_15->Register(JoinGame::PACKET_ORDINAL, 0x26);
@@ -560,7 +574,7 @@ namespace Ship {
     clientbound1_15->Register(OpenInventory::PACKET_ORDINAL, 0x2D);
     clientbound1_15->Register(OpenSignEditor::PACKET_ORDINAL, 0x30);
     clientbound1_15->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x31);
-    clientbound1_15->Register(PlayerAbilities::PACKET_ORDINAL, 0x32);
+    clientbound1_15->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x32);
     clientbound1_15->Register(CombatEvent::PACKET_ORDINAL, 0x33);
     clientbound1_15->Register(PlayerListItem::PACKET_ORDINAL, 0x34);
     clientbound1_15->Register(PlayerFace::PACKET_ORDINAL, 0x35);
@@ -612,7 +626,7 @@ namespace Ship {
     // clientbound1_16->Register(SpawnPlayer::PACKET_ORDINAL, 0x04);
     // clientbound1_16->Register(EntityAnimation::PACKET_ORDINAL, 0x05);
     // clientbound1_16->Register(AwardStatistics::PACKET_ORDINAL, 0x06);
-    // clientbound1_16->Register(AcknowledgeBlockChange::PACKET_ORDINAL, 0x07);
+    // clientbound1_16->Register(AcknowledgePlayerDigging::PACKET_ORDINAL, 0x07);
     // clientbound1_16->Register(BlockDestroyStage::PACKET_ORDINAL, 0x08);
     // clientbound1_16->Register(BlockEntityData::PACKET_ORDINAL, 0x09);
     // clientbound1_16->Register(BlockAction::PACKET_ORDINAL, 0x0A);
@@ -639,7 +653,7 @@ namespace Ship {
     // clientbound1_16->Register(KeepAlive::PACKET_ORDINAL, 0x1F);
     // clientbound1_16->Register(OpenHorseInventory::PACKET_ORDINAL, 0x20);
     // clientbound1_16->Register(ChunkData::PACKET_ORDINAL, 0x21);
-    // clientbound1_16->Register(EntitySoundEffect::PACKET_ORDINAL, 0x22);
+    // clientbound1_16->Register(WorldEvent::PACKET_ORDINAL, 0x22);
     // clientbound1_16->Register(Particle::PACKET_ORDINAL, 0x23);
     // clientbound1_16->Register(ChunkLight::PACKET_ORDINAL, 0x24);
     // clientbound1_16->Register(JoinGame::PACKET_ORDINAL, 0x25);
@@ -654,7 +668,7 @@ namespace Ship {
     // clientbound1_16->Register(OpenInventory::PACKET_ORDINAL, 0x2E);
     // clientbound1_16->Register(OpenSignEditor::PACKET_ORDINAL, 0x2D);
     // clientbound1_16->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x30);
-    // clientbound1_16->Register(PlayerAbilities::PACKET_ORDINAL, 0x31);
+    // clientbound1_16->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x31);
     // clientbound1_16->Register(CombatEvent::PACKET_ORDINAL, 0x32);
     // clientbound1_16->Register(PlayerListItem::PACKET_ORDINAL, 0x33);
     // clientbound1_16->Register(PlayerFace::PACKET_ORDINAL, 0x34);
@@ -706,7 +720,7 @@ namespace Ship {
     clientbound1_16_2->Register(SpawnPlayer::PACKET_ORDINAL, 0x04);
     clientbound1_16_2->Register(EntityAnimation::PACKET_ORDINAL, 0x05);
     clientbound1_16_2->Register(AwardStatistics::PACKET_ORDINAL, 0x06);
-    clientbound1_16_2->Register(AcknowledgeBlockChange::PACKET_ORDINAL, 0x07);
+    clientbound1_16_2->Register(AcknowledgePlayerDigging::PACKET_ORDINAL, 0x07);
     clientbound1_16_2->Register(BlockDestroyStage::PACKET_ORDINAL, 0x08);
     clientbound1_16_2->Register(BlockEntityData::PACKET_ORDINAL, 0x09);
     clientbound1_16_2->Register(BlockAction::PACKET_ORDINAL, 0x0A);
@@ -733,7 +747,7 @@ namespace Ship {
     clientbound1_16_2->Register(KeepAlive::PACKET_ORDINAL, 0x1F);
     clientbound1_16_2->Register(OpenHorseInventory::PACKET_ORDINAL, 0x20);
     clientbound1_16_2->Register(ChunkData::PACKET_ORDINAL, 0x21);
-    clientbound1_16_2->Register(EntitySoundEffect::PACKET_ORDINAL, 0x22);
+    clientbound1_16_2->Register(WorldEvent::PACKET_ORDINAL, 0x22);
     clientbound1_16_2->Register(Particle::PACKET_ORDINAL, 0x23);
     clientbound1_16_2->Register(ChunkLight::PACKET_ORDINAL, 0x24);
     clientbound1_16_2->Register(JoinGame::PACKET_ORDINAL, 0x25);
@@ -748,7 +762,7 @@ namespace Ship {
     clientbound1_16_2->Register(OpenInventory::PACKET_ORDINAL, 0x2E);
     clientbound1_16_2->Register(OpenSignEditor::PACKET_ORDINAL, 0x2D);
     clientbound1_16_2->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x30);
-    clientbound1_16_2->Register(PlayerAbilities::PACKET_ORDINAL, 0x31);
+    clientbound1_16_2->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x31);
     clientbound1_16_2->Register(CombatEvent::PACKET_ORDINAL, 0x32);
     clientbound1_16_2->Register(PlayerListItem::PACKET_ORDINAL, 0x33);
     clientbound1_16_2->Register(PlayerFace::PACKET_ORDINAL, 0x34);
@@ -801,7 +815,7 @@ namespace Ship {
     //    clientbound1_17->Register(SkulkVibration::PACKET_ORDINAL, 0x05); //TODO: SkulkVibration
     clientbound1_17->Register(EntityAnimation::PACKET_ORDINAL, 0x06);
     clientbound1_17->Register(AwardStatistics::PACKET_ORDINAL, 0x07);
-    clientbound1_17->Register(AcknowledgeBlockChange::PACKET_ORDINAL, 0x08);
+    clientbound1_17->Register(AcknowledgePlayerDigging::PACKET_ORDINAL, 0x08);
     clientbound1_17->Register(BlockDestroyStage::PACKET_ORDINAL, 0x09);
     clientbound1_17->Register(BlockEntityData::PACKET_ORDINAL, 0x0A);
     clientbound1_17->Register(BlockAction::PACKET_ORDINAL, 0x0B);
@@ -828,7 +842,7 @@ namespace Ship {
     clientbound1_17->Register(InitializeWorldBorder::PACKET_ORDINAL, 0x20);
     clientbound1_17->Register(KeepAlive::PACKET_ORDINAL, 0x21);
     clientbound1_17->Register(ChunkData::PACKET_ORDINAL, 0x22);
-    clientbound1_17->Register(EntitySoundEffect::PACKET_ORDINAL, 0x23);
+    clientbound1_17->Register(WorldEvent::PACKET_ORDINAL, 0x23);
     clientbound1_17->Register(Particle::PACKET_ORDINAL, 0x24);
     clientbound1_17->Register(ChunkLight::PACKET_ORDINAL, 0x25);
     clientbound1_17->Register(JoinGame::PACKET_ORDINAL, 0x26);
@@ -843,10 +857,10 @@ namespace Ship {
     clientbound1_17->Register(OpenSignEditor::PACKET_ORDINAL, 0x2F);
     clientbound1_17->Register(Ping::PACKET_ORDINAL, 0x30);
     clientbound1_17->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x31);
-    clientbound1_17->Register(PlayerAbilities::PACKET_ORDINAL, 0x32);
-    //    clientbound1_17->Register(EndCombatEvent::PACKET_ORDINAL, 0x33); //TODO: EndCombatEvent
-    //    clientbound1_17->Register(EnterCombatEvent::PACKET_ORDINAL, 0x34); //TODO: EnterCombatEvent
-    //    clientbound1_17->Register(DeathCombatEvent::PACKET_ORDINAL, 0x35); //TODO: DeathCombatEvent
+    clientbound1_17->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x32);
+    clientbound1_17->Register(EndCombatEvent::PACKET_ORDINAL, 0x33);
+    clientbound1_17->Register(EnterCombatEvent::PACKET_ORDINAL, 0x34);
+    clientbound1_17->Register(DeathCombatEvent::PACKET_ORDINAL, 0x35);
     clientbound1_17->Register(PlayerListItem::PACKET_ORDINAL, 0x36);
     clientbound1_17->Register(PlayerFace::PACKET_ORDINAL, 0x37);
     clientbound1_17->Register(PositionRotation::PACKET_ORDINAL, 0x38);
@@ -906,7 +920,7 @@ namespace Ship {
     //    clientbound1_18->Register(SkulkVibration::PACKET_ORDINAL, 0x05); //TODO: SkulkVibration
     clientbound1_18->Register(EntityAnimation::PACKET_ORDINAL, 0x06);
     clientbound1_18->Register(AwardStatistics::PACKET_ORDINAL, 0x07);
-    clientbound1_18->Register(AcknowledgeBlockChange::PACKET_ORDINAL, 0x08);
+    clientbound1_18->Register(AcknowledgePlayerDigging::PACKET_ORDINAL, 0x08);
     clientbound1_18->Register(BlockDestroyStage::PACKET_ORDINAL, 0x09);
     clientbound1_18->Register(BlockEntityData::PACKET_ORDINAL, 0x0A);
     clientbound1_18->Register(BlockAction::PACKET_ORDINAL, 0x0B);
@@ -933,7 +947,7 @@ namespace Ship {
     clientbound1_18->Register(InitializeWorldBorder::PACKET_ORDINAL, 0x20);
     clientbound1_18->Register(KeepAlive::PACKET_ORDINAL, 0x21);
     clientbound1_18->Register(ChunkData::PACKET_ORDINAL, 0x22);
-    clientbound1_18->Register(EntitySoundEffect::PACKET_ORDINAL, 0x23);
+    clientbound1_18->Register(WorldEvent::PACKET_ORDINAL, 0x23);
     clientbound1_18->Register(Particle::PACKET_ORDINAL, 0x24);
     clientbound1_18->Register(ChunkLight::PACKET_ORDINAL, 0x25);
     clientbound1_18->Register(JoinGame::PACKET_ORDINAL, 0x26);
@@ -948,10 +962,10 @@ namespace Ship {
     clientbound1_18->Register(OpenSignEditor::PACKET_ORDINAL, 0x2F);
     clientbound1_18->Register(Ping::PACKET_ORDINAL, 0x30);
     clientbound1_18->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x31);
-    clientbound1_18->Register(PlayerAbilities::PACKET_ORDINAL, 0x32);
-    //    clientbound1_18->Register(EndCombatEvent::PACKET_ORDINAL, 0x33); //TODO: EndCombatEvent
-    //    clientbound1_18->Register(EnterCombatEvent::PACKET_ORDINAL, 0x34); //TODO: EnterCombatEvent
-    //    clientbound1_18->Register(DeathCombatEvent::PACKET_ORDINAL, 0x35); //TODO: DeathCombatEvent
+    clientbound1_18->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x32);
+    clientbound1_18->Register(EndCombatEvent::PACKET_ORDINAL, 0x33);
+    clientbound1_18->Register(EnterCombatEvent::PACKET_ORDINAL, 0x34);
+    clientbound1_18->Register(DeathCombatEvent::PACKET_ORDINAL, 0x35);
     clientbound1_18->Register(PlayerListItem::PACKET_ORDINAL, 0x36);
     clientbound1_18->Register(PlayerFace::PACKET_ORDINAL, 0x37);
     clientbound1_18->Register(PositionRotation::PACKET_ORDINAL, 0x38);
@@ -1016,7 +1030,7 @@ namespace Ship {
     clientbound1_19->Register(BlockUpdate::PACKET_ORDINAL, 0x09);
     clientbound1_19->Register(BossBar::PACKET_ORDINAL, 0x0A);
     clientbound1_19->Register(ServerChangeDifficulty::PACKET_ORDINAL, 0x0B);
-    //    clientbound1_19->Register(ChatPreview::PACKET_ORDINAL, 0x0C); //TODO: ChatPreview
+    clientbound1_19->Register(ServerChatPreview::PACKET_ORDINAL, 0x0C);
     clientbound1_19->Register(ClearTitle::PACKET_ORDINAL, 0x1D);
     clientbound1_19->Register(CommandSuggestionResponse::PACKET_ORDINAL, 0x1E);
     clientbound1_19->Register(DeclareCommands::PACKET_ORDINAL, 0x1F);
@@ -1036,7 +1050,7 @@ namespace Ship {
     clientbound1_19->Register(InitializeWorldBorder::PACKET_ORDINAL, 0x1D);
     clientbound1_19->Register(KeepAlive::PACKET_ORDINAL, 0x1E);
     clientbound1_19->Register(ChunkData::PACKET_ORDINAL, 0x1F);
-    clientbound1_19->Register(EntitySoundEffect::PACKET_ORDINAL, 0x20);
+    clientbound1_19->Register(WorldEvent::PACKET_ORDINAL, 0x20);
     clientbound1_19->Register(Particle::PACKET_ORDINAL, 0x21);
     clientbound1_19->Register(ChunkLight::PACKET_ORDINAL, 0x22);
     clientbound1_19->Register(JoinGame::PACKET_ORDINAL, 0x23);
@@ -1051,11 +1065,11 @@ namespace Ship {
     clientbound1_19->Register(OpenSignEditor::PACKET_ORDINAL, 0x2C);
     clientbound1_19->Register(Ping::PACKET_ORDINAL, 0x2D);
     clientbound1_19->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x2E);
-    clientbound1_19->Register(PlayerAbilities::PACKET_ORDINAL, 0x2F);
-    clientbound1_19->Register(LegacyChat::PACKET_ORDINAL, 0x30);
-    //    clientbound1_19->Register(EndCombatEvent::PACKET_ORDINAL, 0x31); //TODO: EndCombatEvent
-    //    clientbound1_19->Register(EnterCombatEvent::PACKET_ORDINAL, 0x32); //TODO: EnterCombatEvent
-    //    clientbound1_19->Register(DeathCombatEvent::PACKET_ORDINAL, 0x33); //TODO: DeathCombatEvent
+    clientbound1_19->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x2F);
+    clientbound1_19->Register(ServerPlayerChat::PACKET_ORDINAL, 0x30);
+    clientbound1_19->Register(EndCombatEvent::PACKET_ORDINAL, 0x31);
+    clientbound1_19->Register(EnterCombatEvent::PACKET_ORDINAL, 0x32);
+    clientbound1_19->Register(DeathCombatEvent::PACKET_ORDINAL, 0x33);
     clientbound1_19->Register(PlayerListItem::PACKET_ORDINAL, 0x34);
     clientbound1_19->Register(PlayerFace::PACKET_ORDINAL, 0x35);
     clientbound1_19->Register(PositionRotation::PACKET_ORDINAL, 0x36);
@@ -1122,7 +1136,7 @@ namespace Ship {
     clientbound1_19_1->Register(BlockUpdate::PACKET_ORDINAL, 0x09);
     clientbound1_19_1->Register(BossBar::PACKET_ORDINAL, 0x0A);
     clientbound1_19_1->Register(ServerChangeDifficulty::PACKET_ORDINAL, 0x0B);
-    //    clientbound1_19_1->Register(ChatPreview::PACKET_ORDINAL, 0x0C); //TODO: ChatPreview
+    clientbound1_19_1->Register(ServerChatPreview::PACKET_ORDINAL, 0x0C);
     clientbound1_19_1->Register(ClearTitle::PACKET_ORDINAL, 0x1D);
     clientbound1_19_1->Register(CommandSuggestionResponse::PACKET_ORDINAL, 0x1E);
     clientbound1_19_1->Register(DeclareCommands::PACKET_ORDINAL, 0x1F);
@@ -1131,10 +1145,10 @@ namespace Ship {
     clientbound1_19_1->Register(InventoryProperty::PACKET_ORDINAL, 0x12);
     clientbound1_19_1->Register(InventorySlot::PACKET_ORDINAL, 0x13);
     clientbound1_19_1->Register(Cooldown::PACKET_ORDINAL, 0x14);
-    //    clientbound1_19_1->Register(ChatSuggestions::PACKET_ORDINAL, 0x15); //TODO: ChatSuggestions
+    clientbound1_19_1->Register(ChatSuggestions::PACKET_ORDINAL, 0x15);
     clientbound1_19_1->Register(PluginMessage::PACKET_ORDINAL, 0x16);
     clientbound1_19_1->Register(CustomSoundEffect::PACKET_ORDINAL, 0x17);
-    //    clientbound1_19_1->Register(HideMessage::PACKET_ORDINAL, 0x18); //TODO: HideMessage
+    clientbound1_19_1->Register(HideMessage::PACKET_ORDINAL, 0x18);
     clientbound1_19_1->Register(Disconnect::PACKET_ORDINAL, 0x19);
     clientbound1_19_1->Register(EntityEvent::PACKET_ORDINAL, 0x1A);
     clientbound1_19_1->Register(Explosion::PACKET_ORDINAL, 0x1B);
@@ -1144,7 +1158,7 @@ namespace Ship {
     clientbound1_19_1->Register(InitializeWorldBorder::PACKET_ORDINAL, 0x1F);
     clientbound1_19_1->Register(KeepAlive::PACKET_ORDINAL, 0x20);
     clientbound1_19_1->Register(ChunkData::PACKET_ORDINAL, 0x21);
-    clientbound1_19_1->Register(EntitySoundEffect::PACKET_ORDINAL, 0x22);
+    clientbound1_19_1->Register(WorldEvent::PACKET_ORDINAL, 0x22);
     clientbound1_19_1->Register(Particle::PACKET_ORDINAL, 0x23);
     clientbound1_19_1->Register(ChunkLight::PACKET_ORDINAL, 0x24);
     clientbound1_19_1->Register(JoinGame::PACKET_ORDINAL, 0x25);
@@ -1159,12 +1173,12 @@ namespace Ship {
     clientbound1_19_1->Register(OpenSignEditor::PACKET_ORDINAL, 0x2E);
     clientbound1_19_1->Register(Ping::PACKET_ORDINAL, 0x2F);
     clientbound1_19_1->Register(CraftRecipeResponse::PACKET_ORDINAL, 0x30);
-    clientbound1_19_1->Register(PlayerAbilities::PACKET_ORDINAL, 0x31);
-    //    clientbound1_19_1->Register(MessageHeader::PACKET_ORDINAL, 0x32); //TODO: MessageHeader
-    clientbound1_19_1->Register(LegacyChat::PACKET_ORDINAL, 0x33);
-    //    clientbound1_19_1->Register(EndCombatEvent::PACKET_ORDINAL, 0x34); //TODO: EndCombatEvent
-    //    clientbound1_19_1->Register(EnterCombatEvent::PACKET_ORDINAL, 0x35); //TODO: EnterCombatEvent
-    //    clientbound1_19_1->Register(DeathCombatEvent::PACKET_ORDINAL, 0x36); //TODO: DeathCombatEvent
+    clientbound1_19_1->Register(ServerPlayerAbilities::PACKET_ORDINAL, 0x31);
+    clientbound1_19_1->Register(MessageHeader::PACKET_ORDINAL, 0x32);
+    clientbound1_19_1->Register(ServerPlayerChat::PACKET_ORDINAL, 0x33);
+    clientbound1_19_1->Register(EndCombatEvent::PACKET_ORDINAL, 0x34);
+    clientbound1_19_1->Register(EnterCombatEvent::PACKET_ORDINAL, 0x35);
+    clientbound1_19_1->Register(DeathCombatEvent::PACKET_ORDINAL, 0x36);
     clientbound1_19_1->Register(PlayerListItem::PACKET_ORDINAL, 0x37);
     clientbound1_19_1->Register(PlayerFace::PACKET_ORDINAL, 0x38);
     clientbound1_19_1->Register(PositionRotation::PACKET_ORDINAL, 0x39);
@@ -1240,7 +1254,7 @@ namespace Ship {
     serverbound1_12_2->Register(MoveVehicle::PACKET_ORDINAL, 0x10);
     serverbound1_12_2->Register(BoatPaddle::PACKET_ORDINAL, 0x11);
     serverbound1_12_2->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x12);
-    serverbound1_12_2->Register(PlayerAbilities::PACKET_ORDINAL, 0x13);
+    serverbound1_12_2->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x13);
     serverbound1_12_2->Register(Digging::PACKET_ORDINAL, 0x14);
     serverbound1_12_2->Register(EntityAction::PACKET_ORDINAL, 0x15);
     serverbound1_12_2->Register(PlayerInput::PACKET_ORDINAL, 0x16);
@@ -1279,7 +1293,7 @@ namespace Ship {
     serverbound1_13->Register(BoatPaddle::PACKET_ORDINAL, 0x14);
     serverbound1_13->Register(PickItem::PACKET_ORDINAL, 0x15);
     serverbound1_13->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x16);
-    serverbound1_13->Register(PlayerAbilities::PACKET_ORDINAL, 0x17);
+    serverbound1_13->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x17);
     serverbound1_13->Register(Digging::PACKET_ORDINAL, 0x18);
     serverbound1_13->Register(EntityAction::PACKET_ORDINAL, 0x19);
     serverbound1_13->Register(PlayerInput::PACKET_ORDINAL, 0x1A);
@@ -1326,7 +1340,7 @@ namespace Ship {
     serverbound1_14->Register(BoatPaddle::PACKET_ORDINAL, 0x16);
     serverbound1_14->Register(PickItem::PACKET_ORDINAL, 0x17);
     serverbound1_14->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x18);
-    serverbound1_14->Register(PlayerAbilities::PACKET_ORDINAL, 0x19);
+    serverbound1_14->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x19);
     serverbound1_14->Register(Digging::PACKET_ORDINAL, 0x1A);
     serverbound1_14->Register(EntityAction::PACKET_ORDINAL, 0x1B);
     serverbound1_14->Register(PlayerInput::PACKET_ORDINAL, 0x1C);
@@ -1374,7 +1388,7 @@ namespace Ship {
     serverbound1_15->Register(BoatPaddle::PACKET_ORDINAL, 0x16);
     serverbound1_15->Register(PickItem::PACKET_ORDINAL, 0x17);
     serverbound1_15->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x18);
-    serverbound1_15->Register(PlayerAbilities::PACKET_ORDINAL, 0x19);
+    serverbound1_15->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x19);
     serverbound1_15->Register(Digging::PACKET_ORDINAL, 0x1A);
     serverbound1_15->Register(EntityAction::PACKET_ORDINAL, 0x1B);
     serverbound1_15->Register(PlayerInput::PACKET_ORDINAL, 0x1C);
@@ -1423,7 +1437,7 @@ namespace Ship {
     // serverbound1_16->Register(BoatPaddle::PACKET_ORDINAL, 0x17);
     // serverbound1_16->Register(PickItem::PACKET_ORDINAL, 0x18);
     // serverbound1_16->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x19);
-    // serverbound1_16->Register(PlayerAbilities::PACKET_ORDINAL, 0x1A);
+    // serverbound1_16->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x1A);
     // serverbound1_16->Register(Digging::PACKET_ORDINAL, 0x1B);
     // serverbound1_16->Register(EntityAction::PACKET_ORDINAL, 0x1C);
     // serverbound1_16->Register(PlayerInput::PACKET_ORDINAL, 0x1D);
@@ -1472,7 +1486,7 @@ namespace Ship {
     serverbound1_16_2->Register(BoatPaddle::PACKET_ORDINAL, 0x17);
     serverbound1_16_2->Register(PickItem::PACKET_ORDINAL, 0x18);
     serverbound1_16_2->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x19);
-    serverbound1_16_2->Register(PlayerAbilities::PACKET_ORDINAL, 0x1A);
+    serverbound1_16_2->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x1A);
     serverbound1_16_2->Register(Digging::PACKET_ORDINAL, 0x1B);
     serverbound1_16_2->Register(EntityAction::PACKET_ORDINAL, 0x1C);
     serverbound1_16_2->Register(PlayerInput::PACKET_ORDINAL, 0x1D);
@@ -1521,7 +1535,7 @@ namespace Ship {
     serverbound1_17->Register(BoatPaddle::PACKET_ORDINAL, 0x16);
     serverbound1_17->Register(PickItem::PACKET_ORDINAL, 0x17);
     serverbound1_17->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x18);
-    serverbound1_17->Register(PlayerAbilities::PACKET_ORDINAL, 0x19);
+    serverbound1_17->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x19);
     serverbound1_17->Register(Digging::PACKET_ORDINAL, 0x1A);
     serverbound1_17->Register(EntityAction::PACKET_ORDINAL, 0x1B);
     serverbound1_17->Register(PlayerInput::PACKET_ORDINAL, 0x1C);
@@ -1571,7 +1585,7 @@ namespace Ship {
     serverbound1_18->Register(BoatPaddle::PACKET_ORDINAL, 0x16);
     serverbound1_18->Register(PickItem::PACKET_ORDINAL, 0x17);
     serverbound1_18->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x18);
-    serverbound1_18->Register(PlayerAbilities::PACKET_ORDINAL, 0x19);
+    serverbound1_18->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x19);
     serverbound1_18->Register(Digging::PACKET_ORDINAL, 0x1A);
     serverbound1_18->Register(EntityAction::PACKET_ORDINAL, 0x1B);
     serverbound1_18->Register(PlayerInput::PACKET_ORDINAL, 0x1C);
@@ -1600,8 +1614,8 @@ namespace Ship {
     serverbound1_19->Register(BlockTagQueryRequest::PACKET_ORDINAL, 0x01);
     serverbound1_19->Register(ClientChangeDifficulty::PACKET_ORDINAL, 0x02);
     serverbound1_19->Register(Command::PACKET_ORDINAL, 0x03);
-    serverbound1_19->Register(LegacyChat::PACKET_ORDINAL, 0x04);
-    //    serverbound1_19->Register(ChatPreview::PACKET_ORDINAL, 0x05); //TODO: ChatPreview
+    serverbound1_19->Register(ClientPlayerChat::PACKET_ORDINAL, 0x04);
+    serverbound1_19->Register(ClientChatPreview::PACKET_ORDINAL, 0x05);
     serverbound1_19->Register(ClientAction::PACKET_ORDINAL, 0x06);
     serverbound1_19->Register(ClientSettings::PACKET_ORDINAL, 0x07);
     serverbound1_19->Register(CommandSuggestionRequest::PACKET_ORDINAL, 0x08);
@@ -1623,7 +1637,7 @@ namespace Ship {
     serverbound1_19->Register(BoatPaddle::PACKET_ORDINAL, 0x18);
     serverbound1_19->Register(PickItem::PACKET_ORDINAL, 0x19);
     serverbound1_19->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x1A);
-    serverbound1_19->Register(PlayerAbilities::PACKET_ORDINAL, 0x1B);
+    serverbound1_19->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x1B);
     serverbound1_19->Register(Digging::PACKET_ORDINAL, 0x1C);
     serverbound1_19->Register(EntityAction::PACKET_ORDINAL, 0x1D);
     serverbound1_19->Register(PlayerInput::PACKET_ORDINAL, 0x1E);
@@ -1653,8 +1667,8 @@ namespace Ship {
     serverbound1_19_1->Register(ClientChangeDifficulty::PACKET_ORDINAL, 0x02);
     //    serverbound1_19_1->Register(MessageAcknowledgment::PACKET_ORDINAL, 0x03); //TODO: MessageAcknowledgment
     serverbound1_19_1->Register(Command::PACKET_ORDINAL, 0x04);
-    serverbound1_19_1->Register(LegacyChat::PACKET_ORDINAL, 0x05);
-    //    serverbound1_19_1->Register(ChatPreview::PACKET_ORDINAL, 0x06); //TODO: ChatPreview
+    serverbound1_19_1->Register(ClientPlayerChat::PACKET_ORDINAL, 0x05);
+    serverbound1_19_1->Register(ClientChatPreview::PACKET_ORDINAL, 0x06);
     serverbound1_19_1->Register(ClientAction::PACKET_ORDINAL, 0x07);
     serverbound1_19_1->Register(ClientSettings::PACKET_ORDINAL, 0x08);
     serverbound1_19_1->Register(CommandSuggestionRequest::PACKET_ORDINAL, 0x09);
@@ -1676,7 +1690,7 @@ namespace Ship {
     serverbound1_19_1->Register(BoatPaddle::PACKET_ORDINAL, 0x19);
     serverbound1_19_1->Register(PickItem::PACKET_ORDINAL, 0x1A);
     serverbound1_19_1->Register(CraftRecipeRequest::PACKET_ORDINAL, 0x1B);
-    serverbound1_19_1->Register(PlayerAbilities::PACKET_ORDINAL, 0x1C);
+    serverbound1_19_1->Register(ClientPlayerAbilities::PACKET_ORDINAL, 0x1C);
     serverbound1_19_1->Register(Digging::PACKET_ORDINAL, 0x1D);
     serverbound1_19_1->Register(EntityAction::PACKET_ORDINAL, 0x1E);
     serverbound1_19_1->Register(PlayerInput::PACKET_ORDINAL, 0x1F);
@@ -1700,182 +1714,195 @@ namespace Ship {
     serverbound1_19_1->Register(PlaceBlock::PACKET_ORDINAL, 0x31);
     serverbound1_19_1->Register(UseItem::PACKET_ORDINAL, 0x32);
 
-    DirectionRegistry clientbound(clientboundRegistry);
+    auto* clientbound = new DirectionRegistry(clientboundRegistry);
 
-    clientbound.RegisterPacketConstructor(SpawnEntity::PACKET_ORDINAL, CreateConstructor<SpawnEntity>());
-    clientbound.RegisterPacketConstructor(SpawnExperienceOrb::PACKET_ORDINAL, CreateConstructor<SpawnExperienceOrb>());
-    clientbound.RegisterPacketConstructor(SpawnThunderbolt::PACKET_ORDINAL, CreateConstructor<SpawnThunderbolt>());
-    clientbound.RegisterPacketConstructor(SpawnPainting::PACKET_ORDINAL, CreateConstructor<SpawnPainting>());
-    clientbound.RegisterPacketConstructor(SpawnPlayer::PACKET_ORDINAL, CreateConstructor<SpawnPlayer>());
-    clientbound.RegisterPacketConstructor(EntityAnimation::PACKET_ORDINAL, CreateConstructor<EntityAnimation>());
-    clientbound.RegisterPacketConstructor(AwardStatistics::PACKET_ORDINAL, CreateConstructor<AwardStatistics>());
-    clientbound.RegisterPacketConstructor(AcknowledgeBlockChange::PACKET_ORDINAL, CreateConstructor<AcknowledgeBlockChange>());
-    clientbound.RegisterPacketConstructor(BlockDestroyStage::PACKET_ORDINAL, CreateConstructor<BlockDestroyStage>());
-    clientbound.RegisterPacketConstructor(BlockEntityData::PACKET_ORDINAL, CreateConstructor<BlockEntityData>());
-    clientbound.RegisterPacketConstructor(BlockAction::PACKET_ORDINAL, CreateConstructor<BlockAction>());
-    clientbound.RegisterPacketConstructor(BlockUpdate::PACKET_ORDINAL, CreateConstructor<BlockUpdate>());
-    clientbound.RegisterPacketConstructor(BossBar::PACKET_ORDINAL, CreateConstructor<BossBar>());
-    clientbound.RegisterPacketConstructor(ServerChangeDifficulty::PACKET_ORDINAL, CreateConstructor<ServerChangeDifficulty>());
-    // clientbound.RegisterPacketConstructor(); TODO: ChatPreview
-    clientbound.RegisterPacketConstructor(ClearTitle::PACKET_ORDINAL, CreateConstructor<ClearTitle>());
-    clientbound.RegisterPacketConstructor(CommandSuggestionResponse::PACKET_ORDINAL, CreateConstructor<CommandSuggestionResponse>());
-    clientbound.RegisterPacketConstructor(DeclareCommands::PACKET_ORDINAL, CreateConstructor<DeclareCommands>());
-    clientbound.RegisterPacketConstructor(CloseInventory::PACKET_ORDINAL, CreateConstructor<CloseInventory>());
-    clientbound.RegisterPacketConstructor(InventoryContent::PACKET_ORDINAL, CreateConstructor<InventoryContent>());
-    clientbound.RegisterPacketConstructor(InventoryProperty::PACKET_ORDINAL, CreateConstructor<InventoryProperty>());
-    clientbound.RegisterPacketConstructor(InventorySlot::PACKET_ORDINAL, CreateConstructor<InventorySlot>());
-    clientbound.RegisterPacketConstructor(Cooldown::PACKET_ORDINAL, CreateConstructor<Cooldown>());
-    // clientbound.RegisterPacketConstructor(); TODO: ChatSuggestions
-    clientbound.RegisterPacketConstructor(PluginMessage::PACKET_ORDINAL, CreateConstructor<PluginMessage>());
-    clientbound.RegisterPacketConstructor(CustomSoundEffect::PACKET_ORDINAL, CreateConstructor<CustomSoundEffect>());
-    // clientbound.RegisterPacketConstructor(); TODO: HideMessage
-    clientbound.RegisterPacketConstructor(Disconnect::PACKET_ORDINAL, CreateConstructor<Disconnect>());
-    clientbound.RegisterPacketConstructor(EntityEvent::PACKET_ORDINAL, CreateConstructor<EntityEvent>());
-    clientbound.RegisterPacketConstructor(Explosion::PACKET_ORDINAL, CreateConstructor<Explosion>());
-    clientbound.RegisterPacketConstructor(UnloadChunk::PACKET_ORDINAL, CreateConstructor<UnloadChunk>());
-    clientbound.RegisterPacketConstructor(GameEvent::PACKET_ORDINAL, CreateConstructor<GameEvent>());
-    clientbound.RegisterPacketConstructor(OpenHorseInventory::PACKET_ORDINAL, CreateConstructor<OpenHorseInventory>());
-    clientbound.RegisterPacketConstructor(InitializeWorldBorder::PACKET_ORDINAL, CreateConstructor<InitializeWorldBorder>());
-    clientbound.RegisterPacketConstructor(KeepAlive::PACKET_ORDINAL, CreateConstructor<KeepAlive>());
-    clientbound.RegisterPacketConstructor(ChunkData::PACKET_ORDINAL, CreateConstructor<ChunkData>());
-    clientbound.RegisterPacketConstructor(EntitySoundEffect::PACKET_ORDINAL, CreateConstructor<EntitySoundEffect>());
-    clientbound.RegisterPacketConstructor(Particle::PACKET_ORDINAL, CreateConstructor<Particle>());
-    clientbound.RegisterPacketConstructor(ChunkLight::PACKET_ORDINAL, CreateConstructor<ChunkLight>());
-    clientbound.RegisterPacketConstructor(JoinGame::PACKET_ORDINAL,
+    clientbound->RegisterPacketConstructor(SpawnEntity::PACKET_ORDINAL, CreateConstructor<SpawnEntity>(0, UUID {}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(SpawnExperienceOrb::PACKET_ORDINAL, CreateConstructor<SpawnExperienceOrb>(0, 0, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(SpawnThunderbolt::PACKET_ORDINAL, CreateConstructor<SpawnThunderbolt>());
+    clientbound->RegisterPacketConstructor(SpawnPainting::PACKET_ORDINAL, CreateConstructor<SpawnPainting>());
+    clientbound->RegisterPacketConstructor(SpawnPlayer::PACKET_ORDINAL, CreateConstructor<SpawnPlayer>(0, UUID {}, 0, 0, 0, 0, 0, nullptr));
+    clientbound->RegisterPacketConstructor(EntityAnimation::PACKET_ORDINAL, CreateConstructor<EntityAnimation>(0, 0));
+    clientbound->RegisterPacketConstructor(AwardStatistics::PACKET_ORDINAL, CreateConstructor<AwardStatistics>(std::vector<Statistic> {}));
+    clientbound->RegisterPacketConstructor(AcknowledgeBlockChange::PACKET_ORDINAL, CreateConstructor<AcknowledgeBlockChange>(0));
+    clientbound->RegisterPacketConstructor(AcknowledgePlayerDigging::PACKET_ORDINAL, CreateConstructor<AcknowledgePlayerDigging>(0, 0, 0, 0, 0, false));
+    clientbound->RegisterPacketConstructor(BlockDestroyStage::PACKET_ORDINAL, CreateConstructor<BlockDestroyStage>(0, 0, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(BlockEntityData::PACKET_ORDINAL, CreateConstructor<BlockEntityData>(0, 0, 0, 0, nullptr));
+    clientbound->RegisterPacketConstructor(BlockAction::PACKET_ORDINAL, CreateConstructor<BlockAction>(0, 0, 0, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(BlockUpdate::PACKET_ORDINAL, CreateConstructor<BlockUpdate>(0, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(BossBar::PACKET_ORDINAL, CreateConstructor<BossBar>(UUID {}, nullptr));
+    clientbound->RegisterPacketConstructor(ServerChangeDifficulty::PACKET_ORDINAL, CreateConstructor<ServerChangeDifficulty>(Difficulty {}, false));
+    clientbound->RegisterPacketConstructor(ServerChatPreview::PACKET_ORDINAL, CreateConstructor<ServerChatPreview>(0, std::nullopt));
+    clientbound->RegisterPacketConstructor(ClearTitle::PACKET_ORDINAL, CreateConstructor<ClearTitle>(false));
+    clientbound->RegisterPacketConstructor(
+      CommandSuggestionResponse::PACKET_ORDINAL, CreateConstructor<CommandSuggestionResponse>(0, 0, 0, std::vector<CommandSuggestion> {}));
+    clientbound->RegisterPacketConstructor(DeclareCommands::PACKET_ORDINAL, CreateConstructor<DeclareCommands>());
+    clientbound->RegisterPacketConstructor(CloseInventory::PACKET_ORDINAL, CreateConstructor<CloseInventory>(0));
+    clientbound->RegisterPacketConstructor(
+      InventoryContent::PACKET_ORDINAL, CreateConstructor<InventoryContent>(0, 0, std::vector<ItemStack> {}, ItemStack {}));
+    clientbound->RegisterPacketConstructor(InventoryProperty::PACKET_ORDINAL, CreateConstructor<InventoryProperty>(0, 0, 0));
+    clientbound->RegisterPacketConstructor(InventorySlot::PACKET_ORDINAL, CreateConstructor<InventorySlot>(0, 0, 0, ItemStack {}));
+    clientbound->RegisterPacketConstructor(Cooldown::PACKET_ORDINAL, CreateConstructor<Cooldown>(0, 0));
+    clientbound->RegisterPacketConstructor(ChatSuggestions::PACKET_ORDINAL, CreateConstructor<ChatSuggestions>(0, std::vector<std::string> {}));
+    clientbound->RegisterPacketConstructor(PluginMessage::PACKET_ORDINAL, CreateConstructor<PluginMessage>(std::string {}, nullptr));
+    clientbound->RegisterPacketConstructor(CustomSoundEffect::PACKET_ORDINAL, CreateConstructor<CustomSoundEffect>(std::string {}, 0, 0, 0, 0, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(HideMessage::PACKET_ORDINAL, CreateConstructor<HideMessage>(nullptr));
+    clientbound->RegisterPacketConstructor(Disconnect::PACKET_ORDINAL, CreateConstructor<Disconnect>(std::string {}));
+    clientbound->RegisterPacketConstructor(EntityEvent::PACKET_ORDINAL, CreateConstructor<EntityEvent>(0, 0));
+    clientbound->RegisterPacketConstructor(
+      Explosion::PACKET_ORDINAL, CreateConstructor<Explosion>(0, 0, 0, 0, std::vector<std::array<uint8_t, 3>> {}, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(UnloadChunk::PACKET_ORDINAL, CreateConstructor<UnloadChunk>(0, 0));
+    clientbound->RegisterPacketConstructor(GameEvent::PACKET_ORDINAL, CreateConstructor<GameEvent>(0, 0));
+    clientbound->RegisterPacketConstructor(OpenHorseInventory::PACKET_ORDINAL, CreateConstructor<OpenHorseInventory>(0, 0, 0));
+    clientbound->RegisterPacketConstructor(InitializeWorldBorder::PACKET_ORDINAL, CreateConstructor<InitializeWorldBorder>(0, 0, 0, 0, 0, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(KeepAlive::PACKET_ORDINAL, CreateConstructor<KeepAlive>(0));
+    clientbound->RegisterPacketConstructor(ChunkData::PACKET_ORDINAL, CreateConstructor<ChunkData>());
+    clientbound->RegisterPacketConstructor(WorldEvent::PACKET_ORDINAL, CreateConstructor<WorldEvent>(0, 0, 0, 0, 0, false));
+    clientbound->RegisterPacketConstructor(EntitySoundEffect::PACKET_ORDINAL, CreateConstructor<EntitySoundEffect>());
+    clientbound->RegisterPacketConstructor(Particle::PACKET_ORDINAL, CreateConstructor<Particle>(nullptr, false, 0, 0, 0, 0, 0, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(ChunkLight::PACKET_ORDINAL, CreateConstructor<ChunkLight>());
+    clientbound->RegisterPacketConstructor(JoinGame::PACKET_ORDINAL,
       CreateConstructor<JoinGame>(0, Gamemode {}, 0, Difficulty {}, false, 0, 0, false, false, std::set<std::string> {},
         std::map<std::string, Dimension> {}, std::string {}, std::string {}, false, false,
         Dimension {std::string {}, 0, 0, 0, false, 0, false, false, false, false, false, false, false, false, false, 0, std::string {},
           std::optional<uint64_t> {}, std::optional<bool> {}, std::optional<double> {}, std::optional<std::string> {}, 0, 0, 0, 0, nullptr},
         Gamemode {}, nullptr, 0, false, std::pair<std::string, uint64_t> {}, nullptr, nullptr));
-    clientbound.RegisterPacketConstructor(MapData::PACKET_ORDINAL, CreateConstructor<MapData>());
-    clientbound.RegisterPacketConstructor(TradeList::PACKET_ORDINAL, CreateConstructor<TradeList>());
-    clientbound.RegisterPacketConstructor(EntityNotMoved::PACKET_ORDINAL, CreateConstructor<EntityNotMoved>());
-    clientbound.RegisterPacketConstructor(EntityPosition::PACKET_ORDINAL, CreateConstructor<EntityPosition>());
-    clientbound.RegisterPacketConstructor(EntityPositionAndRotation::PACKET_ORDINAL, CreateConstructor<EntityPositionAndRotation>());
-    clientbound.RegisterPacketConstructor(EntityRotation::PACKET_ORDINAL, CreateConstructor<EntityRotation>());
-    clientbound.RegisterPacketConstructor(MoveVehicle::PACKET_ORDINAL, CreateConstructor<MoveVehicle>());
-    clientbound.RegisterPacketConstructor(OpenBook::PACKET_ORDINAL, CreateConstructor<OpenBook>());
-    clientbound.RegisterPacketConstructor(OpenInventory::PACKET_ORDINAL, CreateConstructor<OpenInventory>());
-    clientbound.RegisterPacketConstructor(OpenSignEditor::PACKET_ORDINAL, CreateConstructor<OpenSignEditor>());
-    clientbound.RegisterPacketConstructor(Ping::PACKET_ORDINAL, CreateConstructor<Ping>());
-    clientbound.RegisterPacketConstructor(CraftRecipeResponse::PACKET_ORDINAL, CreateConstructor<CraftRecipeResponse>());
-    clientbound.RegisterPacketConstructor(PlayerAbilities::PACKET_ORDINAL, CreateConstructor<PlayerAbilities>());
-    // clientbound.RegisterPacketConstructor(); TODO: MessageHeader
-    clientbound.RegisterPacketConstructor(LegacyChat::PACKET_ORDINAL, CreateConstructor<LegacyChat>());
-    // clientbound.RegisterPacketConstructor(); TODO: EndCombatEvent
-    // clientbound.RegisterPacketConstructor(); TODO: EnterCombatEvent
-    // clientbound.RegisterPacketConstructor(); TODO: DeathCombatEvent
-    clientbound.RegisterPacketConstructor(PlayerListItem::PACKET_ORDINAL, CreateConstructor<PlayerListItem>());
-    clientbound.RegisterPacketConstructor(PlayerFace::PACKET_ORDINAL, CreateConstructor<PlayerFace>());
-    clientbound.RegisterPacketConstructor(PositionRotation::PACKET_ORDINAL, CreateConstructor<PositionRotation>());
-    clientbound.RegisterPacketConstructor(UseBed::PACKET_ORDINAL, CreateConstructor<UseBed>());
-    clientbound.RegisterPacketConstructor(UnlockRecipes::PACKET_ORDINAL, CreateConstructor<UnlockRecipes>());
-    clientbound.RegisterPacketConstructor(EntityRemove::PACKET_ORDINAL, CreateConstructor<EntityRemove>());
-    clientbound.RegisterPacketConstructor(EntityEffectRemove::PACKET_ORDINAL, CreateConstructor<EntityEffectRemove>());
-    clientbound.RegisterPacketConstructor(ResourcePackRequest::PACKET_ORDINAL, CreateConstructor<ResourcePackRequest>());
-    clientbound.RegisterPacketConstructor(Respawn::PACKET_ORDINAL, CreateConstructor<Respawn>());
-    clientbound.RegisterPacketConstructor(EntityLookAt::PACKET_ORDINAL, CreateConstructor<EntityLookAt>());
-    clientbound.RegisterPacketConstructor(SectionBlocks::PACKET_ORDINAL, CreateConstructor<SectionBlocks>());
-    clientbound.RegisterPacketConstructor(SelectAdvancementsTab::PACKET_ORDINAL, CreateConstructor<SelectAdvancementsTab>());
-    clientbound.RegisterPacketConstructor(ServerData::PACKET_ORDINAL, CreateConstructor<ServerData>());
-    clientbound.RegisterPacketConstructor(ActionBar::PACKET_ORDINAL, CreateConstructor<ActionBar>());
-    clientbound.RegisterPacketConstructor(BorderCenter::PACKET_ORDINAL, CreateConstructor<BorderCenter>());
-    clientbound.RegisterPacketConstructor(BorderRadiusSpeed::PACKET_ORDINAL, CreateConstructor<BorderRadiusSpeed>());
-    clientbound.RegisterPacketConstructor(BorderRadius::PACKET_ORDINAL, CreateConstructor<BorderRadius>());
-    clientbound.RegisterPacketConstructor(BorderWarningTime::PACKET_ORDINAL, CreateConstructor<BorderWarningTime>());
-    clientbound.RegisterPacketConstructor(BorderWarningRadius::PACKET_ORDINAL, CreateConstructor<BorderWarningRadius>());
-    clientbound.RegisterPacketConstructor(LegacyWorldBorder::PACKET_ORDINAL, CreateConstructor<LegacyWorldBorder>());
-    clientbound.RegisterPacketConstructor(Camera::PACKET_ORDINAL, CreateConstructor<Camera>());
-    clientbound.RegisterPacketConstructor(HeldSlot::PACKET_ORDINAL, CreateConstructor<HeldSlot>());
-    clientbound.RegisterPacketConstructor(ViewPosition::PACKET_ORDINAL, CreateConstructor<ViewPosition>());
-    clientbound.RegisterPacketConstructor(ViewDistance::PACKET_ORDINAL, CreateConstructor<ViewDistance>());
-    clientbound.RegisterPacketConstructor(DefaultSpawnPosition::PACKET_ORDINAL, CreateConstructor<DefaultSpawnPosition>());
-    // clientbound.RegisterPacketConstructor(); TODO: SetDisplayChatPreview
-    clientbound.RegisterPacketConstructor(DisplayObjective::PACKET_ORDINAL, CreateConstructor<DisplayObjective>());
-    clientbound.RegisterPacketConstructor(EntityMetadata::PACKET_ORDINAL, CreateConstructor<EntityMetadata>());
-    clientbound.RegisterPacketConstructor(LeadEntities::PACKET_ORDINAL, CreateConstructor<LeadEntities>());
-    clientbound.RegisterPacketConstructor(EntityVelocity::PACKET_ORDINAL, CreateConstructor<EntityVelocity>());
-    clientbound.RegisterPacketConstructor(EntityEquipment::PACKET_ORDINAL, CreateConstructor<EntityEquipment>());
-    clientbound.RegisterPacketConstructor(Experience::PACKET_ORDINAL, CreateConstructor<Experience>());
-    clientbound.RegisterPacketConstructor(Health::PACKET_ORDINAL, CreateConstructor<Health>());
-    clientbound.RegisterPacketConstructor(Objectives::PACKET_ORDINAL, CreateConstructor<Objectives>());
-    clientbound.RegisterPacketConstructor(Passengers::PACKET_ORDINAL, CreateConstructor<Passengers>());
-    clientbound.RegisterPacketConstructor(Teams::PACKET_ORDINAL, CreateConstructor<Teams>());
-    clientbound.RegisterPacketConstructor(Score::PACKET_ORDINAL, CreateConstructor<Score>());
-    clientbound.RegisterPacketConstructor(SimulationDistance::PACKET_ORDINAL, CreateConstructor<SimulationDistance>());
-    clientbound.RegisterPacketConstructor(Subtitle::PACKET_ORDINAL, CreateConstructor<Subtitle>());
-    clientbound.RegisterPacketConstructor(WorldTime::PACKET_ORDINAL, CreateConstructor<WorldTime>());
-    clientbound.RegisterPacketConstructor(LegacyTitle::PACKET_ORDINAL, CreateConstructor<LegacyTitle>());
-    clientbound.RegisterPacketConstructor(Title::PACKET_ORDINAL, CreateConstructor<Title>());
-    clientbound.RegisterPacketConstructor(TitleTimes::PACKET_ORDINAL, CreateConstructor<TitleTimes>());
-    clientbound.RegisterPacketConstructor(EntitySoundEffect::PACKET_ORDINAL, CreateConstructor<EntitySoundEffect>());
-    clientbound.RegisterPacketConstructor(HardcodedSoundEffect::PACKET_ORDINAL, CreateConstructor<HardcodedSoundEffect>());
-    clientbound.RegisterPacketConstructor(StopSound::PACKET_ORDINAL, CreateConstructor<StopSound>());
-    clientbound.RegisterPacketConstructor(SystemChat::PACKET_ORDINAL, CreateConstructor<SystemChat>());
-    clientbound.RegisterPacketConstructor(TabHeaderFooter::PACKET_ORDINAL, CreateConstructor<TabHeaderFooter>());
-    clientbound.RegisterPacketConstructor(TagQueryResponse::PACKET_ORDINAL, CreateConstructor<TagQueryResponse>());
-    clientbound.RegisterPacketConstructor(PickupItem::PACKET_ORDINAL, CreateConstructor<PickupItem>());
-    clientbound.RegisterPacketConstructor(EntityTeleport::PACKET_ORDINAL, CreateConstructor<EntityTeleport>());
-    clientbound.RegisterPacketConstructor(Advancements::PACKET_ORDINAL, CreateConstructor<Advancements>());
-    clientbound.RegisterPacketConstructor(EntityProperties::PACKET_ORDINAL, CreateConstructor<EntityProperties>());
-    clientbound.RegisterPacketConstructor(EntityEffect::PACKET_ORDINAL, CreateConstructor<EntityEffect>());
-    clientbound.RegisterPacketConstructor(Recipes::PACKET_ORDINAL, CreateConstructor<Recipes>());
-    clientbound.RegisterPacketConstructor(Tags::PACKET_ORDINAL, CreateConstructor<Tags>());
+    clientbound->RegisterPacketConstructor(
+      MapData::PACKET_ORDINAL, CreateConstructor<MapData>(0, 0, false, false, std::vector<MapIcon> {}, 0, 0, 0, 0, 0, nullptr));
+    clientbound->RegisterPacketConstructor(TradeList::PACKET_ORDINAL, CreateConstructor<TradeList>(0, std::vector<Trade> {}, 0, 0, false, false));
+    clientbound->RegisterPacketConstructor(EntityNotMoved::PACKET_ORDINAL, CreateConstructor<EntityNotMoved>());
+    clientbound->RegisterPacketConstructor(EntityPosition::PACKET_ORDINAL, CreateConstructor<EntityPosition>(0, 0, 0, 0, false));
+    clientbound->RegisterPacketConstructor(
+      EntityPositionAndRotation::PACKET_ORDINAL, CreateConstructor<EntityPositionAndRotation>(0, 0, 0, 0, 0, 0, false));
+    clientbound->RegisterPacketConstructor(EntityRotation::PACKET_ORDINAL, CreateConstructor<EntityRotation>(0, 0, 0, false));
+    clientbound->RegisterPacketConstructor(MoveVehicle::PACKET_ORDINAL, CreateConstructor<MoveVehicle>(0, 0, 0, 0, 0));
+    clientbound->RegisterPacketConstructor(OpenBook::PACKET_ORDINAL, CreateConstructor<OpenBook>(0));
+    clientbound->RegisterPacketConstructor(OpenInventory::PACKET_ORDINAL, CreateConstructor<OpenInventory>(0, 0, std::string {}));
+    clientbound->RegisterPacketConstructor(OpenSignEditor::PACKET_ORDINAL, CreateConstructor<OpenSignEditor>(0, 0, 0));
+    clientbound->RegisterPacketConstructor(Ping::PACKET_ORDINAL, CreateConstructor<Ping>(0));
+    clientbound->RegisterPacketConstructor(CraftRecipeResponse::PACKET_ORDINAL, CreateConstructor<CraftRecipeResponse>(0, std::string {}));
+    clientbound->RegisterPacketConstructor(LegacyCraftRecipeResponse::PACKET_ORDINAL, CreateConstructor<LegacyCraftRecipeResponse>(0, 0));
+    clientbound->RegisterPacketConstructor(
+      ServerPlayerAbilities::PACKET_ORDINAL, CreateConstructor<ServerPlayerAbilities>(false, false, false, false, 0, 0));
+    clientbound->RegisterPacketConstructor(MessageHeader::PACKET_ORDINAL, CreateConstructor<MessageHeader>(nullptr, UUID {}));
+    clientbound->RegisterPacketConstructor(LegacyChat::PACKET_ORDINAL, CreateConstructor<LegacyChat>());
+    clientbound->RegisterPacketConstructor(ServerPlayerChat::PACKET_ORDINAL, CreateConstructor<ServerPlayerChat>());
+    clientbound->RegisterPacketConstructor(CombatEvent::PACKET_ORDINAL, CreateConstructor<CombatEvent>());
+    clientbound->RegisterPacketConstructor(EndCombatEvent::PACKET_ORDINAL, CreateConstructor<EndCombatEvent>(0, 0));
+    clientbound->RegisterPacketConstructor(EnterCombatEvent::PACKET_ORDINAL, CreateConstructor<EnterCombatEvent>());
+    clientbound->RegisterPacketConstructor(DeathCombatEvent::PACKET_ORDINAL, CreateConstructor<DeathCombatEvent>(0, 0, std::string {}));
+    clientbound->RegisterPacketConstructor(PlayerListItem::PACKET_ORDINAL, CreateConstructor<PlayerListItem>(0, std::vector<PlayerListAction*> {}));
+    clientbound->RegisterPacketConstructor(PlayerFace::PACKET_ORDINAL, CreateConstructor<PlayerFace>());
+    clientbound->RegisterPacketConstructor(PositionRotation::PACKET_ORDINAL, CreateConstructor<PositionRotation>());
+    clientbound->RegisterPacketConstructor(UseBed::PACKET_ORDINAL, CreateConstructor<UseBed>());
+    clientbound->RegisterPacketConstructor(UnlockRecipes::PACKET_ORDINAL, CreateConstructor<UnlockRecipes>());
+    clientbound->RegisterPacketConstructor(EntityRemove::PACKET_ORDINAL, CreateConstructor<EntityRemove>());
+    clientbound->RegisterPacketConstructor(EntityEffectRemove::PACKET_ORDINAL, CreateConstructor<EntityEffectRemove>());
+    clientbound->RegisterPacketConstructor(ResourcePackRequest::PACKET_ORDINAL, CreateConstructor<ResourcePackRequest>());
+    clientbound->RegisterPacketConstructor(Respawn::PACKET_ORDINAL, CreateConstructor<Respawn>());
+    clientbound->RegisterPacketConstructor(EntityLookAt::PACKET_ORDINAL, CreateConstructor<EntityLookAt>());
+    clientbound->RegisterPacketConstructor(SectionBlocks::PACKET_ORDINAL, CreateConstructor<SectionBlocks>());
+    clientbound->RegisterPacketConstructor(SelectAdvancementsTab::PACKET_ORDINAL, CreateConstructor<SelectAdvancementsTab>());
+    clientbound->RegisterPacketConstructor(ServerData::PACKET_ORDINAL, CreateConstructor<ServerData>());
+    clientbound->RegisterPacketConstructor(ActionBar::PACKET_ORDINAL, CreateConstructor<ActionBar>());
+    clientbound->RegisterPacketConstructor(BorderCenter::PACKET_ORDINAL, CreateConstructor<BorderCenter>());
+    clientbound->RegisterPacketConstructor(BorderRadiusSpeed::PACKET_ORDINAL, CreateConstructor<BorderRadiusSpeed>());
+    clientbound->RegisterPacketConstructor(BorderRadius::PACKET_ORDINAL, CreateConstructor<BorderRadius>());
+    clientbound->RegisterPacketConstructor(BorderWarningTime::PACKET_ORDINAL, CreateConstructor<BorderWarningTime>());
+    clientbound->RegisterPacketConstructor(BorderWarningRadius::PACKET_ORDINAL, CreateConstructor<BorderWarningRadius>());
+    clientbound->RegisterPacketConstructor(LegacyWorldBorder::PACKET_ORDINAL, CreateConstructor<LegacyWorldBorder>());
+    clientbound->RegisterPacketConstructor(Camera::PACKET_ORDINAL, CreateConstructor<Camera>());
+    clientbound->RegisterPacketConstructor(HeldSlot::PACKET_ORDINAL, CreateConstructor<HeldSlot>());
+    clientbound->RegisterPacketConstructor(ViewPosition::PACKET_ORDINAL, CreateConstructor<ViewPosition>());
+    clientbound->RegisterPacketConstructor(ViewDistance::PACKET_ORDINAL, CreateConstructor<ViewDistance>());
+    clientbound->RegisterPacketConstructor(DefaultSpawnPosition::PACKET_ORDINAL, CreateConstructor<DefaultSpawnPosition>());
+    // clientbound->RegisterPacketConstructor(); TODO: SetDisplayChatPreview
+    clientbound->RegisterPacketConstructor(DisplayObjective::PACKET_ORDINAL, CreateConstructor<DisplayObjective>());
+    clientbound->RegisterPacketConstructor(EntityMetadata::PACKET_ORDINAL, CreateConstructor<EntityMetadata>());
+    clientbound->RegisterPacketConstructor(LeadEntities::PACKET_ORDINAL, CreateConstructor<LeadEntities>());
+    clientbound->RegisterPacketConstructor(EntityVelocity::PACKET_ORDINAL, CreateConstructor<EntityVelocity>());
+    clientbound->RegisterPacketConstructor(EntityEquipment::PACKET_ORDINAL, CreateConstructor<EntityEquipment>());
+    clientbound->RegisterPacketConstructor(Experience::PACKET_ORDINAL, CreateConstructor<Experience>());
+    clientbound->RegisterPacketConstructor(Health::PACKET_ORDINAL, CreateConstructor<Health>());
+    clientbound->RegisterPacketConstructor(Objectives::PACKET_ORDINAL, CreateConstructor<Objectives>());
+    clientbound->RegisterPacketConstructor(Passengers::PACKET_ORDINAL, CreateConstructor<Passengers>());
+    clientbound->RegisterPacketConstructor(Teams::PACKET_ORDINAL, CreateConstructor<Teams>());
+    clientbound->RegisterPacketConstructor(Score::PACKET_ORDINAL, CreateConstructor<Score>());
+    clientbound->RegisterPacketConstructor(SimulationDistance::PACKET_ORDINAL, CreateConstructor<SimulationDistance>());
+    clientbound->RegisterPacketConstructor(Subtitle::PACKET_ORDINAL, CreateConstructor<Subtitle>());
+    clientbound->RegisterPacketConstructor(WorldTime::PACKET_ORDINAL, CreateConstructor<WorldTime>());
+    clientbound->RegisterPacketConstructor(LegacyTitle::PACKET_ORDINAL, CreateConstructor<LegacyTitle>());
+    clientbound->RegisterPacketConstructor(Title::PACKET_ORDINAL, CreateConstructor<Title>());
+    clientbound->RegisterPacketConstructor(TitleTimes::PACKET_ORDINAL, CreateConstructor<TitleTimes>());
+    clientbound->RegisterPacketConstructor(EntitySoundEffect::PACKET_ORDINAL, CreateConstructor<EntitySoundEffect>());
+    clientbound->RegisterPacketConstructor(HardcodedSoundEffect::PACKET_ORDINAL, CreateConstructor<HardcodedSoundEffect>());
+    clientbound->RegisterPacketConstructor(StopSound::PACKET_ORDINAL, CreateConstructor<StopSound>());
+    clientbound->RegisterPacketConstructor(SystemChat::PACKET_ORDINAL, CreateConstructor<SystemChat>());
+    clientbound->RegisterPacketConstructor(TabHeaderFooter::PACKET_ORDINAL, CreateConstructor<TabHeaderFooter>());
+    clientbound->RegisterPacketConstructor(TagQueryResponse::PACKET_ORDINAL, CreateConstructor<TagQueryResponse>());
+    clientbound->RegisterPacketConstructor(PickupItem::PACKET_ORDINAL, CreateConstructor<PickupItem>());
+    clientbound->RegisterPacketConstructor(EntityTeleport::PACKET_ORDINAL, CreateConstructor<EntityTeleport>());
+    clientbound->RegisterPacketConstructor(Advancements::PACKET_ORDINAL, CreateConstructor<Advancements>());
+    clientbound->RegisterPacketConstructor(EntityProperties::PACKET_ORDINAL, CreateConstructor<EntityProperties>());
+    clientbound->RegisterPacketConstructor(EntityEffect::PACKET_ORDINAL, CreateConstructor<EntityEffect>());
+    clientbound->RegisterPacketConstructor(Recipes::PACKET_ORDINAL, CreateConstructor<Recipes>());
+    clientbound->RegisterPacketConstructor(Tags::PACKET_ORDINAL, CreateConstructor<Tags>());
 
-    DirectionRegistry serverbound(serverboundRegistry);
+    auto* serverbound = new DirectionRegistry(serverboundRegistry);
 
-    serverbound.RegisterPacketConstructor(ConfirmTeleport::PACKET_ORDINAL, CreateConstructor<ConfirmTeleport>());
-    serverbound.RegisterPacketConstructor(BlockTagQueryRequest::PACKET_ORDINAL, CreateConstructor<BlockTagQueryRequest>());
-    serverbound.RegisterPacketConstructor(ClientChangeDifficulty::PACKET_ORDINAL, CreateConstructor<ClientChangeDifficulty>());
-    serverbound.RegisterPacketConstructor(Command::PACKET_ORDINAL, CreateConstructor<Command>());
-    serverbound.RegisterPacketConstructor(CommandSuggestionRequest::PACKET_ORDINAL, CreateConstructor<CommandSuggestionRequest>());
-    serverbound.RegisterPacketConstructor(LegacyChat::PACKET_ORDINAL, CreateConstructor<LegacyChat>());
-    serverbound.RegisterPacketConstructor(ClientAction::PACKET_ORDINAL, CreateConstructor<ClientAction>());
-    serverbound.RegisterPacketConstructor(ClientSettings::PACKET_ORDINAL, CreateConstructor<ClientSettings>());
-    serverbound.RegisterPacketConstructor(ConfirmTransaction::PACKET_ORDINAL, CreateConstructor<ConfirmTransaction>());
-    serverbound.RegisterPacketConstructor(LegacyEnchant::PACKET_ORDINAL, CreateConstructor<LegacyEnchant>());
-    serverbound.RegisterPacketConstructor(ClickInventoryButton::PACKET_ORDINAL, CreateConstructor<ClickInventoryButton>());
-    serverbound.RegisterPacketConstructor(ClickSlot::PACKET_ORDINAL, CreateConstructor<ClickSlot>());
-    serverbound.RegisterPacketConstructor(CloseInventory::PACKET_ORDINAL, CreateConstructor<CloseInventory>());
-    serverbound.RegisterPacketConstructor(PluginMessage::PACKET_ORDINAL, CreateConstructor<PluginMessage>());
-    serverbound.RegisterPacketConstructor(EditBook::PACKET_ORDINAL, CreateConstructor<EditBook>());
-    serverbound.RegisterPacketConstructor(TagQueryRequest::PACKET_ORDINAL, CreateConstructor<TagQueryRequest>());
-    serverbound.RegisterPacketConstructor(EntityInteract::PACKET_ORDINAL, CreateConstructor<EntityInteract>());
-    serverbound.RegisterPacketConstructor(GenerateStructure::PACKET_ORDINAL, CreateConstructor<GenerateStructure>());
-    serverbound.RegisterPacketConstructor(KeepAlive::PACKET_ORDINAL, CreateConstructor<KeepAlive>());
-    serverbound.RegisterPacketConstructor(LockDifficulty::PACKET_ORDINAL, CreateConstructor<LockDifficulty>());
-    serverbound.RegisterPacketConstructor(MoveGroundOnly::PACKET_ORDINAL, CreateConstructor<MoveGroundOnly>());
-    serverbound.RegisterPacketConstructor(MovePositionOnly::PACKET_ORDINAL, CreateConstructor<MovePositionOnly>());
-    serverbound.RegisterPacketConstructor(Move::PACKET_ORDINAL, CreateConstructor<Move>());
-    serverbound.RegisterPacketConstructor(MoveRotationOnly::PACKET_ORDINAL, CreateConstructor<MoveRotationOnly>());
-    serverbound.RegisterPacketConstructor(MoveVehicle::PACKET_ORDINAL, CreateConstructor<MoveVehicle>());
-    serverbound.RegisterPacketConstructor(BoatPaddle::PACKET_ORDINAL, CreateConstructor<BoatPaddle>());
-    serverbound.RegisterPacketConstructor(PickItem::PACKET_ORDINAL, CreateConstructor<PickItem>());
-    serverbound.RegisterPacketConstructor(CraftRecipeRequest::PACKET_ORDINAL, CreateConstructor<CraftRecipeRequest>());
-    serverbound.RegisterPacketConstructor(PlayerAbilities::PACKET_ORDINAL, CreateConstructor<PlayerAbilities>());
-    serverbound.RegisterPacketConstructor(Digging::PACKET_ORDINAL, CreateConstructor<Digging>());
-    serverbound.RegisterPacketConstructor(EntityAction::PACKET_ORDINAL, CreateConstructor<EntityAction>());
-    serverbound.RegisterPacketConstructor(PlayerInput::PACKET_ORDINAL, CreateConstructor<PlayerInput>());
-    serverbound.RegisterPacketConstructor(SeenRecipe::PACKET_ORDINAL, CreateConstructor<SeenRecipe>());
-    serverbound.RegisterPacketConstructor(ChangeRecipeBookSettings::PACKET_ORDINAL, CreateConstructor<ChangeRecipeBookSettings>());
-    serverbound.RegisterPacketConstructor(LegacyRecipeBook::PACKET_ORDINAL, CreateConstructor<LegacyRecipeBook>());
-    serverbound.RegisterPacketConstructor(RenameItem::PACKET_ORDINAL, CreateConstructor<RenameItem>());
-    serverbound.RegisterPacketConstructor(ResourcePackResponse::PACKET_ORDINAL, CreateConstructor<ResourcePackResponse>());
-    serverbound.RegisterPacketConstructor(SelectAdvancementsTab::PACKET_ORDINAL, CreateConstructor<SelectAdvancementsTab>());
-    serverbound.RegisterPacketConstructor(SelectTrade::PACKET_ORDINAL, CreateConstructor<SelectTrade>());
-    serverbound.RegisterPacketConstructor(BeaconEffect::PACKET_ORDINAL, CreateConstructor<BeaconEffect>());
-    serverbound.RegisterPacketConstructor(HeldSlot::PACKET_ORDINAL, CreateConstructor<HeldSlot>());
-    serverbound.RegisterPacketConstructor(ProgramCommandBlock::PACKET_ORDINAL, CreateConstructor<ProgramCommandBlock>());
-    serverbound.RegisterPacketConstructor(ProgramCommandBlockMinecart::PACKET_ORDINAL, CreateConstructor<ProgramCommandBlockMinecart>());
-    serverbound.RegisterPacketConstructor(CreativeSlot::PACKET_ORDINAL, CreateConstructor<CreativeSlot>());
-    serverbound.RegisterPacketConstructor(ProgramJigsawBlock::PACKET_ORDINAL, CreateConstructor<ProgramJigsawBlock>());
-    serverbound.RegisterPacketConstructor(ProgramStructureBlock::PACKET_ORDINAL, CreateConstructor<ProgramStructureBlock>());
-    serverbound.RegisterPacketConstructor(EditSign::PACKET_ORDINAL, CreateConstructor<EditSign>());
-    serverbound.RegisterPacketConstructor(SwingArm::PACKET_ORDINAL, CreateConstructor<SwingArm>());
-    serverbound.RegisterPacketConstructor(Spectate::PACKET_ORDINAL, CreateConstructor<Spectate>());
-    serverbound.RegisterPacketConstructor(Camera::PACKET_ORDINAL, CreateConstructor<Camera>());
-    serverbound.RegisterPacketConstructor(PlaceBlock::PACKET_ORDINAL, CreateConstructor<PlaceBlock>());
-    serverbound.RegisterPacketConstructor(UseItem::PACKET_ORDINAL, CreateConstructor<UseItem>());
+    serverbound->RegisterPacketConstructor(ConfirmTeleport::PACKET_ORDINAL, CreateConstructor<ConfirmTeleport>());
+    serverbound->RegisterPacketConstructor(BlockTagQueryRequest::PACKET_ORDINAL, CreateConstructor<BlockTagQueryRequest>());
+    serverbound->RegisterPacketConstructor(ClientChangeDifficulty::PACKET_ORDINAL, CreateConstructor<ClientChangeDifficulty>());
+    serverbound->RegisterPacketConstructor(ClientChatPreview::PACKET_ORDINAL, CreateConstructor<ClientChatPreview>(0, std::string {}));
+    serverbound->RegisterPacketConstructor(Command::PACKET_ORDINAL, CreateConstructor<Command>());
+    serverbound->RegisterPacketConstructor(CommandSuggestionRequest::PACKET_ORDINAL, CreateConstructor<CommandSuggestionRequest>());
+    serverbound->RegisterPacketConstructor(LegacyChat::PACKET_ORDINAL, CreateConstructor<LegacyChat>());
+    serverbound->RegisterPacketConstructor(ClientPlayerChat::PACKET_ORDINAL, CreateConstructor<ClientPlayerChat>());
+    serverbound->RegisterPacketConstructor(ClientAction::PACKET_ORDINAL, CreateConstructor<ClientAction>());
+    serverbound->RegisterPacketConstructor(ClientSettings::PACKET_ORDINAL, CreateConstructor<ClientSettings>());
+    serverbound->RegisterPacketConstructor(ConfirmTransaction::PACKET_ORDINAL, CreateConstructor<ConfirmTransaction>());
+    serverbound->RegisterPacketConstructor(LegacyEnchant::PACKET_ORDINAL, CreateConstructor<LegacyEnchant>());
+    serverbound->RegisterPacketConstructor(ClickInventoryButton::PACKET_ORDINAL, CreateConstructor<ClickInventoryButton>());
+    serverbound->RegisterPacketConstructor(ClickSlot::PACKET_ORDINAL, CreateConstructor<ClickSlot>());
+    serverbound->RegisterPacketConstructor(CloseInventory::PACKET_ORDINAL, CreateConstructor<CloseInventory>(0));
+    serverbound->RegisterPacketConstructor(PluginMessage::PACKET_ORDINAL, CreateConstructor<PluginMessage>(std::string {}, nullptr));
+    serverbound->RegisterPacketConstructor(EditBook::PACKET_ORDINAL, CreateConstructor<EditBook>());
+    serverbound->RegisterPacketConstructor(TagQueryRequest::PACKET_ORDINAL, CreateConstructor<TagQueryRequest>());
+    serverbound->RegisterPacketConstructor(EntityInteract::PACKET_ORDINAL, CreateConstructor<EntityInteract>());
+    serverbound->RegisterPacketConstructor(GenerateStructure::PACKET_ORDINAL, CreateConstructor<GenerateStructure>());
+    serverbound->RegisterPacketConstructor(KeepAlive::PACKET_ORDINAL, CreateConstructor<KeepAlive>(0));
+    serverbound->RegisterPacketConstructor(LockDifficulty::PACKET_ORDINAL, CreateConstructor<LockDifficulty>());
+    serverbound->RegisterPacketConstructor(MoveGroundOnly::PACKET_ORDINAL, CreateConstructor<MoveGroundOnly>());
+    serverbound->RegisterPacketConstructor(MovePositionOnly::PACKET_ORDINAL, CreateConstructor<MovePositionOnly>());
+    serverbound->RegisterPacketConstructor(Move::PACKET_ORDINAL, CreateConstructor<Move>());
+    serverbound->RegisterPacketConstructor(MoveRotationOnly::PACKET_ORDINAL, CreateConstructor<MoveRotationOnly>());
+    serverbound->RegisterPacketConstructor(MoveVehicle::PACKET_ORDINAL, CreateConstructor<MoveVehicle>(0, 0, 0, 0, 0));
+    serverbound->RegisterPacketConstructor(BoatPaddle::PACKET_ORDINAL, CreateConstructor<BoatPaddle>());
+    serverbound->RegisterPacketConstructor(PickItem::PACKET_ORDINAL, CreateConstructor<PickItem>());
+    serverbound->RegisterPacketConstructor(CraftRecipeRequest::PACKET_ORDINAL, CreateConstructor<CraftRecipeRequest>());
+    serverbound->RegisterPacketConstructor(ClientPlayerAbilities::PACKET_ORDINAL, CreateConstructor<ClientPlayerAbilities>());
+    serverbound->RegisterPacketConstructor(Digging::PACKET_ORDINAL, CreateConstructor<Digging>());
+    serverbound->RegisterPacketConstructor(EntityAction::PACKET_ORDINAL, CreateConstructor<EntityAction>());
+    serverbound->RegisterPacketConstructor(PlayerInput::PACKET_ORDINAL, CreateConstructor<PlayerInput>());
+    serverbound->RegisterPacketConstructor(SeenRecipe::PACKET_ORDINAL, CreateConstructor<SeenRecipe>());
+    serverbound->RegisterPacketConstructor(ChangeRecipeBookSettings::PACKET_ORDINAL, CreateConstructor<ChangeRecipeBookSettings>());
+    serverbound->RegisterPacketConstructor(LegacyRecipeBook::PACKET_ORDINAL, CreateConstructor<LegacyRecipeBook>());
+    serverbound->RegisterPacketConstructor(RenameItem::PACKET_ORDINAL, CreateConstructor<RenameItem>());
+    serverbound->RegisterPacketConstructor(ResourcePackResponse::PACKET_ORDINAL, CreateConstructor<ResourcePackResponse>());
+    serverbound->RegisterPacketConstructor(SelectAdvancementsTab::PACKET_ORDINAL, CreateConstructor<SelectAdvancementsTab>());
+    serverbound->RegisterPacketConstructor(SelectTrade::PACKET_ORDINAL, CreateConstructor<SelectTrade>());
+    serverbound->RegisterPacketConstructor(BeaconEffect::PACKET_ORDINAL, CreateConstructor<BeaconEffect>());
+    serverbound->RegisterPacketConstructor(HeldSlot::PACKET_ORDINAL, CreateConstructor<HeldSlot>());
+    serverbound->RegisterPacketConstructor(ProgramCommandBlock::PACKET_ORDINAL, CreateConstructor<ProgramCommandBlock>());
+    serverbound->RegisterPacketConstructor(ProgramCommandBlockMinecart::PACKET_ORDINAL, CreateConstructor<ProgramCommandBlockMinecart>());
+    serverbound->RegisterPacketConstructor(CreativeSlot::PACKET_ORDINAL, CreateConstructor<CreativeSlot>());
+    serverbound->RegisterPacketConstructor(ProgramJigsawBlock::PACKET_ORDINAL, CreateConstructor<ProgramJigsawBlock>());
+    serverbound->RegisterPacketConstructor(ProgramStructureBlock::PACKET_ORDINAL, CreateConstructor<ProgramStructureBlock>());
+    serverbound->RegisterPacketConstructor(EditSign::PACKET_ORDINAL, CreateConstructor<EditSign>());
+    serverbound->RegisterPacketConstructor(SwingArm::PACKET_ORDINAL, CreateConstructor<SwingArm>());
+    serverbound->RegisterPacketConstructor(Spectate::PACKET_ORDINAL, CreateConstructor<Spectate>());
+    serverbound->RegisterPacketConstructor(Camera::PACKET_ORDINAL, CreateConstructor<Camera>());
+    serverbound->RegisterPacketConstructor(PlaceBlock::PACKET_ORDINAL, CreateConstructor<PlaceBlock>());
+    serverbound->RegisterPacketConstructor(UseItem::PACKET_ORDINAL, CreateConstructor<UseItem>());
 
     return {clientbound, serverbound};
   }

@@ -12,6 +12,14 @@ namespace Ship {
     particle->Write(version, buffer);
   }
 
+  void ProtocolUtils::WriteMetadata(const ProtocolVersion* version, ByteBuffer* buffer, Metadata* metadata) {
+    if (metadata) {
+      metadata->Write(version, buffer);
+    } else {
+      buffer->WriteByte(0xFF);
+    }
+  }
+
   NBT* ProtocolUtils::ReadNBT(ByteBuffer* buffer) {
     auto type = (TagType) buffer->ReadByte();
 
@@ -30,6 +38,12 @@ namespace Ship {
     return particle;
   }
 
+  Metadata* ProtocolUtils::ReadMetadata(const ProtocolVersion* version, ByteBuffer* buffer) {
+    auto* metadata = new Metadata();
+    metadata->Read(version, buffer);
+    return metadata;
+  }
+
   uint32_t ProtocolUtils::NBTSize(NBT* nbt) {
     if (nbt) {
       return ByteBuffer::BYTE_SIZE + ByteBuffer::StringBytes(nbt->GetName()) + nbt->GetSize();
@@ -40,5 +54,13 @@ namespace Ship {
 
   uint32_t ProtocolUtils::ParticleSize(const ProtocolVersion* version, AbstractParticle* particle) {
     return ByteBuffer::VarIntBytes(PARTICLE_REGISTRY.GetIDByOrdinal(version, particle->GetOrdinal())) + particle->Size(version);
+  }
+
+  uint32_t ProtocolUtils::MetadataSize(const ProtocolVersion* version, Metadata* metadata) {
+    if (metadata) {
+      return metadata->Size(version);
+    } else {
+      return 1;
+    }
   }
 } // Ship

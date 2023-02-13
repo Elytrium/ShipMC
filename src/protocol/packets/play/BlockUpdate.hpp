@@ -7,23 +7,53 @@
 namespace Ship {
 
   class BlockUpdate : public Packet {
+   private:
+    int locationX;
+    int locationY;
+    int locationZ;
+    uint32_t blockId;
+
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
-    ~BlockUpdate() override {
+
+    BlockUpdate(int locationX, int locationY, int locationZ, uint32_t blockId)
+      : locationX(locationX), locationY(locationY), locationZ(locationZ), blockId(blockId) {
     }
 
+    ~BlockUpdate() override = default;
+
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+      buffer->ReadPosition(locationX, locationX, locationZ);
+      buffer->WriteVarInt(blockId);
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+      buffer->WritePosition(locationX, locationY, locationZ);
+      buffer->WriteVarInt(blockId);
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return 0;
+      return ByteBuffer::POSITION_SIZE + ByteBuffer::VarIntBytes(blockId);
     }
 
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
+    }
+
+    [[nodiscard]] int GetLocationX() const {
+      return locationX;
+    }
+
+    [[nodiscard]] int GetLocationY() const {
+      return locationY;
+    }
+
+    [[nodiscard]] int GetLocationZ() const {
+      return locationZ;
+    }
+
+    [[nodiscard]] uint32_t GetBlockId() const {
+      return blockId;
     }
   };
 }

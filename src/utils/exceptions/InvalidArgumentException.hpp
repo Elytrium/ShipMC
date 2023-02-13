@@ -10,7 +10,7 @@ namespace Ship {
    private:
     std::string text;
     uint32_t argument;
-    const char** check = new const char*[1];
+    std::string* check = new std::string[1];
 
    public:
     InvalidArgumentException(std::string text, uint32_t argument) : text(std::move(text)), argument(argument) {
@@ -29,8 +29,8 @@ namespace Ship {
     }
 
     [[nodiscard]] const char* what() const noexcept override {
-      this->check[0] = (this->text + std::to_string(argument)).c_str();
-      return *this->check;
+      *this->check = this->text + std::to_string(argument);
+      return this->check->c_str();
     }
   };
 }

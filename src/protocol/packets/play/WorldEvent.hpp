@@ -7,23 +7,67 @@
 namespace Ship {
 
   class WorldEvent : public Packet {
+   private:
+    uint32_t event;
+    int locationX;
+    int locationY;
+    int locationZ;
+    uint32_t data;
+    bool disableRelativeVolume;
+
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
-    ~WorldEvent() override {
+
+    WorldEvent(uint32_t event, int locationX, int locationY, int locationZ, uint32_t data, bool disableRelativeVolume)
+      : event(event), locationX(locationX), locationY(locationY), locationZ(locationZ), data(data), disableRelativeVolume(disableRelativeVolume) {
     }
 
+    ~WorldEvent() override = default;
+
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+      event = buffer->ReadInt();
+      buffer->ReadPosition(locationX, locationY, locationZ);
+      data = buffer->ReadInt();
+      disableRelativeVolume = buffer->ReadBoolean();
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+      buffer->WriteInt(event);
+      buffer->WritePosition(locationX, locationY, locationZ);
+      buffer->WriteInt(data);
+      buffer->WriteBoolean(disableRelativeVolume);
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return 0;
+      return ByteBuffer::INT_SIZE + ByteBuffer::POSITION_SIZE + ByteBuffer::INT_SIZE + ByteBuffer::BOOLEAN_SIZE;
     }
 
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
+    }
+
+    [[nodiscard]] uint32_t GetEvent() const {
+      return event;
+    }
+
+    [[nodiscard]] int GetLocationX() const {
+      return locationX;
+    }
+
+    [[nodiscard]] int GetLocationY() const {
+      return locationY;
+    }
+
+    [[nodiscard]] int GetLocationZ() const {
+      return locationZ;
+    }
+
+    [[nodiscard]] uint32_t GetData() const {
+      return data;
+    }
+
+    [[nodiscard]] bool IsDisableRelativeVolume() const {
+      return disableRelativeVolume;
     }
   };
 }

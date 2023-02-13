@@ -6,10 +6,10 @@
 
 namespace Ship {
 
-  class PlayerAbilities : public Packet {
+  class ClientPlayerChat : public Packet {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
-    ~PlayerAbilities() override {
+    ~ClientPlayerChat() override {
     }
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {

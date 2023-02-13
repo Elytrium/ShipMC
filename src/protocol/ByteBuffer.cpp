@@ -15,6 +15,7 @@ namespace Ship {
   const uint32_t ByteBuffer::DOUBLE_SIZE = LONG_SIZE;
   const uint32_t ByteBuffer::BOOLEAN_SIZE = BYTE_SIZE;
   const uint32_t ByteBuffer::POSITION_SIZE = LONG_SIZE;
+  const uint32_t ByteBuffer::ANGLE_SIZE = BYTE_SIZE;
   const uint32_t ByteBuffer::UUID_SIZE = LONG_SIZE * 2;
   
   ByteBuffer::ByteBuffer(size_t cap) {
@@ -44,6 +45,10 @@ namespace Ship {
     } else {
       return 5;
     }
+  }
+
+  uint32_t ByteBuffer::VarLongBytes(uint64_t varLong) {
+    return 0; // TODO: VarLong
   }
 
   uint32_t ByteBuffer::StringBytes(const std::string& string) {
@@ -126,12 +131,16 @@ namespace Ship {
     WriteByte(input);
   }
 
+  void ByteBuffer::WriteVarLong(uint64_t input) {
+    // TODO: VarLong
+  }
+
   void ByteBuffer::WriteBytes(uint8_t* input, size_t size) {
     size_t bytesIndex = 0;
     TryRefreshWriterBuffer();
 
     if (localWriterIndex + size >= singleCapacity) {
-      std::copy(currentWriteBuffer + localWriterIndex, currentWriteBuffer + singleCapacity, input);
+      std::copy(input, input + singleCapacity - localWriterIndex, currentWriteBuffer + localWriterIndex);
       size_t copiedBytes = singleCapacity - localWriterIndex;
       size -= copiedBytes;
       readableBytes += copiedBytes;
@@ -140,7 +149,7 @@ namespace Ship {
       AppendBuffer();
 
       while (size >= singleCapacity) {
-        std::copy(currentWriteBuffer, currentWriteBuffer + singleCapacity, input + bytesIndex);
+        std::copy(input + bytesIndex, input + bytesIndex + singleCapacity, currentWriteBuffer + localWriterIndex);
         size -= singleCapacity;
         readableBytes += singleCapacity;
         bytesIndex += singleCapacity;
@@ -149,7 +158,7 @@ namespace Ship {
       }
     }
 
-    std::copy(currentWriteBuffer + localWriterIndex, currentWriteBuffer + localWriterIndex + size, input + bytesIndex);
+    std::copy(input + bytesIndex, input + bytesIndex + size, currentWriteBuffer + localWriterIndex);
     localWriterIndex += size;
     readableBytes += size;
   }
@@ -209,6 +218,10 @@ namespace Ship {
 
   void ByteBuffer::WritePosition(int x, int y, int z) {
     WriteLong(((x & 0x3FFFFFFULL) << 38) | ((z & 0x3FFFFFFULL) << 12) | (y & 0xFFF));
+  }
+
+  void ByteBuffer::WriteAngle(float input) {
+    WriteByte((uint8_t) (input * (256.0F / 360.0F)));
   }
 
   bool ByteBuffer::ReadBoolean() {
@@ -277,6 +290,10 @@ namespace Ship {
 
     return (uint64_t) ReadByteUnsafe() << 56 | (uint64_t) ReadByteUnsafe() << 48 | (uint64_t) ReadByteUnsafe() << 32 | (uint64_t) ReadByteUnsafe() << 24
          | (uint64_t) ReadByteUnsafe() << 16 | (uint64_t) ReadByteUnsafe() << 8 | (uint64_t) ReadByteUnsafe();
+  }
+
+  uint64_t ByteBuffer::ReadVarLong() {
+    return 0; // TODO: VarLong
   }
 
   uint8_t* ByteBuffer::ReadBytes(size_t size) {
@@ -374,6 +391,10 @@ namespace Ship {
     if (z >= 1 << 25) {
       z -= 1 << 26;
     }
+  }
+
+  float ByteBuffer::ReadAngle() {
+    return (float) ReadByte() / (256.0F / 360.0F);
   }
 
   ByteBuffer::~ByteBuffer() {

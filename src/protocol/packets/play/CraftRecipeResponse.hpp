@@ -3,27 +3,47 @@
 #include "../../../utils/ordinal/OrdinalRegistry.hpp"
 #include "../Packet.hpp"
 #include <string>
+#include <utility>
 
 namespace Ship {
 
   class CraftRecipeResponse : public Packet {
+   private:
+    uint8_t windowId;
+    std::string recipe;
+
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
-    ~CraftRecipeResponse() override {
+
+    CraftRecipeResponse(uint8_t windowId, std::string recipe) : windowId(windowId), recipe(std::move(recipe)) {
     }
 
+    ~CraftRecipeResponse() override = default;
+
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+      windowId = buffer->ReadByte();
+      recipe = buffer->ReadString();
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+      buffer->WriteByte(windowId);
+      buffer->WriteString(recipe);
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return 0;
+      return ByteBuffer::BYTE_SIZE + ByteBuffer::StringBytes(recipe);
     }
 
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
+    }
+
+    [[nodiscard]] uint8_t GetWindowId() const {
+      return windowId;
+    }
+
+    [[nodiscard]] const std::string& GetRecipe() const {
+      return recipe;
     }
   };
 }

@@ -3,37 +3,35 @@
 #include "../../../utils/ordinal/OrdinalRegistry.hpp"
 #include "../Packet.hpp"
 #include <string>
+#include <utility>
 
 namespace Ship {
 
-  class OpenHorseInventory : public Packet {
+  class LegacyCraftRecipeResponse : public Packet {
    private:
     uint8_t windowId;
-    uint32_t slotCount;
-    uint32_t entityId;
+    uint32_t recipe;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    OpenHorseInventory(uint8_t windowId, uint32_t slotCount, uint32_t entityId) : windowId(windowId), slotCount(slotCount), entityId(entityId) {
+    LegacyCraftRecipeResponse(uint8_t windowId, uint32_t recipe) : windowId(windowId), recipe(recipe) {
     }
 
-    ~OpenHorseInventory() override = default;
+    ~LegacyCraftRecipeResponse() override = default;
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
       windowId = buffer->ReadByte();
-      slotCount = buffer->ReadVarInt();
-      entityId = buffer->ReadInt();
+      recipe = buffer->ReadVarInt();
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
       buffer->WriteByte(windowId);
-      buffer->WriteVarInt(slotCount);
-      buffer->WriteInt(entityId);
+      buffer->WriteVarInt(recipe);
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::BYTE_SIZE + ByteBuffer::VarIntBytes(slotCount) + ByteBuffer::INT_SIZE;
+      return ByteBuffer::BYTE_SIZE + ByteBuffer::VarIntBytes(recipe);
     }
 
     uint32_t GetOrdinal() override {
@@ -44,12 +42,8 @@ namespace Ship {
       return windowId;
     }
 
-    [[nodiscard]] uint32_t GetSlotCount() const {
-      return slotCount;
-    }
-
-    [[nodiscard]] uint32_t GetEntityId() const {
-      return entityId;
+    [[nodiscard]] uint32_t GetRecipe() const {
+      return recipe;
     }
   };
 }

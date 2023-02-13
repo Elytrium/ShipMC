@@ -1,29 +1,104 @@
 #pragma once
 
 #include "../../../utils/ordinal/OrdinalRegistry.hpp"
+#include "../../ProtocolUtils.hpp"
+#include "../../data/entity/metadata/Metadata.hpp"
 #include "../Packet.hpp"
 #include <string>
 
 namespace Ship {
 
   class SpawnPlayer : public Packet {
+   private:
+    uint32_t entityId;
+    UUID playerUuid;
+    double x;
+    double y;
+    double z;
+    float yaw;
+    float pitch;
+    Metadata* metadata;
+
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
+
+    SpawnPlayer(uint32_t entityId, const UUID& playerUuid, double x, double y, double z, float yaw, float pitch, Metadata* metadata)
+      : entityId(entityId), playerUuid(playerUuid), x(x), y(y), z(z), yaw(yaw), pitch(pitch), metadata(metadata) {
+    }
+
     ~SpawnPlayer() override {
+      delete metadata;
     }
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+      entityId = buffer->ReadVarInt();
+      playerUuid = buffer->ReadUUID();
+      x = buffer->ReadDouble();
+      y = buffer->ReadDouble();
+      z = buffer->ReadDouble();
+      yaw = buffer->ReadAngle();
+      pitch = buffer->ReadAngle();
+      if (version <= &ProtocolVersion::MINECRAFT_1_14_4) {
+        delete metadata;
+        metadata = ProtocolUtils::ReadMetadata(version, buffer);
+      }
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+      buffer->WriteVarInt(entityId);
+      buffer->WriteUUID(playerUuid);
+      buffer->WriteDouble(x);
+      buffer->WriteDouble(y);
+      buffer->WriteDouble(z);
+      buffer->WriteAngle(yaw);
+      buffer->WriteAngle(pitch);
+      if (version <= &ProtocolVersion::MINECRAFT_1_14_4) {
+        ProtocolUtils::WriteMetadata(version, buffer, metadata);
+      }
     }
 
     uint32_t Size(const ProtocolVersion* version) override {
-      return 0;
+      uint32_t size = ByteBuffer::VarIntBytes(entityId) + ByteBuffer::UUID_SIZE + ByteBuffer::DOUBLE_SIZE * 3 + ByteBuffer::ANGLE_SIZE * 2;
+      if (version <= &ProtocolVersion::MINECRAFT_1_14_4) {
+        return size + ProtocolUtils::MetadataSize(version, metadata);
+      }
+      return size;
     }
 
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
+    }
+
+    [[nodiscard]] uint32_t GetEntityId() const {
+      return entityId;
+    }
+
+    [[nodiscard]] const UUID& GetPlayerUuid() const {
+      return playerUuid;
+    }
+
+    [[nodiscard]] double GetX() const {
+      return x;
+    }
+
+    [[nodiscard]] double GetY() const {
+      return y;
+    }
+
+    [[nodiscard]] double GetZ() const {
+      return z;
+    }
+
+    [[nodiscard]] float GetYaw() const {
+      return yaw;
+    }
+
+    [[nodiscard]] float GetPitch() const {
+      return pitch;
+    }
+
+    [[nodiscard]] Metadata* GetMetadata() const {
+      return metadata;
     }
   };
 }
