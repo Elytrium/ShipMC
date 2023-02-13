@@ -25,7 +25,7 @@ namespace Ship {
       delete precedingSignature;
       if (buffer->ReadBoolean()) {
         uint32_t size = buffer->GetReadableBytes() - ByteBuffer::UUID_SIZE;
-        precedingSignature = new ByteBuffer(buffer->ReadBytes(size), size);
+        precedingSignature = new ByteBufferImpl(buffer->ReadBytes(size), size);
       } else {
         precedingSignature = nullptr;
       }

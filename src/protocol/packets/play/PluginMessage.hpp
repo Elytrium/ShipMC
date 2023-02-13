@@ -26,7 +26,7 @@ namespace Ship {
       channel = buffer->ReadString();
       delete data;
       uint32_t size = buffer->GetReadableBytes();
-      data = new ByteBuffer(buffer->ReadBytes(size), size);
+      data = new ByteBufferImpl(buffer->ReadBytes(size), size);
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {

@@ -26,7 +26,7 @@ namespace Ship {
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      auto* temp = new ByteBuffer(*unknownBytes[version->GetOrdinal()]);
+      auto* temp = new ByteBufferImpl(unknownBytes[version->GetOrdinal()]);
       buffer->WriteBytes(temp, temp->GetReadableBytes());
     }
 
@@ -39,7 +39,7 @@ namespace Ship {
     }
 
     ByteBuffer* GetBytes(const ProtocolVersion* version) {
-      return new ByteBuffer(*unknownBytes[version->GetOrdinal()]);
+      return new ByteBufferImpl(unknownBytes[version->GetOrdinal()]);
     }
   };
 }

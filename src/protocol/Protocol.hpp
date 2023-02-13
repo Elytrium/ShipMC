@@ -89,60 +89,48 @@ namespace Ship {
   };
 
   class ByteBuffer {
-   private:
-    std::deque<uint8_t*> buffers;
-    size_t singleCapacity;
-    uint8_t* currentReadBuffer;
-    uint8_t* currentWriteBuffer;
-    size_t localReaderIndex = 0;
-    size_t localWriterIndex = 0;
-    size_t readableBytes = 0;
-
    public:
-    explicit ByteBuffer(size_t singleCapacity);
-    ByteBuffer(uint8_t* buffer, size_t singleCapacity);
+    virtual ~ByteBuffer();
 
-    ~ByteBuffer();
+    virtual void WriteBoolean(bool input);
+    virtual void WriteByte(uint8_t input) = 0;
+    virtual void WriteShort(uint16_t input);
+    virtual void WriteMedium(uint32_t input);
+    virtual void WriteInt(uint32_t input);
+    virtual void WriteVarInt(uint32_t input);
+    virtual void WriteLong(uint64_t input);
+    virtual void WriteVarLong(uint64_t input);
+    virtual void WriteBytes(uint8_t* input, size_t size) = 0;
+    virtual void WriteBytesAndDelete(uint8_t* input, size_t size) = 0;
+    virtual void WriteBytes(ByteBuffer* input, size_t size) = 0;
+    virtual void WriteUUID(UUID input);
+    virtual void WriteUUIDIntArray(UUID input);
+    virtual void WriteDouble(double input);
+    virtual void WriteFloat(float input);
+    virtual void WriteString(const std::string& input);
+    virtual void WriteProperties(const std::vector<GameProfileProperty> &properties);
+    virtual void WritePosition(int x, int y, int z);
+    virtual void WriteAngle(float input);
 
-    void WriteBoolean(bool input);
-    void WriteByte(uint8_t input);
-    void WriteShort(uint16_t input);
-    void WriteMedium(uint32_t input);
-    void WriteInt(uint32_t input);
-    void WriteVarInt(uint32_t input);
-    void WriteLong(uint64_t input);
-    void WriteVarLong(uint64_t input);
-    void WriteBytes(uint8_t* input, size_t size);
-    void WriteBytesAndDelete(uint8_t* input, size_t size);
-    void WriteBytes(ByteBuffer* input, size_t size);
-    void WriteUUID(UUID input);
-    void WriteUUIDIntArray(UUID input);
-    void WriteDouble(double input);
-    void WriteFloat(float input);
-    void WriteString(const std::string& input);
-    void WriteProperties(const std::vector<GameProfileProperty> &properties);
-    void WritePosition(int x, int y, int z);
-    void WriteAngle(float input);
-
-    bool ReadBoolean();
-    uint8_t ReadByte();
-    uint8_t ReadByteUnsafe();
-    uint16_t ReadShort();
-    uint32_t ReadMedium();
-    uint32_t ReadInt();
-    uint32_t ReadVarInt();
-    uint64_t ReadLong();
-    uint64_t ReadVarLong();
-    uint8_t* ReadBytes(size_t size);
-    double ReadDouble();
-    float ReadFloat();
-    UUID ReadUUID();
-    UUID ReadUUIDIntArray();
-    std::string ReadString();
-    std::string ReadString(uint32_t max_size);
-    std::vector<GameProfileProperty> ReadProperties();
-    void ReadPosition(int& x, int& y, int& z);
-    float ReadAngle();
+    virtual bool ReadBoolean();
+    virtual uint8_t ReadByte();
+    virtual uint8_t ReadByteUnsafe() = 0;
+    virtual uint16_t ReadShort();
+    virtual uint32_t ReadMedium();
+    virtual uint32_t ReadInt();
+    virtual uint32_t ReadVarInt();
+    virtual uint64_t ReadLong();
+    virtual uint64_t ReadVarLong();
+    virtual uint8_t* ReadBytes(size_t size) = 0;
+    virtual double ReadDouble();
+    virtual float ReadFloat();
+    virtual UUID ReadUUID();
+    virtual UUID ReadUUIDIntArray();
+    virtual std::string ReadString();
+    virtual std::string ReadString(uint32_t max_size);
+    virtual std::vector<GameProfileProperty> ReadProperties();
+    virtual void ReadPosition(int& x, int& y, int& z);
+    virtual float ReadAngle();
 
     friend ByteBuffer& operator<<(ByteBuffer& buffer, bool input);
     friend ByteBuffer& operator<<(ByteBuffer& buffer, uint8_t input);
@@ -160,23 +148,24 @@ namespace Ship {
     friend ByteBuffer& operator>>(ByteBuffer& buffer, double& input);
     friend ByteBuffer& operator>>(ByteBuffer& buffer, float& input);
 
-    void Release();
-    void ResetReaderIndex();
-    [[nodiscard]] size_t GetReaderIndex() const;
-    void ResetWriterIndex();
-    [[nodiscard]] size_t GetWriterIndex() const;
-    [[nodiscard]] size_t GetReadableBytes() const;
-    [[nodiscard]] size_t GetSingleCapacity() const;
-    void TryRefreshReaderBuffer();
-    void TryRefreshWriterBuffer();
-    void AppendBuffer();
-    void PopBuffer();
+    virtual void Release() = 0;
+    virtual void ResetReaderIndex() = 0;
+    [[nodiscard]] virtual size_t GetReaderIndex() const = 0;
+    virtual void ResetWriterIndex() = 0;
+    [[nodiscard]] virtual size_t GetWriterIndex() const = 0;
+    [[nodiscard]] virtual size_t GetReadableBytes() const = 0;
+    [[nodiscard]] virtual size_t GetSingleCapacity() const = 0;
+    [[nodiscard]] virtual std::deque<uint8_t*> GetDirectBuffers() const = 0;
+    virtual void TryRefreshReaderBuffer() = 0;
+    virtual void TryRefreshWriterBuffer() = 0;
+    virtual void AppendBuffer() = 0;
+    virtual void PopBuffer() = 0;
 
-    [[nodiscard]] bool CanReadDirect(size_t read_size) const;
-    uint8_t* GetDirectReadAddress();
+    [[nodiscard]] virtual bool CanReadDirect(size_t read_size) const = 0;
+    virtual uint8_t* GetDirectReadAddress() = 0;
 
-    [[nodiscard]] bool CanWriteDirect(size_t write_size) const;
-    uint8_t* GetDirectWriteAddress();
+    [[nodiscard]] virtual bool CanWriteDirect(size_t write_size) const = 0;
+    virtual uint8_t* GetDirectWriteAddress() = 0;
 
     static uint32_t VarIntBytes(uint32_t varInt);
     static uint32_t VarLongBytes(uint64_t varLong);
@@ -194,5 +183,50 @@ namespace Ship {
     static const uint32_t POSITION_SIZE;
     static const uint32_t ANGLE_SIZE;
     static const uint32_t UUID_SIZE;
+  };
+
+  class ByteBufferImpl : public ByteBuffer {
+   private:
+    std::deque<uint8_t*> buffers;
+    size_t singleCapacity;
+    uint8_t* currentReadBuffer;
+    uint8_t* currentWriteBuffer;
+    size_t localReaderIndex = 0;
+    size_t localWriterIndex = 0;
+    size_t readableBytes = 0;
+
+   public:
+    explicit ByteBufferImpl(size_t singleCapacity);
+    ByteBufferImpl(uint8_t* buffer, size_t singleCapacity);
+    explicit ByteBufferImpl(ByteBuffer* buffer);
+
+    ~ByteBufferImpl() override;
+
+    void WriteByte(uint8_t input) override;
+    void WriteBytes(uint8_t* input, size_t size) override;
+    void WriteBytes(ByteBuffer* buffer, size_t size) override;
+
+    uint8_t ReadByteUnsafe() override;
+    uint8_t* ReadBytes(size_t size) override;
+    void WriteBytesAndDelete(uint8_t* input, size_t size) override;
+
+    void Release() override;
+    void ResetReaderIndex() override;
+    [[nodiscard]] size_t GetReaderIndex() const override;
+    void ResetWriterIndex() override;
+    [[nodiscard]] size_t GetWriterIndex() const override;
+    [[nodiscard]] size_t GetReadableBytes() const override;
+    [[nodiscard]] size_t GetSingleCapacity() const override;
+    [[nodiscard]] std::deque<uint8_t*> GetDirectBuffers() const override;
+    void TryRefreshReaderBuffer() override;
+    void TryRefreshWriterBuffer() override;
+    void AppendBuffer() override;
+    void PopBuffer() override;
+
+    [[nodiscard]] bool CanReadDirect(size_t read_size) const override;
+    uint8_t* GetDirectReadAddress() override;
+
+    [[nodiscard]] bool CanWriteDirect(size_t write_size) const override;
+    uint8_t* GetDirectWriteAddress() override;
   };
 }

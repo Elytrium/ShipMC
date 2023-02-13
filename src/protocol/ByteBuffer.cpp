@@ -3,7 +3,6 @@
 #include "Protocol.hpp"
 #include "data/profile/GameProfile.hpp"
 #include <cmath>
-#include <iostream>
 
 namespace Ship {
 
@@ -17,21 +16,8 @@ namespace Ship {
   const uint32_t ByteBuffer::POSITION_SIZE = LONG_SIZE;
   const uint32_t ByteBuffer::ANGLE_SIZE = BYTE_SIZE;
   const uint32_t ByteBuffer::UUID_SIZE = LONG_SIZE * 2;
-  
-  ByteBuffer::ByteBuffer(size_t cap) {
-    singleCapacity = cap;
-    auto* buffer = new uint8_t[singleCapacity];
-    currentReadBuffer = buffer;
-    currentWriteBuffer = buffer;
-    buffers.push_back(buffer);
-  }
 
-  ByteBuffer::ByteBuffer(uint8_t* buffer, size_t cap) {
-    singleCapacity = cap;
-    currentReadBuffer = buffer;
-    currentWriteBuffer = buffer;
-    buffers.push_back(buffer);
-  }
+  ByteBuffer::~ByteBuffer() = default;
 
   uint32_t ByteBuffer::VarIntBytes(uint32_t input) {
     if ((input & (0xFFFFFFFF << 7)) == 0) {
@@ -70,12 +56,6 @@ namespace Ship {
 
   void ByteBuffer::WriteBoolean(bool input) {
     WriteByte(input ? 1 : 0);
-  }
-
-  void ByteBuffer::WriteByte(uint8_t input) {
-    TryRefreshWriterBuffer();
-    ++readableBytes;
-    currentWriteBuffer[localWriterIndex++] = input;
   }
 
   void ByteBuffer::WriteShort(uint16_t input) {
@@ -135,48 +115,6 @@ namespace Ship {
     // TODO: VarLong
   }
 
-  void ByteBuffer::WriteBytes(uint8_t* input, size_t size) {
-    size_t bytesIndex = 0;
-    TryRefreshWriterBuffer();
-
-    if (localWriterIndex + size >= singleCapacity) {
-      std::copy(input, input + singleCapacity - localWriterIndex, currentWriteBuffer + localWriterIndex);
-      size_t copiedBytes = singleCapacity - localWriterIndex;
-      size -= copiedBytes;
-      readableBytes += copiedBytes;
-      bytesIndex += copiedBytes;
-      localWriterIndex = 0;
-      AppendBuffer();
-
-      while (size >= singleCapacity) {
-        std::copy(input + bytesIndex, input + bytesIndex + singleCapacity, currentWriteBuffer + localWriterIndex);
-        size -= singleCapacity;
-        readableBytes += singleCapacity;
-        bytesIndex += singleCapacity;
-        localWriterIndex = 0;
-        AppendBuffer();
-      }
-    }
-
-    std::copy(input + bytesIndex, input + bytesIndex + size, currentWriteBuffer + localWriterIndex);
-    localWriterIndex += size;
-    readableBytes += size;
-  }
-
-  void ByteBuffer::WriteBytesAndDelete(uint8_t* input, size_t size) {
-    if (localWriterIndex == 0 && size == singleCapacity) {
-      buffers.pop_back();
-      buffers.push_back(input);
-    } else {
-      WriteBytes(input, size);
-      delete[] input;
-    }
-  }
-
-  void ByteBuffer::WriteBytes(ByteBuffer* input, size_t size) {
-    WriteBytesAndDelete(input->ReadBytes(size), size);
-  }
-
   void ByteBuffer::WriteUUID(UUID input) {
     WriteLong(input.GetMostSignificant());
     WriteLong(input.GetLeastSignificant());
@@ -225,7 +163,7 @@ namespace Ship {
   }
 
   bool ByteBuffer::ReadBoolean() {
-    if (readableBytes < 1) {
+    if (GetReadableBytes() < 1) {
       throw Exception("Tried to read boolean, but not enough readable bytes");
     }
 
@@ -233,21 +171,15 @@ namespace Ship {
   }
 
   uint8_t ByteBuffer::ReadByte() {
-    if (readableBytes < 1) {
+    if (GetReadableBytes() < 1) {
       throw Exception("Tried to read byte, but not enough readable bytes");
     }
 
     return ReadByteUnsafe();
   }
 
-  uint8_t ByteBuffer::ReadByteUnsafe() {
-    TryRefreshReaderBuffer();
-    --readableBytes;
-    return currentReadBuffer[localReaderIndex++];
-  }
-
   uint16_t ByteBuffer::ReadShort() {
-    if (readableBytes < 2) {
+    if (GetReadableBytes() < 2) {
       throw Exception("Tried to read short, but not enough readable bytes");
     }
 
@@ -255,7 +187,7 @@ namespace Ship {
   }
 
   uint32_t ByteBuffer::ReadMedium() {
-    if (readableBytes < 3) {
+    if (GetReadableBytes() < 3) {
       throw Exception("Tried to read medium, but not enough readable bytes");
     }
 
@@ -263,7 +195,7 @@ namespace Ship {
   }
 
   uint32_t ByteBuffer::ReadInt() {
-    if (readableBytes < 4) {
+    if (GetReadableBytes() < 4) {
       throw Exception("Tried to read int, but not enough readable bytes");
     }
 
@@ -284,7 +216,7 @@ namespace Ship {
   }
 
   uint64_t ByteBuffer::ReadLong() {
-    if (readableBytes < 8) {
+    if (GetReadableBytes() < 8) {
       throw Exception("Tried to read long, but not enough readable bytes");
     }
 
@@ -294,40 +226,6 @@ namespace Ship {
 
   uint64_t ByteBuffer::ReadVarLong() {
     return 0; // TODO: VarLong
-  }
-
-  uint8_t* ByteBuffer::ReadBytes(size_t size) {
-    if (readableBytes < size) {
-      throw Exception("Tried to read byte array, but not enough readable bytes");
-    }
-
-    auto* bytes = new uint8_t[size];
-    uint32_t bytesIndex = 0;
-    TryRefreshReaderBuffer();
-
-    if (localWriterIndex + size >= singleCapacity) {
-      std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + singleCapacity, bytes);
-      uint32_t copiedBytes = singleCapacity - localReaderIndex;
-      size -= copiedBytes;
-      readableBytes -= copiedBytes;
-      bytesIndex += copiedBytes;
-      localReaderIndex = 0;
-      PopBuffer();
-
-      while (size >= singleCapacity) {
-        std::copy(currentReadBuffer, currentReadBuffer + singleCapacity, bytes + bytesIndex);
-        size -= singleCapacity;
-        readableBytes -= singleCapacity;
-        bytesIndex += singleCapacity;
-        localReaderIndex = 0;
-        PopBuffer();
-      }
-    }
-
-    std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + localReaderIndex + size, bytes + bytesIndex);
-    localReaderIndex += size;
-    readableBytes -= size;
-    return bytes;
   }
 
   UUID ByteBuffer::ReadUUID() {
@@ -395,17 +293,6 @@ namespace Ship {
 
   float ByteBuffer::ReadAngle() {
     return (float) ReadByte() / (256.0F / 360.0F);
-  }
-
-  ByteBuffer::~ByteBuffer() {
-    Release();
-  }
-
-  void ByteBuffer::Release() {
-    while (!buffers.empty()) {
-      delete[] buffers.front();
-      buffers.pop_front();
-    }
   }
 
   ByteBuffer& operator<<(ByteBuffer& buffer, bool input) {
@@ -477,22 +364,146 @@ namespace Ship {
     output = buffer.ReadFloat();
     return buffer;
   }
+  
+  ByteBufferImpl::ByteBufferImpl(size_t cap) {
+    singleCapacity = cap;
+    auto* buffer = new uint8_t[singleCapacity];
+    currentReadBuffer = buffer;
+    currentWriteBuffer = buffer;
+    buffers.push_back(buffer);
+  }
 
-  void ByteBuffer::ResetReaderIndex() {
+  ByteBufferImpl::ByteBufferImpl(uint8_t* buffer, size_t cap) {
+    singleCapacity = cap;
+    currentReadBuffer = buffer;
+    currentWriteBuffer = buffer;
+    buffers.push_back(buffer);
+  }
+
+  ByteBufferImpl::ByteBufferImpl(ByteBuffer* buffer) {
+    readableBytes = buffer->GetReadableBytes();
+    singleCapacity = buffer->GetSingleCapacity();
+    localReaderIndex = buffer->GetReaderIndex();
+    localWriterIndex = buffer->GetWriterIndex();
+    currentReadBuffer = buffer->GetDirectReadAddress() - localReaderIndex;
+    currentWriteBuffer = buffer->GetDirectWriteAddress() - localWriterIndex;
+    buffers = buffer->GetDirectBuffers();
+  }
+
+  uint8_t ByteBufferImpl::ReadByteUnsafe() {
+    TryRefreshReaderBuffer();
+    --readableBytes;
+    return currentReadBuffer[localReaderIndex++];
+  }
+
+  void ByteBufferImpl::WriteByte(uint8_t input) {
+    TryRefreshWriterBuffer();
+    ++readableBytes;
+    currentWriteBuffer[localWriterIndex++] = input;
+  }
+
+  void ByteBufferImpl::WriteBytes(uint8_t* input, size_t size) {
+    size_t bytesIndex = 0;
+    TryRefreshWriterBuffer();
+
+    if (localWriterIndex + size >= singleCapacity) {
+      std::copy(input, input + singleCapacity - localWriterIndex, currentWriteBuffer + localWriterIndex);
+      size_t copiedBytes = singleCapacity - localWriterIndex;
+      size -= copiedBytes;
+      readableBytes += copiedBytes;
+      bytesIndex += copiedBytes;
+      localWriterIndex = 0;
+      AppendBuffer();
+
+      while (size >= singleCapacity) {
+        std::copy(input + bytesIndex, input + bytesIndex + singleCapacity, currentWriteBuffer + localWriterIndex);
+        size -= singleCapacity;
+        readableBytes += singleCapacity;
+        bytesIndex += singleCapacity;
+        localWriterIndex = 0;
+        AppendBuffer();
+      }
+    }
+
+    std::copy(input + bytesIndex, input + bytesIndex + size, currentWriteBuffer + localWriterIndex);
+    localWriterIndex += size;
+    readableBytes += size;
+  }
+
+  void ByteBufferImpl::WriteBytesAndDelete(uint8_t* input, size_t size) {
+    if (localWriterIndex == 0 && size == singleCapacity) {
+      buffers.pop_back();
+      buffers.push_back(input);
+    } else {
+      WriteBytes(input, size);
+      delete[] input;
+    }
+  }
+
+  void ByteBufferImpl::WriteBytes(ByteBuffer* input, size_t size) {
+    WriteBytesAndDelete(input->ReadBytes(size), size);
+  }
+
+  uint8_t* ByteBufferImpl::ReadBytes(size_t size) {
+    if (GetReadableBytes() < size) {
+      throw Exception("Tried to read byte array, but not enough readable bytes");
+    }
+
+    auto* bytes = new uint8_t[size];
+    uint32_t bytesIndex = 0;
+    TryRefreshReaderBuffer();
+
+    if (localWriterIndex + size >= singleCapacity) {
+      std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + singleCapacity, bytes);
+      uint32_t copiedBytes = singleCapacity - localReaderIndex;
+      size -= copiedBytes;
+      readableBytes -= copiedBytes;
+      bytesIndex += copiedBytes;
+      localReaderIndex = 0;
+      PopBuffer();
+
+      while (size >= singleCapacity) {
+        std::copy(currentReadBuffer, currentReadBuffer + singleCapacity, bytes + bytesIndex);
+        size -= singleCapacity;
+        readableBytes -= singleCapacity;
+        bytesIndex += singleCapacity;
+        localReaderIndex = 0;
+        PopBuffer();
+      }
+    }
+
+    std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + localReaderIndex + size, bytes + bytesIndex);
+    localReaderIndex += size;
+    readableBytes -= size;
+    return bytes;
+  }
+
+  ByteBufferImpl::~ByteBufferImpl() {
+    ByteBufferImpl::Release();
+  }
+
+  void ByteBufferImpl::Release() {
+    while (!buffers.empty()) {
+      delete[] buffers.front();
+      buffers.pop_front();
+    }
+  }
+
+  void ByteBufferImpl::ResetReaderIndex() {
     localReaderIndex = 0;
     readableBytes = (buffers.size() - 1) * singleCapacity + localWriterIndex;
   }
 
-  void ByteBuffer::ResetWriterIndex() {
+  void ByteBufferImpl::ResetWriterIndex() {
     localWriterIndex = 0;
     readableBytes = 0;
   }
 
-  size_t ByteBuffer::GetReadableBytes() const {
+  size_t ByteBufferImpl::GetReadableBytes() const {
     return readableBytes;
   }
 
-  void ByteBuffer::TryRefreshReaderBuffer() {
+  void ByteBufferImpl::TryRefreshReaderBuffer() {
     if (localReaderIndex >= singleCapacity) {
       delete[] currentReadBuffer;
       localReaderIndex = 0;
@@ -500,49 +511,53 @@ namespace Ship {
     }
   }
 
-  void ByteBuffer::TryRefreshWriterBuffer() {
+  void ByteBufferImpl::TryRefreshWriterBuffer() {
     if (localWriterIndex >= singleCapacity) {
       localWriterIndex = 0;
       AppendBuffer();
     }
   }
 
-  void ByteBuffer::AppendBuffer() {
+  void ByteBufferImpl::AppendBuffer() {
     currentWriteBuffer = new uint8_t[singleCapacity];
     buffers.push_back(currentWriteBuffer);
   }
 
-  void ByteBuffer::PopBuffer() {
+  void ByteBufferImpl::PopBuffer() {
     delete buffers.front();
     buffers.pop_front();
     currentReadBuffer = buffers.front();
   }
 
-  bool ByteBuffer::CanReadDirect(size_t read_size) const {
+  bool ByteBufferImpl::CanReadDirect(size_t read_size) const {
     return localReaderIndex + read_size < singleCapacity;
   }
 
-  uint8_t* ByteBuffer::GetDirectReadAddress() {
+  uint8_t* ByteBufferImpl::GetDirectReadAddress() {
     return currentReadBuffer + localReaderIndex;
   }
 
-  bool ByteBuffer::CanWriteDirect(size_t write_size) const {
+  bool ByteBufferImpl::CanWriteDirect(size_t write_size) const {
     return localWriterIndex + write_size < singleCapacity;
   }
 
-  uint8_t* ByteBuffer::GetDirectWriteAddress() {
+  uint8_t* ByteBufferImpl::GetDirectWriteAddress() {
     return currentWriteBuffer + localWriterIndex;
   }
 
-  size_t ByteBuffer::GetReaderIndex() const {
+  size_t ByteBufferImpl::GetReaderIndex() const {
     return localReaderIndex;
   }
 
-  size_t ByteBuffer::GetWriterIndex() const {
+  size_t ByteBufferImpl::GetWriterIndex() const {
     return localWriterIndex;
   }
 
-  size_t ByteBuffer::GetSingleCapacity() const {
+  size_t ByteBufferImpl::GetSingleCapacity() const {
     return singleCapacity;
+  }
+
+  std::deque<uint8_t*> ByteBufferImpl::GetDirectBuffers() const {
+    return buffers;
   }
 }

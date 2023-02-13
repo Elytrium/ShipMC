@@ -23,7 +23,7 @@ namespace Ship {
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
       uint32_t size = buffer->GetReadableBytes();
       delete signature;
-      signature = new ByteBuffer(buffer->ReadBytes(size), size);
+      signature = new ByteBufferImpl(buffer->ReadBytes(size), size);
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {

@@ -42,18 +42,18 @@ namespace Ship {
     if (packetSize != -1) {
       uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
       uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetSize);
-      auto buffer = new ByteBuffer(packetSizeWithID + ByteBuffer::VarIntBytes(packetSizeWithID));
+      auto* buffer = new ByteBufferImpl(packetSizeWithID + ByteBuffer::VarIntBytes(packetSizeWithID));
       buffer->WriteVarInt(packetSizeWithID);
       buffer->WriteVarInt(packetID);
       packet->Write(version, buffer);
       return buffer;
     } else {
-      auto buffer = new ByteBuffer(longPacketBufferCapacity);
+      auto* buffer = new ByteBufferImpl(longPacketBufferCapacity);
       packet->Write(version, buffer);
       packetSize = buffer->GetReadableBytes();
       uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
       uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetSize);
-      auto prefixedBuffer = new ByteBuffer(packetSizeWithID + ByteBuffer::VarIntBytes(packetSizeWithID));
+      auto* prefixedBuffer = new ByteBufferImpl(packetSizeWithID + ByteBuffer::VarIntBytes(packetSizeWithID));
       prefixedBuffer->WriteVarInt(packetSizeWithID);
       prefixedBuffer->WriteVarInt(packetID);
       prefixedBuffer->WriteBytes(buffer, packetSize);
@@ -68,7 +68,7 @@ namespace Ship {
 
     if (packet == nullptr) {
       packet = new SingleVersionPreparedPacket();
-      auto* buffer = new ByteBuffer(in->GetSingleCapacity());
+      auto* buffer = new ByteBufferImpl(in->GetSingleCapacity());
       buffer->WriteVarInt(frame_size);
       buffer->WriteVarInt(packetID);
       buffer->WriteBytes(in, frame_size - ByteBuffer::VarIntBytes(packetID));

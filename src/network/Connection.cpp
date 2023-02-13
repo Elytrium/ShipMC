@@ -3,7 +3,7 @@
 
 namespace Ship {
   Connection::Connection(BytePacketPipe* bytePacketPipe, size_t reader_buffer_length, size_t writer_buffer_length, ReadWriteCloser* read_write_closer)
-    : bytePacketPipe(bytePacketPipe), readerBuffer(new ByteBuffer(reader_buffer_length)), writerBuffer(new ByteBuffer(writer_buffer_length)),
+    : bytePacketPipe(bytePacketPipe), readerBuffer(new ByteBufferImpl(reader_buffer_length)), writerBuffer(new ByteBufferImpl(writer_buffer_length)),
       readWriteCloser(read_write_closer) {
   }
 

@@ -22,7 +22,7 @@ namespace Ship {
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteBytes(new ByteBuffer(*unknownBytes), unknownBytes->GetReadableBytes());
+      buffer->WriteBytes(new ByteBufferImpl(unknownBytes), unknownBytes->GetReadableBytes());
     }
 
     uint32_t Size(const ProtocolVersion* version) override {

@@ -11,7 +11,7 @@ namespace Ship {
 
    public:
     ByteBytePipe(size_t reader_buffer_length, size_t writer_buffer_length)
-      : readerBuffer(new ByteBuffer(reader_buffer_length)), writerBuffer(new ByteBuffer(writer_buffer_length)) {
+      : readerBuffer(new ByteBufferImpl(reader_buffer_length)), writerBuffer(new ByteBufferImpl(writer_buffer_length)) {
     }
     ByteBytePipe(ByteBuffer* reader_buffer, ByteBuffer* writer_buffer) : readerBuffer(reader_buffer), writerBuffer(writer_buffer) {
     }
