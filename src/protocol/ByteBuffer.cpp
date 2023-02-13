@@ -128,11 +128,11 @@ namespace Ship {
   }
 
   void ByteBuffer::WriteDouble(double input) {
-    WriteLong((uint64_t) input);
+    WriteLong(*((uint64_t*) &input));
   }
 
   void ByteBuffer::WriteFloat(float input) {
-    WriteInt((uint32_t) input);
+    WriteInt(*((uint32_t*) &input));
   }
 
   void ByteBuffer::WriteString(const std::string& input) {
@@ -220,8 +220,8 @@ namespace Ship {
       throw Exception("Tried to read long, but not enough readable bytes");
     }
 
-    return (uint64_t) ReadByteUnsafe() << 56 | (uint64_t) ReadByteUnsafe() << 48 | (uint64_t) ReadByteUnsafe() << 32 | (uint64_t) ReadByteUnsafe() << 24
-         | (uint64_t) ReadByteUnsafe() << 16 | (uint64_t) ReadByteUnsafe() << 8 | (uint64_t) ReadByteUnsafe();
+    return (uint64_t) ReadByteUnsafe() << 56 | (uint64_t) ReadByteUnsafe() << 48 | (uint64_t) ReadByteUnsafe() << 40 | (uint64_t) ReadByteUnsafe() << 32
+         | (uint64_t) ReadByteUnsafe() << 24 | (uint64_t) ReadByteUnsafe() << 16 | (uint64_t) ReadByteUnsafe() << 8 | (uint64_t) ReadByteUnsafe();
   }
 
   uint64_t ByteBuffer::ReadVarLong() {
@@ -237,11 +237,13 @@ namespace Ship {
   }
 
   double ByteBuffer::ReadDouble() {
-    return (double) ReadLong();
+    uint64_t value = ReadLong();
+    return *((double*) &value);
   }
 
   float ByteBuffer::ReadFloat() {
-    return (float) ReadInt();
+    uint32_t value = ReadInt();
+    return *((float*) &value);
   }
 
   std::string ByteBuffer::ReadString() {
