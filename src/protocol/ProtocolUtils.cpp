@@ -31,7 +31,11 @@ namespace Ship {
   }
 
   uint32_t ProtocolUtils::NBTSize(NBT* nbt) {
-    return ByteBuffer::BYTE_SIZE + ByteBuffer::StringBytes(nbt->GetName()) + nbt->GetSize();
+    if (nbt) {
+      return ByteBuffer::BYTE_SIZE + ByteBuffer::StringBytes(nbt->GetName()) + nbt->GetSize();
+    } else {
+      return ByteBuffer::BYTE_SIZE;
+    }
   }
 
   uint32_t ProtocolUtils::ParticleSize(const ProtocolVersion* version, AbstractParticle* particle) {

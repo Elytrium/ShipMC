@@ -3,21 +3,49 @@
 
 namespace Ship {
 
-  ItemStack::ItemStack() : present(false), itemID(0), itemCount(0), nbt(nullptr) {
+  ItemStack::ItemStack() : present(false), itemID(0), itemCount(0), data(0), nbt(nullptr) {
   }
 
-  ItemStack::ItemStack(uint32_t itemId, uint8_t itemCount, NBT* nbt) : present(true), itemID(itemId), itemCount(itemCount), nbt(nbt) {
+  ItemStack::ItemStack(uint32_t itemId, uint8_t itemCount, uint16_t data, NBT* nbt)
+    : present(true), itemID(itemId), itemCount(itemCount), data(data), nbt(nbt) {
+  }
+
+  ItemStack::ItemStack(uint32_t itemId, uint8_t itemCount, NBT* nbt) : present(true), itemID(itemId), itemCount(itemCount), data(0), nbt(nbt) {
+  }
+
+  ItemStack::ItemStack(uint32_t itemId, uint8_t itemCount) : present(true), itemID(itemId), itemCount(itemCount), data(0), nbt(nullptr) {
+  }
+
+  ItemStack::ItemStack(const ProtocolVersion* version, ByteBuffer* buffer) : ItemStack() {
+    Read(version, buffer);
   }
 
   ItemStack::~ItemStack() {
     delete nbt;
   }
 
-  void ItemStack::Write(ByteBuffer* buffer) {
-    buffer->WriteBoolean(present);
+  void ItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+    if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
+      buffer->WriteBoolean(present);
+    }
+
+    if (!present && version < &ProtocolVersion::MINECRAFT_1_13_2) {
+      buffer->WriteShort(-1);
+    }
+
     if (present) {
-      buffer->WriteVarInt(itemID);
+      if (version < &ProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
+        buffer->WriteShort(itemID);
+      } else {
+        buffer->WriteVarInt(itemID);
+      }
+
       buffer->WriteByte(itemCount);
+
+      if (version < &ProtocolVersion::MINECRAFT_1_13) {
+        buffer->WriteShort(data);
+      }
+
       if (nbt) {
         ProtocolUtils::WriteNBT(buffer, nbt);
       } else {
@@ -26,28 +54,54 @@ namespace Ship {
     }
   }
 
-  void ItemStack::Read(ByteBuffer* buffer) {
-    present = buffer->ReadBoolean();
+  void ItemStack::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+    if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
+      present = buffer->ReadBoolean();
+    } else {
+      present = buffer->ReadShort() != (uint16_t) -1;
+    }
+
     delete nbt;
     if (present) {
-      itemID = buffer->ReadVarInt();
+      if (version < &ProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
+        itemID = buffer->ReadShort();
+      } else {
+        itemID = buffer->ReadVarInt();
+      }
+
       itemCount = buffer->ReadByte();
+
+      if (version < &ProtocolVersion::MINECRAFT_1_13) {
+        data = buffer->ReadShort();
+      }
+
       nbt = ProtocolUtils::ReadNBT(buffer);
     } else {
-      itemID = itemCount = 0;
+      itemID = itemCount = data = 0;
       nbt = nullptr;
     }
   }
 
-  uint32_t ItemStack::Size() const {
+  uint32_t ItemStack::Size(const ProtocolVersion* version) const {
     if (present) {
-      if (nbt) {
-        return ByteBuffer::BOOLEAN_SIZE + ByteBuffer::VarIntBytes(itemID) + ByteBuffer::BYTE_SIZE + ProtocolUtils::NBTSize(nbt);
+      uint32_t size = ByteBuffer::BYTE_SIZE;
+      if (version < &ProtocolVersion::MINECRAFT_1_13_2) {
+        size += ByteBuffer::SHORT_SIZE;
       } else {
-        return ByteBuffer::BOOLEAN_SIZE + ByteBuffer::VarIntBytes(itemID) + ByteBuffer::BYTE_SIZE * 2;
+        size += ByteBuffer::VarIntBytes(itemID); // TODO: Mappings
       }
+
+      if (version < &ProtocolVersion::MINECRAFT_1_13) {
+        size += ByteBuffer::SHORT_SIZE;
+      }
+
+      return size + ProtocolUtils::NBTSize(nbt);
     } else {
-      return ByteBuffer::BOOLEAN_SIZE;
+      if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
+        return ByteBuffer::BOOLEAN_SIZE;
+      } else {
+        return ByteBuffer::SHORT_SIZE;
+      }
     }
   }
 
@@ -73,6 +127,14 @@ namespace Ship {
 
   void ItemStack::SetItemCount(uint8_t value) {
     itemCount = value;
+  }
+
+  uint16_t ItemStack::GetData() const {
+    return data;
+  }
+
+  void ItemStack::SetData(uint16_t value) {
+    data = value;
   }
 
   NBT* ItemStack::GetNBT() const {

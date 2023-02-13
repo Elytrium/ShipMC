@@ -6,15 +6,15 @@ namespace Ship {
   }
 
   void ItemParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
-    item.Write(buffer);
+    item.Write(version, buffer);
   }
 
   void ItemParticle::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
-    item.Read(buffer);
+    item.Read(version, buffer);
   }
 
   uint32_t ItemParticle::Size(const ProtocolVersion* version) const {
-    return item.Size();
+    return item.Size(version);
   }
 
   std::string ItemParticle::GetIdentifier() const {

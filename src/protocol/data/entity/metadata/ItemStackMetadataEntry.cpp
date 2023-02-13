@@ -6,15 +6,15 @@ namespace Ship {
   }
 
   void ItemStackMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value.Write(buffer);
+    value.Write(version, buffer);
   }
 
   void ItemStackMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value.Read(buffer);
+    value.Read(version, buffer);
   }
 
   uint32_t ItemStackMetadataEntry::Size(const ProtocolVersion* version) const {
-    return value.Size();
+    return value.Size(version);
   }
 
   MetadataEntryType ItemStackMetadataEntry::GetType() const {
