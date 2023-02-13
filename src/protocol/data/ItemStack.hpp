@@ -4,7 +4,7 @@
 
 namespace Ship {
 
-  class ItemStack {
+  class ItemStack : public Serializable {
    private:
     bool present;
     uint32_t itemID;
@@ -19,11 +19,10 @@ namespace Ship {
     ItemStack(uint32_t itemId, uint8_t itemCount);
     ItemStack(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    ~ItemStack();
+    ~ItemStack() override;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const;
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer);
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const;
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
 
     [[nodiscard]] bool IsPresent() const;
     void SetPresent(bool value);

@@ -16,10 +16,6 @@ namespace Ship {
     buffer->ReadPosition(x, y, z);
   }
 
-  uint32_t GlobalPosMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::StringBytes(dimension) + ByteBuffer::POSITION_SIZE;
-  }
-
   MetadataEntryType GlobalPosMetadataEntry::GetType() const {
     return MetadataEntryType::GLOBAL_POS;
   }

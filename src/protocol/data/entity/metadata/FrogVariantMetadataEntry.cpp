@@ -13,10 +13,6 @@ namespace Ship {
     value = FROG_VARIANT_REGISTRY.GetValue(version, buffer->ReadVarInt());
   }
 
-  uint32_t FrogVariantMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes(FROG_VARIANT_REGISTRY.GetID(version, value));
-  }
-
   MetadataEntryType FrogVariantMetadataEntry::GetType() const {
     return MetadataEntryType::FROG_VARIANT;
   }

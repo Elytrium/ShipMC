@@ -13,10 +13,6 @@ namespace Ship {
     value.Read(version, buffer);
   }
 
-  uint32_t ItemStackMetadataEntry::Size(const ProtocolVersion* version) const {
-    return value.Size(version);
-  }
-
   MetadataEntryType ItemStackMetadataEntry::GetType() const {
     return MetadataEntryType::ITEM_STACK;
   }

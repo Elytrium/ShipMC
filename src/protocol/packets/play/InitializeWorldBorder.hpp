@@ -50,11 +50,6 @@ namespace Ship {
       buffer->WriteVarInt(warningTime);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::DOUBLE_SIZE + ByteBuffer::DOUBLE_SIZE + ByteBuffer::DOUBLE_SIZE + ByteBuffer::DOUBLE_SIZE + ByteBuffer::VarLongBytes(speed)
-           + ByteBuffer::VarIntBytes(portalTeleportBoundary) + ByteBuffer::VarIntBytes(warningBlocks) + ByteBuffer::VarIntBytes(warningTime);
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

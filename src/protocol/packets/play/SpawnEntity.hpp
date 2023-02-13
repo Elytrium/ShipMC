@@ -81,23 +81,6 @@ namespace Ship {
       buffer->WriteShort((uint16_t) (velocityZ * 8000.0F));
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size = ByteBuffer::VarIntBytes(entityId) + ByteBuffer::UUID_SIZE + ByteBuffer::DOUBLE_SIZE * 3 + ByteBuffer::ANGLE_SIZE * 2
-                    + ByteBuffer::SHORT_SIZE * 3;
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
-        size += ByteBuffer::VarIntBytes(type);
-      } else {
-        size += ByteBuffer::BYTE_SIZE;
-      }
-      if (version >= &ProtocolVersion::MINECRAFT_1_19) {
-        size += ByteBuffer::ANGLE_SIZE;
-        size += ByteBuffer::VarIntBytes(data);
-      } else {
-        size += ByteBuffer::INT_SIZE;
-      }
-      return size;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

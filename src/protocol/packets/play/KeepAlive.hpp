@@ -26,10 +26,6 @@ namespace Ship {
       buffer->WriteLong(id);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::LONG_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

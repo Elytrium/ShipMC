@@ -8,13 +8,10 @@
 
 namespace Ship {
 
-  class BossBarAction {
+  class BossBarAction : public Serializable {
    public:
-    virtual ~BossBarAction() = default;
+    ~BossBarAction() override = default;
 
-    virtual void Write(const ProtocolVersion* version, ByteBuffer* buffer) = 0;
-    virtual void Read(const ProtocolVersion* version, ByteBuffer* buffer) = 0;
-    [[nodiscard]] virtual uint32_t Size() const = 0;
     [[nodiscard]] virtual uint32_t GetAction() const = 0;
   };
 
@@ -47,11 +44,6 @@ namespace Ship {
       color = buffer->ReadVarInt();
       division = buffer->ReadVarInt();
       flags = buffer->ReadByte();
-    }
-
-    [[nodiscard]] uint32_t Size() const override {
-      return ByteBuffer::StringBytes(title) + ByteBuffer::FLOAT_SIZE + ByteBuffer::VarIntBytes(color) + ByteBuffer::VarIntBytes(division)
-           + ByteBuffer::BYTE_SIZE;
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -89,10 +81,6 @@ namespace Ship {
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
     }
 
-    [[nodiscard]] uint32_t Size() const override {
-      return 0;
-    }
-
     [[nodiscard]] uint32_t GetAction() const override {
       return 1;
     }
@@ -114,10 +102,6 @@ namespace Ship {
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
       health = buffer->ReadFloat();
-    }
-
-    [[nodiscard]] uint32_t Size() const override {
-      return ByteBuffer::FLOAT_SIZE;
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -145,10 +129,6 @@ namespace Ship {
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
       title = buffer->ReadString();
-    }
-
-    [[nodiscard]] uint32_t Size() const override {
-      return ByteBuffer::StringBytes(title);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -181,10 +161,6 @@ namespace Ship {
       dividers = buffer->ReadVarInt();
     }
 
-    [[nodiscard]] uint32_t Size() const override {
-      return ByteBuffer::VarIntBytes(color) + ByteBuffer::VarIntBytes(dividers);
-    }
-
     [[nodiscard]] uint32_t GetAction() const override {
       return 4;
     }
@@ -212,10 +188,6 @@ namespace Ship {
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
       flags = buffer->ReadByte();
-    }
-
-    [[nodiscard]] uint32_t Size() const override {
-      return ByteBuffer::BYTE_SIZE;
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -283,10 +255,6 @@ namespace Ship {
       buffer->WriteUUID(uuid);
       buffer->WriteVarInt(action->GetAction());
       action->Write(version, buffer);
-    }
-
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::UUID_SIZE + ByteBuffer::VarIntBytes(action->GetAction()) + action->Size();
     }
 
     uint32_t GetOrdinal() override {

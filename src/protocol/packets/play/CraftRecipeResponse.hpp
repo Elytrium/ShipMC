@@ -30,10 +30,6 @@ namespace Ship {
       buffer->WriteString(recipe);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::BYTE_SIZE + ByteBuffer::StringBytes(recipe);
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

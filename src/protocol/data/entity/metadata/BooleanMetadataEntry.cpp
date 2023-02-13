@@ -13,10 +13,6 @@ namespace Ship {
     value = buffer->ReadBoolean();
   }
 
-  uint32_t BooleanMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::BOOLEAN_SIZE;
-  }
-
   MetadataEntryType BooleanMetadataEntry::GetType() const {
     return MetadataEntryType::BOOLEAN;
   }

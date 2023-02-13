@@ -13,10 +13,6 @@ namespace Ship {
     value = buffer->ReadString();
   }
 
-  uint32_t ChatMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::StringBytes(value);
-  }
-
   MetadataEntryType ChatMetadataEntry::GetType() const {
     return MetadataEntryType::CHAT;
   }

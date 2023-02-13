@@ -30,10 +30,6 @@ namespace Ship {
       buffer->WriteBytes(signature, signature->GetReadableBytes());
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::VarIntBytes(signature->GetReadableBytes()) + signature->GetReadableBytes();
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

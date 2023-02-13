@@ -13,10 +13,6 @@ namespace Ship {
     value = CAT_VARIANT_REGISTRY.GetValue(version, buffer->ReadVarInt());
   }
 
-  uint32_t CatVariantMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes(CAT_VARIANT_REGISTRY.GetID(version, value));
-  }
-
   MetadataEntryType CatVariantMetadataEntry::GetType() const {
     return MetadataEntryType::CAT_VARIANT;
   }

@@ -103,27 +103,6 @@ namespace Ship {
       }
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size;
-
-      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
-        size = ByteBuffer::VarIntBytes(id) + ByteBuffer::VarIntBytes(start) + ByteBuffer::VarIntBytes(length) + ByteBuffer::VarIntBytes(matches.size());
-        for (const CommandSuggestion& match : matches) {
-          size += ByteBuffer::StringBytes(match.GetMatch()) + ByteBuffer::BOOLEAN_SIZE;
-          if (match.GetTooltip()) {
-            size += ByteBuffer::StringBytes(match.GetTooltip().value());
-          }
-        }
-      } else {
-        size = ByteBuffer::VarIntBytes(matches.size());
-        for (const CommandSuggestion& match : matches) {
-          size += ByteBuffer::StringBytes(match.GetMatch());
-        }
-      }
-
-      return size;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

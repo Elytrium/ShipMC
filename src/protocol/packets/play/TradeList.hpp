@@ -30,7 +30,7 @@ namespace Ship {
     Trade() : Trade({}, {}, std::nullopt, false, 0, 0, 0, 0, 0, 0) {
     }
 
-    [[nodiscard]] const ItemStack& GetFirstInputItem() const {
+    [[nodiscard]] ItemStack& GetFirstInputItem() {
       return firstInputItem;
     }
 
@@ -38,7 +38,7 @@ namespace Ship {
       firstInputItem = value;
     }
 
-    [[nodiscard]] const ItemStack& GetOutputItem() const {
+    [[nodiscard]] ItemStack& GetOutputItem() {
       return outputItem;
     }
 
@@ -46,7 +46,7 @@ namespace Ship {
       outputItem = value;
     }
 
-    [[nodiscard]] const std::optional<ItemStack>& GetSecondInputItem() const {
+    [[nodiscard]] std::optional<ItemStack>& GetSecondInputItem() {
       return secondInputItem;
     }
 
@@ -166,7 +166,7 @@ namespace Ship {
       } else {
         buffer->WriteByte(trades.size());
       }
-      for (const Trade& trade : trades) {
+      for (Trade& trade : trades) {
         trade.GetFirstInputItem().Write(version, buffer);
         trade.GetOutputItem().Write(version, buffer);
         if (trade.GetSecondInputItem()) {
@@ -184,24 +184,6 @@ namespace Ship {
       buffer->WriteVarInt(experience);
       buffer->WriteBoolean(regularVillager);
       buffer->WriteBoolean(canRestock);
-    }
-
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size = ByteBuffer::VarIntBytes(windowId) + ByteBuffer::VarIntBytes(villagerLevel) + ByteBuffer::VarIntBytes(experience)
-                    + ByteBuffer::BOOLEAN_SIZE + ByteBuffer::BOOLEAN_SIZE;
-      if (version >= &ProtocolVersion::MINECRAFT_1_19) {
-        size += ByteBuffer::VarIntBytes(trades.size());
-      } else {
-        size += ByteBuffer::BYTE_SIZE;
-      }
-      for (const Trade& trade : trades) {
-        size += trade.GetFirstInputItem().Size(version) + trade.GetOutputItem().Size(version) + ByteBuffer::BOOLEAN_SIZE + ByteBuffer::BOOLEAN_SIZE
-              + ByteBuffer::INT_SIZE + ByteBuffer::INT_SIZE + ByteBuffer::INT_SIZE + ByteBuffer::INT_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::INT_SIZE;
-        if (trade.GetSecondInputItem()) {
-          size += trade.GetSecondInputItem()->Size(version);
-        }
-      }
-      return size;
     }
 
     uint32_t GetOrdinal() override {

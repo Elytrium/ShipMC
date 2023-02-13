@@ -81,22 +81,6 @@ namespace Ship {
       buffer->WriteFloat(playerMotionZ);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size = ByteBuffer::FLOAT_SIZE + ByteBuffer::BYTE_SIZE * 3 * records.size()
-                    + ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE;
-      if (version >= &ProtocolVersion::MINECRAFT_1_17) {
-        size += ByteBuffer::VarIntBytes(records.size());
-      } else {
-        size += ByteBuffer::INT_SIZE;
-      }
-      if (version == &ProtocolVersion::MINECRAFT_1_19) {
-        size += ByteBuffer::FLOAT_SIZE * 3;
-      } else {
-        size += ByteBuffer::DOUBLE_SIZE * 3;
-      }
-      return size;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

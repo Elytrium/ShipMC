@@ -7,13 +7,9 @@
 
 namespace Ship {
 
-  class PlayerListAction {
+  class PlayerListAction : public Serializable {
    public:
-    virtual ~PlayerListAction() = default;
-
-    virtual void Write(const ProtocolVersion* version, ByteBuffer* buffer) = 0;
-    virtual void Read(const ProtocolVersion* version, ByteBuffer* buffer) = 0;
-    [[nodiscard]] virtual uint32_t Size(const ProtocolVersion* version) const = 0;
+    ~PlayerListAction() override = default;
   };
 
   class PlayerListAddPlayer : public PlayerListAction {
@@ -80,31 +76,6 @@ namespace Ship {
       }
     }
 
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override {
-      uint32_t size = ByteBuffer::StringBytes(gameProfile.GetName()) + ByteBuffer::UUID_SIZE + ByteBuffer::PropertiesBytes(gameProfile.GetProperties())
-                    + ByteBuffer::VarIntBytes(gamemode) + ByteBuffer::VarIntBytes(ping) + ByteBuffer::BOOLEAN_SIZE;
-      if (displayName) {
-        size += ByteBuffer::StringBytes(*displayName);
-      }
-      if (version >= &ProtocolVersion::MINECRAFT_1_19) {
-        size += ByteBuffer::BOOLEAN_SIZE;
-        if (hasSigData) {
-          size += ByteBuffer::LONG_SIZE;
-          if (publicKey) {
-            size += ByteBuffer::VarIntBytes(publicKey->GetReadableBytes()) + publicKey->GetReadableBytes();
-          } else {
-            size += ByteBuffer::BYTE_SIZE;
-          }
-          if (signature) {
-            size += ByteBuffer::VarIntBytes(signature->GetReadableBytes()) + signature->GetReadableBytes();
-          } else {
-            size += ByteBuffer::BYTE_SIZE;
-          }
-        }
-      }
-      return size;
-    }
-
     [[nodiscard]] const GameProfile& GetGameProfile() const {
       return gameProfile;
     }
@@ -157,10 +128,6 @@ namespace Ship {
       gamemode = (Gamemode) buffer->ReadVarInt();
     }
 
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override {
-      return ByteBuffer::UUID_SIZE + ByteBuffer::VarIntBytes(gamemode);
-    }
-
     [[nodiscard]] const UUID& GetUuid() const {
       return uuid;
     }
@@ -187,10 +154,6 @@ namespace Ship {
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
       uuid = buffer->ReadUUID();
       ping = buffer->ReadVarInt();
-    }
-
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override {
-      return ByteBuffer::UUID_SIZE + ByteBuffer::VarIntBytes(ping);
     }
 
     [[nodiscard]] const UUID& GetUuid() const {
@@ -228,10 +191,6 @@ namespace Ship {
       }
     }
 
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override {
-      return ByteBuffer::UUID_SIZE + ByteBuffer::BOOLEAN_SIZE + (displayName ? ByteBuffer::StringBytes(*displayName) : 0);
-    }
-
     [[nodiscard]] const UUID& GetUuid() const {
       return uuid;
     }
@@ -255,10 +214,6 @@ namespace Ship {
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
       uuid = buffer->ReadUUID();
-    }
-
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override {
-      return ByteBuffer::UUID_SIZE;
     }
 
     [[nodiscard]] const UUID& GetUuid() const {
@@ -320,15 +275,6 @@ namespace Ship {
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-    }
-
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size = ByteBuffer::VarIntBytes(action) + ByteBuffer::VarIntBytes(players.size());
-      for (PlayerListAction* player : players) {
-        size += player->Size(version);
-      }
-
-      return size;
     }
 
     uint32_t GetOrdinal() override {

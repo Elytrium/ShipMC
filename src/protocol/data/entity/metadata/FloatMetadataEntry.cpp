@@ -13,10 +13,6 @@ namespace Ship {
     value = buffer->ReadFloat();
   }
 
-  uint32_t FloatMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::FLOAT_SIZE;
-  }
-
   MetadataEntryType FloatMetadataEntry::GetType() const {
     return MetadataEntryType::FLOAT;
   }

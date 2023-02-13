@@ -40,14 +40,6 @@ namespace Ship {
       item.Write(version, buffer);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
-        return ByteBuffer::BYTE_SIZE + ByteBuffer::VarIntBytes(stateId) + ByteBuffer::SHORT_SIZE + item.Size(version);
-      } else {
-        return ByteBuffer::BYTE_SIZE + ByteBuffer::SHORT_SIZE + item.Size(version);
-      }
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

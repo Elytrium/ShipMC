@@ -107,13 +107,10 @@ namespace Ship {
     PAINTING_VARIANT,
   };
 
-  class MetadataEntry {
+  class MetadataEntry : public Serializable {
    public:
-    virtual ~MetadataEntry() = default;
+    ~MetadataEntry() override = default;
 
-    virtual void Write(const ProtocolVersion* version, ByteBuffer* buffer) = 0;
-    virtual void Read(const ProtocolVersion* version, ByteBuffer* buffer) = 0;
-    [[nodiscard]] virtual uint32_t Size(const ProtocolVersion* version) const = 0;
     [[nodiscard]] virtual MetadataEntryType GetType() const = 0;
     [[nodiscard]] virtual uint32_t GetOrdinal() const = 0;
   };
@@ -129,7 +126,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -148,7 +144,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -167,7 +162,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -186,7 +180,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -205,7 +198,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -225,7 +217,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -244,7 +235,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -263,7 +253,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -284,7 +273,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -312,7 +300,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -342,7 +329,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -371,7 +357,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -391,7 +376,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -411,7 +395,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -432,7 +415,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -453,7 +435,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -474,7 +455,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -498,7 +478,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -517,7 +496,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -536,7 +514,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -555,7 +532,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -577,7 +553,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -605,7 +580,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 

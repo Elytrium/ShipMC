@@ -32,10 +32,6 @@ namespace Ship {
       buffer->WriteShort(value);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::BYTE_SIZE + ByteBuffer::SHORT_SIZE + ByteBuffer::SHORT_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

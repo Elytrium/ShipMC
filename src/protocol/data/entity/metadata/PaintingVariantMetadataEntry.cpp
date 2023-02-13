@@ -13,10 +13,6 @@ namespace Ship {
     value = PAINTING_VARIANT_REGISTRY.GetValue(version, buffer->ReadVarInt());
   }
 
-  uint32_t PaintingVariantMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes(PAINTING_VARIANT_REGISTRY.GetID(version, value));
-  }
-
   MetadataEntryType PaintingVariantMetadataEntry::GetType() const {
     return MetadataEntryType::FROG_VARIANT;
   }

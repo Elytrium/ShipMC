@@ -23,14 +23,6 @@ namespace Ship {
     value = ProtocolUtils::ReadParticle(version, buffer);
   }
 
-  uint32_t ParticleMetadataEntry::Size(const ProtocolVersion* version) const {
-    if (value) {
-      return ProtocolUtils::ParticleSize(version, value);
-    } else {
-      return ByteBuffer::BYTE_SIZE;
-    }
-  }
-
   MetadataEntryType ParticleMetadataEntry::GetType() const {
     return MetadataEntryType::PARTICLE;
   }

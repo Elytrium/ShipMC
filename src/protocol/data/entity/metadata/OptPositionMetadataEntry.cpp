@@ -24,14 +24,6 @@ namespace Ship {
     }
   }
 
-  uint32_t OptPositionMetadataEntry::Size(const ProtocolVersion* version) const {
-    if (present) {
-      return ByteBuffer::BOOLEAN_SIZE + ByteBuffer::POSITION_SIZE;
-    } else {
-      return ByteBuffer::BOOLEAN_SIZE;
-    }
-  }
-
   MetadataEntryType OptPositionMetadataEntry::GetType() const {
     return MetadataEntryType::OPT_POSITION;
   }

@@ -13,10 +13,6 @@ namespace Ship {
     value = (Direction) buffer->ReadVarInt();
   }
 
-  uint32_t DirectionMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes((uint32_t) value);
-  }
-
   MetadataEntryType DirectionMetadataEntry::GetType() const {
     return MetadataEntryType::DIRECTION;
   }

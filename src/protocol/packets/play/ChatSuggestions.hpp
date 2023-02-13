@@ -36,14 +36,6 @@ namespace Ship {
       }
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size = ByteBuffer::VarIntBytes(action) + ByteBuffer::VarIntBytes(entries.size());
-      for (const std::string& entry : entries) {
-        size += ByteBuffer::StringBytes(entry);
-      }
-      return size;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

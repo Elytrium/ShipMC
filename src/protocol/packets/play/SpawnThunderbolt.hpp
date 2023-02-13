@@ -18,10 +18,6 @@ namespace Ship {
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return 0;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

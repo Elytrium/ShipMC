@@ -13,10 +13,6 @@ namespace Ship {
     value = buffer->ReadVarInt();
   }
 
-  uint32_t VarIntMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes(value);
-  }
-
   MetadataEntryType VarIntMetadataEntry::GetType() const {
     return MetadataEntryType::VARINT;
   }

@@ -17,10 +17,6 @@ namespace Ship {
     z = buffer->ReadFloat();
   }
 
-  uint32_t RotationMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::FLOAT_SIZE * 3;
-  }
-
   MetadataEntryType RotationMetadataEntry::GetType() const {
     return MetadataEntryType::ROTATION;
   }

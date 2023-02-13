@@ -84,22 +84,6 @@ namespace Ship {
       particle->Write(version, buffer);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size = ByteBuffer::BOOLEAN_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE
-                    + ByteBuffer::INT_SIZE + particle->Size(version);
-      if (version >= &ProtocolVersion::MINECRAFT_1_19) {
-        size += ByteBuffer::VarIntBytes(PARTICLE_REGISTRY.GetIDByOrdinal(version, particle->GetOrdinal()));
-      } else {
-        size += ByteBuffer::INT_SIZE;
-      }
-      if (version >= &ProtocolVersion::MINECRAFT_1_15) {
-        size += ByteBuffer::DOUBLE_SIZE + ByteBuffer::DOUBLE_SIZE + ByteBuffer::DOUBLE_SIZE;
-      } else {
-        size += ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE;
-      }
-      return size;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

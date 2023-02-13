@@ -38,14 +38,6 @@ namespace Ship {
       }
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      if (message) {
-        return ByteBuffer::INT_SIZE + ByteBuffer::BOOLEAN_SIZE + ByteBuffer::StringBytes(message.value());
-      } else {
-        return ByteBuffer::INT_SIZE + ByteBuffer::BOOLEAN_SIZE;
-      }
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

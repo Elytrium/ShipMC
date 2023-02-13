@@ -25,10 +25,6 @@ namespace Ship {
       buffer->WriteVarInt(threshold);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::VarIntBytes(threshold);
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

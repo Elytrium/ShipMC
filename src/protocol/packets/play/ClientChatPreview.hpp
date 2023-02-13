@@ -31,10 +31,6 @@ namespace Ship {
       buffer->WriteString(message);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::INT_SIZE + ByteBuffer::StringBytes(message);
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

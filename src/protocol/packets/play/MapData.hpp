@@ -174,29 +174,6 @@ namespace Ship {
       }
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size = ByteBuffer::VarIntBytes(mapId) + ByteBuffer::BYTE_SIZE + ByteBuffer::BOOLEAN_SIZE + ByteBuffer::VarIntBytes(icons.size())
-                    + ByteBuffer::VarIntBytes(columns);
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
-        size += ByteBuffer::BOOLEAN_SIZE;
-      }
-      for (const MapIcon& icon : icons) {
-        if (version >= &ProtocolVersion::MINECRAFT_1_13) {
-          size
-            += ByteBuffer::VarIntBytes(icon.GetType()) + ByteBuffer::BYTE_SIZE + ByteBuffer::BYTE_SIZE + ByteBuffer::BYTE_SIZE + ByteBuffer::BOOLEAN_SIZE;
-          if (icon.GetDisplayName()) {
-            size += ByteBuffer::StringBytes(icon.GetDisplayName().value());
-          }
-        } else {
-          size += ByteBuffer::BYTE_SIZE + ByteBuffer::BYTE_SIZE + ByteBuffer::BYTE_SIZE;
-        }
-      }
-      if (columns) {
-        size += ByteBuffer::BYTE_SIZE + ByteBuffer::BYTE_SIZE + ByteBuffer::BYTE_SIZE + ByteBuffer::VarIntBytes(length) + length;
-      }
-      return size;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

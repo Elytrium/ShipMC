@@ -29,10 +29,6 @@ namespace Ship {
       buffer->WriteVarInt(cooldownTicks);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::VarIntBytes(itemId) + ByteBuffer::VarIntBytes(cooldownTicks);
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

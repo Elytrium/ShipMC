@@ -25,10 +25,6 @@ namespace Ship {
       buffer->WriteLong(id);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return (INT64_WIDTH / INT8_WIDTH);
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

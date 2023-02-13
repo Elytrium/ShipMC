@@ -40,10 +40,6 @@ namespace Ship {
       buffer->WriteUUID(sender);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::BOOLEAN_SIZE + (precedingSignature ? precedingSignature->GetReadableBytes() : 0) + ByteBuffer::UUID_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

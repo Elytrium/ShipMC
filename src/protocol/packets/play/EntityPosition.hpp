@@ -39,10 +39,6 @@ namespace Ship {
       buffer->WriteBoolean(onGround);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::VarIntBytes(entityId) + ByteBuffer::SHORT_SIZE + ByteBuffer::SHORT_SIZE + ByteBuffer::SHORT_SIZE + ByteBuffer::BOOLEAN_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

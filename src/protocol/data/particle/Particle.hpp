@@ -7,13 +7,9 @@
 
 namespace Ship {
 
-  class AbstractParticle {
+  class AbstractParticle : public Serializable {
    public:
-    virtual ~AbstractParticle() = default;
-
-    virtual void Write(const ProtocolVersion* version, ByteBuffer* buffer) = 0;
-    virtual void Read(const ProtocolVersion* version, ByteBuffer* buffer) = 0;
-    [[nodiscard]] virtual uint32_t Size(const ProtocolVersion* version) const = 0;
+    ~AbstractParticle() override = default;
 
     [[nodiscard]] virtual std::string GetIdentifier() const = 0;
     [[nodiscard]] virtual uint32_t GetOrdinal() const = 0;
@@ -26,7 +22,6 @@ namespace Ship {
                                                                                                 \
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {}                  \
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {}                   \
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override { return 0; }    \
     [[nodiscard]] std::string GetIdentifier() const override { return Identifier; }             \
     [[nodiscard]] uint32_t GetOrdinal() const override { return ORDINAL; }                      \
   }
@@ -126,7 +121,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -145,7 +139,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -167,7 +160,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -198,7 +190,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -229,7 +220,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -248,7 +238,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -276,7 +265,6 @@ namespace Ship {
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 

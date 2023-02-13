@@ -55,10 +55,6 @@ namespace Ship {
       }
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::UUID_SIZE + ByteBuffer::StringBytes(username) + ByteBuffer::PropertiesBytes(properties);
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

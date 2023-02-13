@@ -16,10 +16,6 @@ namespace Ship {
     value = buffer->ReadVarInt();
   }
 
-  uint32_t BlockIDMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes(value);
-  }
-
   MetadataEntryType BlockIDMetadataEntry::GetType() const {
     return MetadataEntryType::BLOCK_ID;
   }

@@ -17,14 +17,14 @@ namespace Ship {
   }
 
   ItemStack::ItemStack(const ProtocolVersion* version, ByteBuffer* buffer) : ItemStack() {
-    Read(version, buffer);
+    ItemStack::Read(version, buffer);
   }
 
   ItemStack::~ItemStack() {
     delete nbt;
   }
 
-  void ItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  void ItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
     if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
       buffer->WriteBoolean(present);
     }
@@ -79,29 +79,6 @@ namespace Ship {
     } else {
       itemID = itemCount = data = 0;
       nbt = nullptr;
-    }
-  }
-
-  uint32_t ItemStack::Size(const ProtocolVersion* version) const {
-    if (present) {
-      uint32_t size = ByteBuffer::BYTE_SIZE;
-      if (version < &ProtocolVersion::MINECRAFT_1_13_2) {
-        size += ByteBuffer::SHORT_SIZE;
-      } else {
-        size += ByteBuffer::VarIntBytes(itemID); // TODO: Mappings
-      }
-
-      if (version < &ProtocolVersion::MINECRAFT_1_13) {
-        size += ByteBuffer::SHORT_SIZE;
-      }
-
-      return size + ProtocolUtils::NBTSize(nbt);
-    } else {
-      if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
-        return ByteBuffer::BOOLEAN_SIZE;
-      } else {
-        return ByteBuffer::SHORT_SIZE;
-      }
     }
   }
 

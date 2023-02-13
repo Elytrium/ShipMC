@@ -35,10 +35,6 @@ namespace Ship {
       buffer->WriteByte(destroyStage);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::VarIntBytes(entityId) + ByteBuffer::POSITION_SIZE + ByteBuffer::BYTE_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

@@ -18,11 +18,6 @@ namespace Ship {
     level = buffer->ReadVarInt();
   }
 
-  uint32_t VillagerDataMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes(VILLAGER_TYPE_REGISTRY.GetID(version, type))
-         + ByteBuffer::VarIntBytes(VILLAGER_PROFESSION_REGISTRY.GetID(version, profession)) + ByteBuffer::VarIntBytes(level);
-  }
-
   MetadataEntryType VillagerDataMetadataEntry::GetType() const {
     return MetadataEntryType::VILLAGER_DATA;
   }

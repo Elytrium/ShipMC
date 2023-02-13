@@ -13,10 +13,6 @@ namespace Ship {
     blockState = buffer->ReadVarInt();
   }
 
-  uint32_t FallingDustParticle::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes(blockState);
-  }
-
   std::string FallingDustParticle::GetIdentifier() const {
     return "minecraft:falling_dust";
   }

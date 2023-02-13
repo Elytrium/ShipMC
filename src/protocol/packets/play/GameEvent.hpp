@@ -29,10 +29,6 @@ namespace Ship {
       buffer->WriteFloat(value);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::BYTE_SIZE + ByteBuffer::FLOAT_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

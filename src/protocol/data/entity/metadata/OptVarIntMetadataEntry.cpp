@@ -20,10 +20,6 @@ namespace Ship {
     }
   }
 
-  uint32_t OptVarIntMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes(optValue.value_or(-1) + 1);
-  }
-
   MetadataEntryType OptVarIntMetadataEntry::GetType() const {
     return MetadataEntryType::OPT_VARINT;
   }

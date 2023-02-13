@@ -19,10 +19,6 @@ namespace Ship {
     scale = buffer->ReadFloat();
   }
 
-  uint32_t DustParticle::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::FLOAT_SIZE * 4;
-  }
-
   std::string DustParticle::GetIdentifier() const {
     return "minecraft:dust";
   }

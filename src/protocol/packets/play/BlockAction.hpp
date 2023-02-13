@@ -38,10 +38,6 @@ namespace Ship {
       buffer->WriteVarInt(blockType);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::POSITION_SIZE + ByteBuffer::BYTE_SIZE + ByteBuffer::BYTE_SIZE + ByteBuffer::VarIntBytes(blockType);
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

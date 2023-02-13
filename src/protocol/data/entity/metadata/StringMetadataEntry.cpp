@@ -14,10 +14,6 @@ namespace Ship {
     value = buffer->ReadString();
   }
 
-  uint32_t StringMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::StringBytes(value);
-  }
-
   MetadataEntryType StringMetadataEntry::GetType() const {
     return MetadataEntryType::STRING;
   }

@@ -51,32 +51,13 @@ namespace Ship {
         buffer->WriteShort(slots.size());
       }
 
-      for (const ItemStack& slot : slots) {
+      for (ItemStack& slot : slots) {
         slot.Write(version, buffer);
       }
 
       if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
         carriedItem.Write(version, buffer);
       }
-    }
-
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size = ByteBuffer::BYTE_SIZE;
-      if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
-        size += ByteBuffer::VarIntBytes(stateId) + ByteBuffer::VarIntBytes(slots.size());
-      } else {
-        size += ByteBuffer::SHORT_SIZE;
-      }
-
-      for (const ItemStack& slot : slots) {
-        size += slot.Size(version);
-      }
-
-      if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
-        size += carriedItem.Size(version);
-      }
-
-      return size;
     }
 
     uint32_t GetOrdinal() override {

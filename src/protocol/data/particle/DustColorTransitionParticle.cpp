@@ -27,10 +27,6 @@ namespace Ship {
     toBlue = buffer->ReadFloat();
   }
 
-  uint32_t DustColorTransitionParticle::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::FLOAT_SIZE * 7;
-  }
-
   std::string DustColorTransitionParticle::GetIdentifier() const {
     return "minecraft:dust_color_transition";
   }

@@ -57,14 +57,6 @@ namespace Ship {
       }
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      uint32_t size = ByteBuffer::VarIntBytes(entityId) + ByteBuffer::UUID_SIZE + ByteBuffer::DOUBLE_SIZE * 3 + ByteBuffer::ANGLE_SIZE * 2;
-      if (version <= &ProtocolVersion::MINECRAFT_1_14_4) {
-        return size + ProtocolUtils::MetadataSize(version, metadata);
-      }
-      return size;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

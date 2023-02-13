@@ -13,10 +13,6 @@ namespace Ship {
     blockState = buffer->ReadVarInt();
   }
 
-  uint32_t BlockParticle::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes(blockState);
-  }
-
   std::string BlockParticle::GetIdentifier() const {
     return "minecraft:block";
   }

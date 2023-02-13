@@ -26,10 +26,6 @@ namespace Ship {
       buffer->WriteVarInt(hand);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::VarIntBytes(hand);
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

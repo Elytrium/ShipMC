@@ -42,16 +42,6 @@ namespace Ship {
     ticks = buffer->ReadVarInt();
   }
 
-  uint32_t VibrationParticle::Size(const ProtocolVersion* version) const {
-    if (sourceType == "minecraft:block") {
-      return ByteBuffer::StringBytes(sourceType) + ByteBuffer::POSITION_SIZE + ByteBuffer::VarIntBytes(ticks);
-    } else if (sourceType == "minecraft:entity") {
-      return ByteBuffer::StringBytes(sourceType) + ByteBuffer::VarIntBytes(entityId) + ByteBuffer::FLOAT_SIZE + ByteBuffer::VarIntBytes(ticks);
-    } else {
-      return ByteBuffer::StringBytes(sourceType) + ByteBuffer::VarIntBytes(ticks);
-    }
-  }
-
   std::string VibrationParticle::GetIdentifier() const {
     return "minecraft:vibration";
   }

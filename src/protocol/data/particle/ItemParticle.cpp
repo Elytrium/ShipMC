@@ -13,10 +13,6 @@ namespace Ship {
     item.Read(version, buffer);
   }
 
-  uint32_t ItemParticle::Size(const ProtocolVersion* version) const {
-    return item.Size(version);
-  }
-
   std::string ItemParticle::GetIdentifier() const {
     return "minecraft:item";
   }

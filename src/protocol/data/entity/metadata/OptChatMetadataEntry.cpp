@@ -23,14 +23,6 @@ namespace Ship {
     }
   }
 
-  uint32_t OptChatMetadataEntry::Size(const ProtocolVersion* version) const {
-    if (optValue) {
-      return ByteBuffer::BOOLEAN_SIZE + ByteBuffer::StringBytes(optValue.value());
-    } else {
-      return ByteBuffer::BOOLEAN_SIZE;
-    }
-  }
-
   MetadataEntryType OptChatMetadataEntry::GetType() const {
     return MetadataEntryType::OPT_CHAT;
   }

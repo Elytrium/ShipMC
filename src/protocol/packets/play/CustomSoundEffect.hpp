@@ -55,15 +55,6 @@ namespace Ship {
       }
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      if (version >= &ProtocolVersion::MINECRAFT_1_19) {
-        return ByteBuffer::StringBytes(soundName) + ByteBuffer::VarIntBytes(soundCategory) + ByteBuffer::INT_SIZE + ByteBuffer::INT_SIZE
-             + ByteBuffer::INT_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::LONG_SIZE;
-      }
-      return ByteBuffer::StringBytes(soundName) + ByteBuffer::VarIntBytes(soundCategory) + ByteBuffer::INT_SIZE + ByteBuffer::INT_SIZE
-           + ByteBuffer::INT_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

@@ -13,10 +13,6 @@ namespace Ship {
     value = (Pose) buffer->ReadVarInt();
   }
 
-  uint32_t PoseMetadataEntry::Size(const ProtocolVersion* version) const {
-    return ByteBuffer::VarIntBytes((uint32_t) value);
-  }
-
   MetadataEntryType PoseMetadataEntry::GetType() const {
     return MetadataEntryType::POSE;
   }

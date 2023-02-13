@@ -38,10 +38,6 @@ namespace Ship {
       buffer->WriteFloat(pitch);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::DOUBLE_SIZE + ByteBuffer::DOUBLE_SIZE + ByteBuffer::DOUBLE_SIZE + ByteBuffer::FLOAT_SIZE + ByteBuffer::FLOAT_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

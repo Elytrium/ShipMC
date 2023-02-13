@@ -28,10 +28,6 @@ namespace Ship {
       buffer->WritePosition(locationX, locationY, locationZ);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::POSITION_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

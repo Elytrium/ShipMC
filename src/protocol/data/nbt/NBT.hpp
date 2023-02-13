@@ -39,10 +39,15 @@ namespace Ship {
 
     virtual void Read(ByteBuffer* buffer) {};
     virtual void Write(ByteBuffer* buffer) {};
-    virtual uint32_t GetSize() = 0;
     virtual TagType GetType() = 0;
 
-    std::string GetName() {
+    virtual uint32_t GetSize() {
+      ByteCounter counter;
+      Write(&counter);
+      return counter.GetWriterIndex();
+    }
+
+      std::string GetName() {
       return name;
     }
 

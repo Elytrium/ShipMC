@@ -38,10 +38,6 @@ namespace Ship {
       buffer->WriteBoolean(successful);
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return ByteBuffer::POSITION_SIZE + ByteBuffer::VarIntBytes(block) + ByteBuffer::VarIntBytes(status) + ByteBuffer::BOOLEAN_SIZE;
-    }
-
     uint32_t GetOrdinal() override {
       return PACKET_ORDINAL;
     }

@@ -23,14 +23,6 @@ namespace Ship {
     value = ProtocolUtils::ReadNBT(buffer);
   }
 
-  uint32_t NBTMetadataEntry::Size(const ProtocolVersion* version) const {
-    if (value) {
-      return ProtocolUtils::NBTSize(value);
-    } else {
-      return ByteBuffer::BYTE_SIZE;
-    }
-  }
-
   MetadataEntryType NBTMetadataEntry::GetType() const {
     return MetadataEntryType::NBT;
   }
