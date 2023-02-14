@@ -1,11 +1,11 @@
 #include "../../utils/exceptions/Exception.hpp"
 #include "../readwritecloser/ReadWriteCloser.hpp"
 #include "EventLoop.hpp"
-#include <csignal>
 #include <cstring>
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <thread>
+#include <unistd.h>
 #include <utility>
 
 namespace Ship {

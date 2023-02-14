@@ -1,7 +1,7 @@
 #include "../../utils/exceptions/Exception.hpp"
 #include "../eventloop/EventLoop.hpp"
 #include "ReadWriteCloser.hpp"
-#include <csignal>
+#include <unistd.h>
 
 namespace Ship {
   UnixReadWriteCloser::UnixReadWriteCloser(int socket_file_descriptor) : socketFileDescriptor(socket_file_descriptor) {

@@ -1,0 +1,28 @@
+name: CMake Build
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ ubuntu-20.04 ]
+        build_type: [ Debug, Release ]
+      fail-fast: true
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.0.2
+      - name: Install libdeflate
+        run: sudo apt install libdeflate-dev
+      - name: Configure
+        run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      - name: Build Ship
+        run: cmake --build ${{ github.workspace }}/build --config ${{ matrix.build_type }}
+      - name: Test
+        run: ctest -C ${{ env.build_type }}
+      - name: Upload Ship
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: Ship ${{ matrix.build_type }} ${{ matrix.platform }}
+          path: "build/bin/*"

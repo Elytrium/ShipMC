@@ -1,13 +1,13 @@
 #include "../../utils/exceptions/Exception.hpp"
 #include "Listener.hpp"
 #include <arpa/inet.h>
-#include <csignal>
 #include <cstring>
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <thread>
+#include <unistd.h>
 
 namespace Ship {
 
