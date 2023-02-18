@@ -8,6 +8,7 @@ namespace Ship {
 
   const uint32_t ByteBuffer::BYTE_SIZE = INT8_WIDTH / INT_FAST8_WIDTH;
   const uint32_t ByteBuffer::SHORT_SIZE = INT16_WIDTH / INT_FAST8_WIDTH;
+  const uint32_t ByteBuffer::MEDIUM_SIZE = BYTE_SIZE * 3;
   const uint32_t ByteBuffer::INT_SIZE = INT32_WIDTH / INT_FAST8_WIDTH;
   const uint32_t ByteBuffer::LONG_SIZE = INT64_WIDTH / INT_FAST8_WIDTH;
   const uint32_t ByteBuffer::FLOAT_SIZE = INT_SIZE;
@@ -366,7 +367,13 @@ namespace Ship {
     output = buffer.ReadFloat();
     return buffer;
   }
-  
+
+  uint8_t* ByteBuffer::ReadBytes(size_t size) {
+    auto* bytes = new uint8_t[size];
+    ReadBytes(bytes, size);
+    return bytes;
+  }
+
   ByteBufferImpl::ByteBufferImpl(size_t cap) {
     singleCapacity = cap;
     auto* buffer = new uint8_t[singleCapacity];
@@ -446,17 +453,16 @@ namespace Ship {
     WriteBytesAndDelete(input->ReadBytes(size), size);
   }
 
-  uint8_t* ByteBufferImpl::ReadBytes(size_t size) {
+  void ByteBufferImpl::ReadBytes(uint8_t* output, size_t size) {
     if (GetReadableBytes() < size) {
       throw Exception("Tried to read byte array, but not enough readable bytes");
     }
 
-    auto* bytes = new uint8_t[size];
     uint32_t bytesIndex = 0;
     TryRefreshReaderBuffer();
 
     if (localWriterIndex + size >= singleCapacity) {
-      std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + singleCapacity, bytes);
+      std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + singleCapacity, output);
       uint32_t copiedBytes = singleCapacity - localReaderIndex;
       size -= copiedBytes;
       readableBytes -= copiedBytes;
@@ -465,7 +471,7 @@ namespace Ship {
       PopBuffer();
 
       while (size >= singleCapacity) {
-        std::copy(currentReadBuffer, currentReadBuffer + singleCapacity, bytes + bytesIndex);
+        std::copy(currentReadBuffer, currentReadBuffer + singleCapacity, output + bytesIndex);
         size -= singleCapacity;
         readableBytes -= singleCapacity;
         bytesIndex += singleCapacity;
@@ -474,10 +480,9 @@ namespace Ship {
       }
     }
 
-    std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + localReaderIndex + size, bytes + bytesIndex);
+    std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + localReaderIndex + size, output + bytesIndex);
     localReaderIndex += size;
     readableBytes -= size;
-    return bytes;
   }
 
   ByteBufferImpl::~ByteBufferImpl() {

@@ -121,7 +121,8 @@ namespace Ship {
     virtual uint32_t ReadVarInt();
     virtual uint64_t ReadLong();
     virtual uint64_t ReadVarLong();
-    virtual uint8_t* ReadBytes(size_t size) = 0;
+    virtual uint8_t* ReadBytes(size_t size);
+    virtual void ReadBytes(uint8_t* output, size_t size) = 0;
     virtual double ReadDouble();
     virtual float ReadFloat();
     virtual UUID ReadUUID();
@@ -175,6 +176,7 @@ namespace Ship {
 
     static const uint32_t BYTE_SIZE;
     static const uint32_t SHORT_SIZE;
+    static const uint32_t MEDIUM_SIZE;
     static const uint32_t INT_SIZE;
     static const uint32_t LONG_SIZE;
     static const uint32_t FLOAT_SIZE;
@@ -207,7 +209,7 @@ namespace Ship {
     void WriteBytes(ByteBuffer* buffer, size_t size) override;
 
     uint8_t ReadByteUnsafe() override;
-    uint8_t* ReadBytes(size_t size) override;
+    void ReadBytes(uint8_t* output, size_t size) override;
     void WriteBytesAndDelete(uint8_t* input, size_t size) override;
 
     void Release() override;
@@ -232,92 +234,52 @@ namespace Ship {
 
   class ByteCounter : public ByteBuffer {
    private:
-    size_t writerIndex;
+    size_t writerIndex = 0;
 
    public:
     ~ByteCounter() override = default;
 
-    void WriteByte(uint8_t input) override {
-      ++writerIndex;
-    }
+    void WriteByte(uint8_t input) override;
+    void WriteBytes(uint8_t* input, size_t size) override;
+    void WriteBytes(ByteBuffer* buffer, size_t size) override;
 
-    void WriteBytes(uint8_t* input, size_t size) override {
-      writerIndex += size;
-    }
+    void WriteBoolean(bool input) override;
+    void WriteShort(uint16_t input) override;
+    void WriteMedium(uint32_t input) override;
+    void WriteInt(uint32_t input) override;
+    void WriteVarInt(uint32_t input) override;
+    void WriteLong(uint64_t input) override;
+    void WriteVarLong(uint64_t input) override;
+    void WriteUUID(UUID input) override;
+    void WriteUUIDIntArray(UUID input) override;
+    void WriteDouble(double input) override;
+    void WriteFloat(float input) override;
+    void WriteString(const std::string& input) override;
+    void WritePosition(int x, int y, int z) override;
+    void WriteAngle(float input) override;
 
-    void WriteBytes(ByteBuffer* buffer, size_t size) override {
-      writerIndex += size;
-    }
+    uint8_t ReadByteUnsafe() override;
+    void ReadBytes(uint8_t* output, size_t size) override;
+    void WriteBytesAndDelete(uint8_t* input, size_t size) override;
 
-    uint8_t ReadByteUnsafe() override {
-      return 0;
-    }
+    void Release() override;
+    void ResetReaderIndex() override;
+    [[nodiscard]] size_t GetReaderIndex() const override;
+    void ResetWriterIndex() override;
+    [[nodiscard]] size_t GetWriterIndex() const override;
+    [[nodiscard]] size_t GetReadableBytes() const override;
+    [[nodiscard]] size_t GetSingleCapacity() const override;
+    [[nodiscard]] std::deque<uint8_t*> GetDirectBuffers() const override;
+    void TryRefreshReaderBuffer() override;
+    void TryRefreshWriterBuffer() override;
+    void AppendBuffer() override;
+    void PopBuffer() override;
 
-    uint8_t* ReadBytes(size_t size) override {
-      return new uint8_t[size];
-    }
+    [[nodiscard]] bool CanReadDirect(size_t read_size) const override;
+    uint8_t* GetDirectReadAddress() override;
 
-    void WriteBytesAndDelete(uint8_t* input, size_t size) override {
-      delete[] input;
-    }
-
-    void Release() override {
-    }
-
-    void ResetReaderIndex() override {
-    }
-
-    [[nodiscard]] size_t GetReaderIndex() const override {
-      return 0;
-    }
-
-    void ResetWriterIndex() override {
-      writerIndex = 0;
-    }
-
-    [[nodiscard]] size_t GetWriterIndex() const override {
-      return writerIndex;
-    }
-
-    [[nodiscard]] size_t GetReadableBytes() const override {
-      return SIZE_MAX;
-    }
-
-    [[nodiscard]] size_t GetSingleCapacity() const override {
-      return SIZE_MAX;
-    }
-
-    [[nodiscard]] std::deque<uint8_t*> GetDirectBuffers() const override {
-      return {};
-    }
-
-    void TryRefreshReaderBuffer() override {
-    }
-
-    void TryRefreshWriterBuffer() override {
-    }
-
-    void AppendBuffer() override {
-    }
-
-    void PopBuffer() override {
-    }
-
-    [[nodiscard]] bool CanReadDirect(size_t read_size) const override {
-      return false;
-    }
-
-    uint8_t* GetDirectReadAddress() override {
-      return nullptr;
-    }
-
-    [[nodiscard]] bool CanWriteDirect(size_t write_size) const override {
-      return false;
-    }
-
-    uint8_t* GetDirectWriteAddress() override {
-      return nullptr;
-    }
+    [[nodiscard]] bool CanWriteDirect(size_t write_size) const override;
+    uint8_t* GetDirectWriteAddress() override;
   };
 
   class Serializable {
