@@ -34,8 +34,28 @@ namespace Ship {
     }
   }
 
-  uint32_t ByteBuffer::VarLongBytes(uint64_t varLong) {
-    return 0; // TODO: VarLong
+  uint32_t ByteBuffer::VarLongBytes(uint64_t input) {
+    if ((input & (0xFFFFFFFFFFFFFFFFULL << 7)) == 0) {
+      return 1;
+    } else if ((input & (0xFFFFFFFFFFFFFFFFULL << 14)) == 0) {
+      return 2;
+    } else if ((input & (0xFFFFFFFFFFFFFFFFULL << 21)) == 0) {
+      return 3;
+    } else if ((input & (0xFFFFFFFFFFFFFFFFULL << 28)) == 0) {
+      return 4;
+    } else if ((input & (0xFFFFFFFFFFFFFFFFULL << 35)) == 0) {
+      return 5;
+    } else if ((input & (0xFFFFFFFFFFFFFFFFULL << 42)) == 0) {
+      return 6;
+    } else if ((input & (0xFFFFFFFFFFFFFFFFULL << 49)) == 0) {
+      return 7;
+    } else if ((input & (0xFFFFFFFFFFFFFFFFULL << 56)) == 0) {
+      return 8;
+    } else if ((input & (0xFFFFFFFFFFFFFFFFULL << 63)) == 0) {
+      return 9;
+    } else {
+      return 10;
+    }
   }
 
   uint32_t ByteBuffer::StringBytes(const std::string& string) {
@@ -78,26 +98,14 @@ namespace Ship {
   }
 
   void ByteBuffer::WriteVarInt(uint32_t input) {
-    if ((input & (0xFFFFFFFF << 7)) == 0) {
-      WriteByte(input);
-    } else if ((input & (0xFFFFFFFF << 14)) == 0) {
-      WriteByte(((input & 0x7F) | 0x80));
-      WriteByte((input >> 7));
-    } else if ((input & (0xFFFFFFFF << 21)) == 0) {
-      WriteByte(((input & 0x7F) | 0x80));
-      WriteByte((((input >> 7) & 0x7F) | 0x80));
-      WriteByte((input >> 14));
-    } else if ((input & (0xFFFFFFFF << 28)) == 0) {
-      WriteByte(((input & 0x7F) | 0x80));
-      WriteByte((((input >> 7) & 0x7F) | 0x80));
-      WriteByte((((input >> 14) & 0x7F) | 0x80));
-      WriteByte((input >> 21));
-    } else {
-      WriteByte(((input & 0x7F) | 0x80));
-      WriteByte((((input >> 7) & 0x7F) | 0x80));
-      WriteByte((((input >> 14) & 0x7F) | 0x80));
-      WriteByte((((input >> 21) & 0x7F) | 0x80));
-      WriteByte((input >> 28));
+    while (true) {
+      if ((input & ~0x7F) == 0) {
+        WriteByte(input);
+        return;
+      }
+
+      WriteByte((input & 0x7F) | 0x80);
+      input >>= 7;
     }
   }
 
@@ -113,7 +121,15 @@ namespace Ship {
   }
 
   void ByteBuffer::WriteVarLong(uint64_t input) {
-    // TODO: VarLong
+    while (true) {
+      if ((input & ~0x7FULL) == 0) {
+        WriteByte(input);
+        return;
+      }
+
+      WriteByte((input & 0x7FULL) | 0x80ULL);
+      input >>= 7;
+    }
   }
 
   void ByteBuffer::WriteUUID(UUID input) {
@@ -208,7 +224,7 @@ namespace Ship {
     for (uint32_t byteIndex = 0; byteIndex < 5; ++byteIndex) {
       uint8_t byte = ReadByteUnsafe();
       decodedVarInt |= (byte & 0x7F) << byteIndex * 7;
-      if ((byte & 0x80) != 128) {
+      if ((byte & 0x80) == 0) {
         return decodedVarInt;
       }
     }
@@ -226,7 +242,16 @@ namespace Ship {
   }
 
   uint64_t ByteBuffer::ReadVarLong() {
-    return 0; // TODO: VarLong
+    uint64_t decodedVarLong = 0;
+    for (uint32_t byteIndex = 0; byteIndex < 10; ++byteIndex) {
+      uint8_t byte = ReadByteUnsafe();
+      decodedVarLong |= ((uint64_t) (byte & 0x7FULL)) << byteIndex * 7;
+      if ((byte & 0x80) == 0) {
+        return decodedVarLong;
+      }
+    }
+
+    throw Exception("Invalid VarLong");
   }
 
   UUID ByteBuffer::ReadUUID() {

@@ -50,6 +50,7 @@ namespace Ship {
   }
 
   void ByteCounter::WriteString(const std::string& input) {
+    writerIndex += VarIntBytes(input.size());
     writerIndex += input.size();
   }
 
