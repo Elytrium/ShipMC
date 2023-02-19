@@ -11,11 +11,11 @@ namespace Ship {
     }
   }
 
-  uint32_t VersionedRegistry::GetOrdinalByID(const ProtocolVersion* version, uint32_t id) {
+  uint32_t VersionedRegistry::GetOrdinalByID(const ProtocolVersion* version, uint32_t id) const {
     return versionRegistry[VersionToOrdinal(version)].GetOrdinalByID(id);
   }
 
-  uint32_t VersionedRegistry::GetIDByOrdinal(const ProtocolVersion* version, uint32_t ordinal) {
+  uint32_t VersionedRegistry::GetIDByOrdinal(const ProtocolVersion* version, uint32_t ordinal) const {
     return versionRegistry[VersionToOrdinal(version)].GetIDByOrdinal(ordinal);
   }
 } // Ship

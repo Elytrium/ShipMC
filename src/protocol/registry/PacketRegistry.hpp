@@ -14,10 +14,10 @@ namespace Ship {
     std::vector<std::function<Packet*()>> ordinalToPacketMap;
 
    public:
-    uint32_t VersionToOrdinal(const ProtocolVersion* version) override;
+    uint32_t VersionToOrdinal(const ProtocolVersion* version) const override;
     void RegisterPacketConstructor(uint32_t ordinal, const std::function<Packet*()>& constructor);
-    Packet* GetPacketByID(const ProtocolVersion* version, uint32_t ordinal);
-    uint32_t GetIDByPacket(const ProtocolVersion* version, Packet* packet);
+    Packet* GetPacketByID(const ProtocolVersion* version, uint32_t ordinal) const;
+    uint32_t GetIDByPacket(const ProtocolVersion* version, Packet* packet) const;
   };
 
   enum PacketDirection {

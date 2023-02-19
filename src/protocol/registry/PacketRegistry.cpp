@@ -5,15 +5,15 @@ namespace Ship {
     ResizeVectorAndSet(ordinalToPacketMap, ordinal, constructor);
   }
 
-  Packet* DirectionRegistry::GetPacketByID(const ProtocolVersion* version, uint32_t id) {
+  Packet* DirectionRegistry::GetPacketByID(const ProtocolVersion* version, uint32_t id) const {
     return (Packet*) GetObjectByID(version, id);
   }
 
-  uint32_t DirectionRegistry::GetIDByPacket(const ProtocolVersion* version, Packet* packet) {
+  uint32_t DirectionRegistry::GetIDByPacket(const ProtocolVersion* version, Packet* packet) const {
     return GetIDByOrdinal(version, packet->GetOrdinal());
   }
 
-  uint32_t DirectionRegistry::VersionToOrdinal(const ProtocolVersion* version) {
+  uint32_t DirectionRegistry::VersionToOrdinal(const ProtocolVersion* version) const {
     return version->GetPacketIDOrdinal();
   }
 

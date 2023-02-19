@@ -7,7 +7,7 @@ namespace Ship {
   template<typename T>
   class EnumRegistry : public VersionedRegistry {
    public:
-    uint32_t VersionToOrdinal(const ProtocolVersion* version) override {
+    uint32_t VersionToOrdinal(const ProtocolVersion* version) const override {
       return version->GetOrdinal();
     }
 
