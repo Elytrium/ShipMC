@@ -1,29 +1,23 @@
 #pragma once
 
 #include "../packets/Packet.hpp"
+#include "ConstructorRegistry.hpp"
 #include "VersionRegistry.hpp"
+#include "VersionedRegistry.hpp"
 #include <functional>
 #include <vector>
 
 namespace Ship {
 
-  class DirectionRegistry {
+  class DirectionRegistry : public ConstructorRegistry<Packet> {
    private:
     std::vector<std::function<Packet*()>> ordinalToPacketMap;
-    const VersionRegistry* versionRegistry = NewVersionRegistry();
 
    public:
-    static VersionRegistry* NewVersionRegistry();
-
-    ~DirectionRegistry() {
-      delete[] versionRegistry;
-    }
-
-    explicit DirectionRegistry(VersionRegistry* version_registry);
-
+    uint32_t VersionToOrdinal(const ProtocolVersion* version) override;
     void RegisterPacketConstructor(uint32_t ordinal, const std::function<Packet*()>& constructor);
-    Packet* GetPacketByID(const ProtocolVersion* version, uint32_t ordinal) const;
-    uint32_t GetIDByPacket(const ProtocolVersion* version, Packet* packet) const;
+    Packet* GetPacketByID(const ProtocolVersion* version, uint32_t ordinal);
+    uint32_t GetIDByPacket(const ProtocolVersion* version, Packet* packet);
   };
 
   enum PacketDirection {

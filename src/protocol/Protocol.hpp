@@ -49,6 +49,7 @@ namespace Ship {
     static const ProtocolVersion MINECRAFT_1_18_2;
     static const ProtocolVersion MINECRAFT_1_19;
     static const ProtocolVersion MINECRAFT_1_19_1;
+    static const ProtocolVersion MINECRAFT_1_19_3;
 
     static const ProtocolVersion MINIMUM_VERSION;
     static const ProtocolVersion MAXIMUM_VERSION;

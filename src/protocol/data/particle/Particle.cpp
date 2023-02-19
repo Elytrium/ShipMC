@@ -2,8 +2,8 @@
 
 namespace Ship {
 
-  DataTypeRegistry<AbstractParticle> GetParticleRegistry() {
-    VersionRegistry* versionRegistry = DataTypeRegistry<AbstractParticle>::NewVersionRegistry();
+  ConstructorRegistry<AbstractParticle> GetParticleRegistry() {
+    VersionRegistry* versionRegistry = ConstructorRegistry<AbstractParticle>::NewVersionRegistry();
 
     // TODO: Other versions
 
@@ -98,7 +98,7 @@ namespace Ship {
       versionRegistry[i].Register(ScrapeParticle::ORDINAL, 87);
     }
 
-    DataTypeRegistry<AbstractParticle> registry(versionRegistry);
+    ConstructorRegistry<AbstractParticle> registry(versionRegistry);
 
     registry.RegisterConstructor(AmbientEntityEffectParticle::ORDINAL, CreateConstructor<AmbientEntityEffectParticle>());
     registry.RegisterConstructor(AngryVillagerParticle::ORDINAL, CreateConstructor<AngryVillagerParticle>());
@@ -192,5 +192,5 @@ namespace Ship {
     return registry;
   }
 
-  const DataTypeRegistry<AbstractParticle> PARTICLE_REGISTRY = GetParticleRegistry();
+  const ConstructorRegistry<AbstractParticle> PARTICLE_REGISTRY = GetParticleRegistry();
 }

@@ -2,7 +2,7 @@
 
 #include "../../../../utils/ordinal/OrdinalRegistry.hpp"
 #include "../../../Protocol.hpp"
-#include "../../../registry/DataTypeRegistry.hpp"
+#include "../../../registry/ConstructorRegistry.hpp"
 #include "../../ItemStack.hpp"
 #include "../../particle/Particle.hpp"
 #include "VillagerData.hpp"
@@ -639,7 +639,7 @@ namespace Ship {
     [[nodiscard]] std::optional<PaintingVariant> GetPaintingVariant(uint8_t index) const;
   };
 
-  extern const DataTypeRegistry<MetadataEntry> METADATA_ENTRY_REGISTRY;
+  extern const ConstructorRegistry<MetadataEntry> METADATA_ENTRY_REGISTRY;
 
   extern const EnumRegistry<CatVariant> CAT_VARIANT_REGISTRY;
   extern const EnumRegistry<FrogVariant> FROG_VARIANT_REGISTRY;
