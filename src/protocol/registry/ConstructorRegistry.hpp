@@ -23,7 +23,7 @@ namespace Ship {
       ResizeVectorAndSet(ordinalToObjectMap, ordinal, constructor);
     }
 
-    T* GetObjectByID(const ProtocolVersion* version, uint32_t id) {
+    T* GetObjectByID(const ProtocolVersion* version, uint32_t id) const {
       uint32_t ordinal = GetOrdinalByID(version, id);
       if (ordinal >= ordinalToObjectMap.size()) {
         return nullptr;
