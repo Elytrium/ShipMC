@@ -28,6 +28,7 @@ namespace Ship {
   const ProtocolVersion ProtocolVersion::MINECRAFT_1_18_2 = ProtocolVersion(18, 7, 758, "1.18.2");
   const ProtocolVersion ProtocolVersion::MINECRAFT_1_19 = ProtocolVersion(19, 8, 759, "1.19");
   const ProtocolVersion ProtocolVersion::MINECRAFT_1_19_1 = ProtocolVersion(20, 9, 760, "1.19.1 - 1.19.2");
+  const ProtocolVersion ProtocolVersion::MINECRAFT_1_19_3 = ProtocolVersion(21, 10, 761, "1.19.3");
 
   const ProtocolVersion ProtocolVersion::MINIMUM_VERSION = ProtocolVersion::MINECRAFT_1_12_2;
   const ProtocolVersion ProtocolVersion::MAXIMUM_VERSION = ProtocolVersion::MINECRAFT_1_19_1;

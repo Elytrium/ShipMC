@@ -2,7 +2,7 @@
 
 #include "../../../utils/ordinal/OrdinalRegistry.hpp"
 #include "../../Protocol.hpp"
-#include "../../registry/DataTypeRegistry.hpp"
+#include "../../registry/ConstructorRegistry.hpp"
 #include "../ItemStack.hpp"
 
 namespace Ship {
@@ -284,5 +284,5 @@ namespace Ship {
     void SetTicks(uint32_t newValue);
   };
 
-  extern const DataTypeRegistry<AbstractParticle> PARTICLE_REGISTRY;
+  extern const ConstructorRegistry<AbstractParticle> PARTICLE_REGISTRY;
 }

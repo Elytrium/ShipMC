@@ -355,8 +355,8 @@ namespace Ship {
     return entry->GetValue();
   }
 
-  DataTypeRegistry<MetadataEntry> GetMetadataRegistry() {
-    VersionRegistry* versionRegistry = DataTypeRegistry<MetadataEntry>::NewVersionRegistry();
+  ConstructorRegistry<MetadataEntry> GetMetadataRegistry() {
+    VersionRegistry* versionRegistry = ConstructorRegistry<MetadataEntry>::NewVersionRegistry();
 
     VersionRegistry* registry1_12_2 = versionRegistry + ProtocolVersion::MINECRAFT_1_12_2.GetPacketIDOrdinal();
     registry1_12_2->Register(ByteMetadataEntry::ORDINAL, 0);
@@ -464,7 +464,7 @@ namespace Ship {
     registry1_19_1->Register(GlobalPosMetadataEntry::ORDINAL, 21);
     registry1_19_1->Register(PaintingVariantMetadataEntry::ORDINAL, 22);
 
-    DataTypeRegistry<MetadataEntry> dataRegistry(nullptr);
+    ConstructorRegistry<MetadataEntry> dataRegistry(nullptr);
 
     dataRegistry.RegisterConstructor(ByteMetadataEntry::ORDINAL, CreateConstructor<ByteMetadataEntry>(0));
     dataRegistry.RegisterConstructor(VarIntMetadataEntry::ORDINAL, CreateConstructor<VarIntMetadataEntry>(0));
@@ -571,7 +571,7 @@ namespace Ship {
     return EnumRegistry<PaintingVariant>(versionRegistry);
   }
 
-  const DataTypeRegistry<MetadataEntry> METADATA_ENTRY_REGISTRY = GetMetadataRegistry();
+  const ConstructorRegistry<MetadataEntry> METADATA_ENTRY_REGISTRY = GetMetadataRegistry();
 
   const EnumRegistry<CatVariant> CAT_VARIANT_REGISTRY = GetCatVariantRegistry();
   const EnumRegistry<FrogVariant> FROG_VARIANT_REGISTRY = GetFrogVariantRegistry();
