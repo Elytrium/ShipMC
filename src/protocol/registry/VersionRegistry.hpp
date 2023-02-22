@@ -21,7 +21,10 @@ namespace Ship {
     int latestRegisteredID = -1;
 
    public:
-    VersionRegistry();
+    VersionRegistry() = default;
+
+    template<typename T>
+    explicit VersionRegistry(const std::vector<T>& ordinals);
     explicit VersionRegistry(const std::vector<uint32_t>& ordinals);
 
     void Register(uint32_t ordinal);

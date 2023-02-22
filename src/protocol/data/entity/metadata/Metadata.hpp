@@ -11,7 +11,7 @@
 
 namespace Ship {
 
-  enum class Pose {
+  enum class Pose : uint32_t {
     STANDING = 0,
     FALL_FLYING = 1,
     SLEEPING = 2,
@@ -28,7 +28,7 @@ namespace Ship {
     DIGGING = 13,
   };
 
-  enum class CatVariant {
+  enum class CatVariant : uint32_t {
     TABBY = 0,
     BLACK = 1,
     RED = 2,
@@ -42,13 +42,13 @@ namespace Ship {
     ALL_BLACK = 10,
   };
 
-  enum class FrogVariant {
+  enum class FrogVariant : uint32_t {
     TEMPERATE = 0,
     WARM = 1,
     COLD = 2,
   };
 
-  enum class PaintingVariant {
+  enum class PaintingVariant : uint32_t {
     KEBAB,
     AZTEC,
     ALBAN,

@@ -3,193 +3,124 @@
 namespace Ship {
 
   ConstructorRegistry<AbstractParticle> GetParticleRegistry() {
-    VersionRegistry* versionRegistry = ConstructorRegistry<AbstractParticle>::NewVersionRegistry();
+    ConstructorRegistry<AbstractParticle> particleRegistry({
+      // TODO: Other versions
+      ProtocolVersion::MINECRAFT_1_19,
+      ProtocolVersion::MINECRAFT_1_19_3,
+    });
 
-    // TODO: Other versions
+    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
+      VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BlockParticle::ORDINAL, BlockMarkerParticle::ORDINAL,
+        BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
+        DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
+        FallingWaterParticle::ORDINAL, DustParticle::ORDINAL, DustColorTransitionParticle::ORDINAL, EffectParticle::ORDINAL,
+        ElderGuardianParticle::ORDINAL, EnchantedHitParticle::ORDINAL, EnchantParticle::ORDINAL, EndRodParticle::ORDINAL, EntityEffectParticle::ORDINAL,
+        ExplosionEmitterParticle::ORDINAL, ExplosionParticle::ORDINAL, FallingDustParticle::ORDINAL, FireworkParticle::ORDINAL, FishingParticle::ORDINAL,
+        FlameParticle::ORDINAL, SoulFireFlameParticle::ORDINAL, SoulParticle::ORDINAL, FlashParticle::ORDINAL, HappyVillagerParticle::ORDINAL,
+        ComposterParticle::ORDINAL, HeartParticle::ORDINAL, InstantEffectParticle::ORDINAL, ItemParticle::ORDINAL, VibrationParticle::ORDINAL,
+        ItemSlimeParticle::ORDINAL, ItemSnowballParticle::ORDINAL, LargeSmokeParticle::ORDINAL, LavaParticle::ORDINAL, MyceliumParticle::ORDINAL,
+        NoteParticle::ORDINAL, PoofParticle::ORDINAL, PortalParticle::ORDINAL, RainParticle::ORDINAL, SmokeParticle::ORDINAL, SneezeParticle::ORDINAL,
+        SpitParticle::ORDINAL, SquidInkParticle::ORDINAL, SweepAttackParticle::ORDINAL, TotemOfUndyingParticle::ORDINAL, UnderwaterParticle::ORDINAL,
+        SplashParticle::ORDINAL, WitchParticle::ORDINAL, BubblePopParticle::ORDINAL, CurrentDownParticle::ORDINAL, BubbleColumnUpParticle::ORDINAL,
+        NautilusParticle::ORDINAL, DolphinParticle::ORDINAL, CampfireCosySmokeParticle::ORDINAL, CampfireSignalSmokeParticle::ORDINAL,
+        DrippingHoneyParticle::ORDINAL, FallingHoneyParticle::ORDINAL, LandingHoneyParticle::ORDINAL, FallingNectarParticle::ORDINAL,
+        FallingSporeBlossomParticle::ORDINAL, AshParticle::ORDINAL, CrimsonSporeParticle::ORDINAL, WarpedSporeParticle::ORDINAL,
+        SporeBlossomAirParticle::ORDINAL, DrippingObsidianTearParticle::ORDINAL, FallingObsidianTearParticle::ORDINAL,
+        LandingObsidianTearParticle::ORDINAL, ReversePortalParticle::ORDINAL, WhiteAshParticle::ORDINAL, SmallFlameParticle::ORDINAL,
+        SnowflakeParticle::ORDINAL, DrippingDripstoneLavaParticle::ORDINAL, FallingDripstoneLavaParticle::ORDINAL, DrippingDripstoneWaterParticle::ORDINAL,
+        FallingDripstoneWaterParticle::ORDINAL, GlowSquidInkParticle::ORDINAL, GlowParticle::ORDINAL, WaxOnParticle::ORDINAL, WaxOffParticle::ORDINAL,
+        ElectricSparkParticle::ORDINAL, ScrapeParticle::ORDINAL}));
 
-    for (uint32_t i = ProtocolVersion::MINECRAFT_1_19.GetOrdinal(); i <= ProtocolVersion::MINECRAFT_1_19_1.GetOrdinal(); ++i) {
-      versionRegistry[i].Register(AmbientEntityEffectParticle::ORDINAL, 0);
-      versionRegistry[i].Register(AngryVillagerParticle::ORDINAL, 1);
-      versionRegistry[i].Register(BlockParticle::ORDINAL, 2);
-      versionRegistry[i].Register(BlockMarkerParticle::ORDINAL, 3);
-      versionRegistry[i].Register(BubbleParticle::ORDINAL, 4);
-      versionRegistry[i].Register(CloudParticle::ORDINAL, 5);
-      versionRegistry[i].Register(CritParticle::ORDINAL, 6);
-      versionRegistry[i].Register(DamageIndicatorParticle::ORDINAL, 7);
-      versionRegistry[i].Register(DragonBreathParticle::ORDINAL, 8);
-      versionRegistry[i].Register(DrippingLavaParticle::ORDINAL, 9);
-      versionRegistry[i].Register(FallingLavaParticle::ORDINAL, 10);
-      versionRegistry[i].Register(LandingLavaParticle::ORDINAL, 11);
-      versionRegistry[i].Register(DrippingWaterParticle::ORDINAL, 12);
-      versionRegistry[i].Register(FallingWaterParticle::ORDINAL, 13);
-      versionRegistry[i].Register(DustParticle::ORDINAL, 14);
-      versionRegistry[i].Register(DustColorTransitionParticle::ORDINAL, 15);
-      versionRegistry[i].Register(EffectParticle::ORDINAL, 16);
-      versionRegistry[i].Register(ElderGuardianParticle::ORDINAL, 17);
-      versionRegistry[i].Register(EnchantedHitParticle::ORDINAL, 18);
-      versionRegistry[i].Register(EnchantParticle::ORDINAL, 19);
-      versionRegistry[i].Register(EndRodParticle::ORDINAL, 20);
-      versionRegistry[i].Register(EntityEffectParticle::ORDINAL, 21);
-      versionRegistry[i].Register(ExplosionEmitterParticle::ORDINAL, 22);
-      versionRegistry[i].Register(ExplosionParticle::ORDINAL, 23);
-      versionRegistry[i].Register(FallingDustParticle::ORDINAL, 24);
-      versionRegistry[i].Register(FireworkParticle::ORDINAL, 25);
-      versionRegistry[i].Register(FishingParticle::ORDINAL, 26);
-      versionRegistry[i].Register(FlameParticle::ORDINAL, 27);
-      versionRegistry[i].Register(SoulFireFlameParticle::ORDINAL, 28);
-      versionRegistry[i].Register(SoulParticle::ORDINAL, 29);
-      versionRegistry[i].Register(FlashParticle::ORDINAL, 30);
-      versionRegistry[i].Register(HappyVillagerParticle::ORDINAL, 31);
-      versionRegistry[i].Register(ComposterParticle::ORDINAL, 32);
-      versionRegistry[i].Register(HeartParticle::ORDINAL, 33);
-      versionRegistry[i].Register(InstantEffectParticle::ORDINAL, 34);
-      versionRegistry[i].Register(ItemParticle::ORDINAL, 35);
-      versionRegistry[i].Register(VibrationParticle::ORDINAL, 36);
-      versionRegistry[i].Register(ItemSlimeParticle::ORDINAL, 37);
-      versionRegistry[i].Register(ItemSnowballParticle::ORDINAL, 38);
-      versionRegistry[i].Register(LargeSmokeParticle::ORDINAL, 39);
-      versionRegistry[i].Register(LavaParticle::ORDINAL, 40);
-      versionRegistry[i].Register(MyceliumParticle::ORDINAL, 41);
-      versionRegistry[i].Register(NoteParticle::ORDINAL, 42);
-      versionRegistry[i].Register(PoofParticle::ORDINAL, 43);
-      versionRegistry[i].Register(PortalParticle::ORDINAL, 44);
-      versionRegistry[i].Register(RainParticle::ORDINAL, 45);
-      versionRegistry[i].Register(SmokeParticle::ORDINAL, 46);
-      versionRegistry[i].Register(SneezeParticle::ORDINAL, 47);
-      versionRegistry[i].Register(SpitParticle::ORDINAL, 48);
-      versionRegistry[i].Register(SquidInkParticle::ORDINAL, 49);
-      versionRegistry[i].Register(SweepAttackParticle::ORDINAL, 50);
-      versionRegistry[i].Register(TotemOfUndyingParticle::ORDINAL, 51);
-      versionRegistry[i].Register(UnderwaterParticle::ORDINAL, 52);
-      versionRegistry[i].Register(SplashParticle::ORDINAL, 53);
-      versionRegistry[i].Register(WitchParticle::ORDINAL, 54);
-      versionRegistry[i].Register(BubblePopParticle::ORDINAL, 55);
-      versionRegistry[i].Register(CurrentDownParticle::ORDINAL, 56);
-      versionRegistry[i].Register(BubbleColumnUpParticle::ORDINAL, 57);
-      versionRegistry[i].Register(NautilusParticle::ORDINAL, 58);
-      versionRegistry[i].Register(DolphinParticle::ORDINAL, 59);
-      versionRegistry[i].Register(CampfireCosySmokeParticle::ORDINAL, 60);
-      versionRegistry[i].Register(CampfireSignalSmokeParticle::ORDINAL, 61);
-      versionRegistry[i].Register(DrippingHoneyParticle::ORDINAL, 62);
-      versionRegistry[i].Register(FallingHoneyParticle::ORDINAL, 63);
-      versionRegistry[i].Register(LandingHoneyParticle::ORDINAL, 64);
-      versionRegistry[i].Register(FallingNectarParticle::ORDINAL, 65);
-      versionRegistry[i].Register(FallingSporeBlossomParticle::ORDINAL, 66);
-      versionRegistry[i].Register(AshParticle::ORDINAL, 67);
-      versionRegistry[i].Register(CrimsonSporeParticle::ORDINAL, 68);
-      versionRegistry[i].Register(WarpedSporeParticle::ORDINAL, 69);
-      versionRegistry[i].Register(SporeBlossomAirParticle::ORDINAL, 70);
-      versionRegistry[i].Register(DrippingObsidianTearParticle::ORDINAL, 71);
-      versionRegistry[i].Register(FallingObsidianTearParticle::ORDINAL, 72);
-      versionRegistry[i].Register(LandingObsidianTearParticle::ORDINAL, 73);
-      versionRegistry[i].Register(ReversePortalParticle::ORDINAL, 74);
-      versionRegistry[i].Register(WhiteAshParticle::ORDINAL, 75);
-      versionRegistry[i].Register(SmallFlameParticle::ORDINAL, 76);
-      versionRegistry[i].Register(SnowflakeParticle::ORDINAL, 77);
-      versionRegistry[i].Register(DrippingDripstoneLavaParticle::ORDINAL, 78);
-      versionRegistry[i].Register(FallingDripstoneLavaParticle::ORDINAL, 79);
-      versionRegistry[i].Register(DrippingDripstoneWaterParticle::ORDINAL, 80);
-      versionRegistry[i].Register(FallingDripstoneWaterParticle::ORDINAL, 81);
-      versionRegistry[i].Register(GlowSquidInkParticle::ORDINAL, 82);
-      versionRegistry[i].Register(GlowParticle::ORDINAL, 83);
-      versionRegistry[i].Register(WaxOnParticle::ORDINAL, 84);
-      versionRegistry[i].Register(WaxOffParticle::ORDINAL, 85);
-      versionRegistry[i].Register(ElectricSparkParticle::ORDINAL, 86);
-      versionRegistry[i].Register(ScrapeParticle::ORDINAL, 87);
-    }
+    particleRegistry.RegisterConstructor(AmbientEntityEffectParticle::ORDINAL, CreateConstructor<AmbientEntityEffectParticle>());
+    particleRegistry.RegisterConstructor(AngryVillagerParticle::ORDINAL, CreateConstructor<AngryVillagerParticle>());
+    particleRegistry.RegisterConstructor(BlockParticle::ORDINAL, CreateConstructor<BlockParticle>(0));
+    particleRegistry.RegisterConstructor(BlockMarkerParticle::ORDINAL, CreateConstructor<BlockMarkerParticle>(0));
+    particleRegistry.RegisterConstructor(BubbleParticle::ORDINAL, CreateConstructor<BubbleParticle>());
+    particleRegistry.RegisterConstructor(CloudParticle::ORDINAL, CreateConstructor<CloudParticle>());
+    particleRegistry.RegisterConstructor(CritParticle::ORDINAL, CreateConstructor<CritParticle>());
+    particleRegistry.RegisterConstructor(DamageIndicatorParticle::ORDINAL, CreateConstructor<DamageIndicatorParticle>());
+    particleRegistry.RegisterConstructor(DragonBreathParticle::ORDINAL, CreateConstructor<DragonBreathParticle>());
+    particleRegistry.RegisterConstructor(DrippingLavaParticle::ORDINAL, CreateConstructor<DrippingLavaParticle>());
+    particleRegistry.RegisterConstructor(FallingLavaParticle::ORDINAL, CreateConstructor<FallingLavaParticle>());
+    particleRegistry.RegisterConstructor(LandingLavaParticle::ORDINAL, CreateConstructor<LandingLavaParticle>());
+    particleRegistry.RegisterConstructor(DrippingWaterParticle::ORDINAL, CreateConstructor<DrippingWaterParticle>());
+    particleRegistry.RegisterConstructor(FallingWaterParticle::ORDINAL, CreateConstructor<FallingWaterParticle>());
+    particleRegistry.RegisterConstructor(DustParticle::ORDINAL, CreateConstructor<DustParticle>(0, 0, 0, 0));
+    particleRegistry.RegisterConstructor(DustColorTransitionParticle::ORDINAL, CreateConstructor<DustColorTransitionParticle>(0, 0, 0, 0, 0, 0, 0));
+    particleRegistry.RegisterConstructor(EffectParticle::ORDINAL, CreateConstructor<EffectParticle>());
+    particleRegistry.RegisterConstructor(ElderGuardianParticle::ORDINAL, CreateConstructor<ElderGuardianParticle>());
+    particleRegistry.RegisterConstructor(EnchantedHitParticle::ORDINAL, CreateConstructor<EnchantedHitParticle>());
+    particleRegistry.RegisterConstructor(EnchantParticle::ORDINAL, CreateConstructor<EnchantParticle>());
+    particleRegistry.RegisterConstructor(EndRodParticle::ORDINAL, CreateConstructor<EndRodParticle>());
+    particleRegistry.RegisterConstructor(EntityEffectParticle::ORDINAL, CreateConstructor<EntityEffectParticle>());
+    particleRegistry.RegisterConstructor(ExplosionEmitterParticle::ORDINAL, CreateConstructor<ExplosionEmitterParticle>());
+    particleRegistry.RegisterConstructor(ExplosionParticle::ORDINAL, CreateConstructor<ExplosionParticle>());
+    particleRegistry.RegisterConstructor(FallingDustParticle::ORDINAL, CreateConstructor<FallingDustParticle>(0));
+    particleRegistry.RegisterConstructor(FireworkParticle::ORDINAL, CreateConstructor<FireworkParticle>());
+    particleRegistry.RegisterConstructor(FishingParticle::ORDINAL, CreateConstructor<FishingParticle>());
+    particleRegistry.RegisterConstructor(FlameParticle::ORDINAL, CreateConstructor<FlameParticle>());
+    particleRegistry.RegisterConstructor(SoulFireFlameParticle::ORDINAL, CreateConstructor<SoulFireFlameParticle>());
+    particleRegistry.RegisterConstructor(SoulParticle::ORDINAL, CreateConstructor<SoulParticle>());
+    particleRegistry.RegisterConstructor(FlashParticle::ORDINAL, CreateConstructor<FlashParticle>());
+    particleRegistry.RegisterConstructor(HappyVillagerParticle::ORDINAL, CreateConstructor<HappyVillagerParticle>());
+    particleRegistry.RegisterConstructor(ComposterParticle::ORDINAL, CreateConstructor<ComposterParticle>());
+    particleRegistry.RegisterConstructor(HeartParticle::ORDINAL, CreateConstructor<HeartParticle>());
+    particleRegistry.RegisterConstructor(InstantEffectParticle::ORDINAL, CreateConstructor<InstantEffectParticle>());
+    particleRegistry.RegisterConstructor(ItemParticle::ORDINAL, CreateConstructor<ItemParticle>(ItemStack {}));
+    particleRegistry.RegisterConstructor(VibrationParticle::ORDINAL, CreateConstructor<VibrationParticle>(std::string {}, 0));
+    particleRegistry.RegisterConstructor(ItemSlimeParticle::ORDINAL, CreateConstructor<ItemSlimeParticle>());
+    particleRegistry.RegisterConstructor(ItemSnowballParticle::ORDINAL, CreateConstructor<ItemSnowballParticle>());
+    particleRegistry.RegisterConstructor(LargeSmokeParticle::ORDINAL, CreateConstructor<LargeSmokeParticle>());
+    particleRegistry.RegisterConstructor(LavaParticle::ORDINAL, CreateConstructor<LavaParticle>());
+    particleRegistry.RegisterConstructor(MyceliumParticle::ORDINAL, CreateConstructor<MyceliumParticle>());
+    particleRegistry.RegisterConstructor(NoteParticle::ORDINAL, CreateConstructor<NoteParticle>());
+    particleRegistry.RegisterConstructor(PoofParticle::ORDINAL, CreateConstructor<PoofParticle>());
+    particleRegistry.RegisterConstructor(PortalParticle::ORDINAL, CreateConstructor<PortalParticle>());
+    particleRegistry.RegisterConstructor(RainParticle::ORDINAL, CreateConstructor<RainParticle>());
+    particleRegistry.RegisterConstructor(SmokeParticle::ORDINAL, CreateConstructor<SmokeParticle>());
+    particleRegistry.RegisterConstructor(SneezeParticle::ORDINAL, CreateConstructor<SneezeParticle>());
+    particleRegistry.RegisterConstructor(SpitParticle::ORDINAL, CreateConstructor<SpitParticle>());
+    particleRegistry.RegisterConstructor(SquidInkParticle::ORDINAL, CreateConstructor<SquidInkParticle>());
+    particleRegistry.RegisterConstructor(SweepAttackParticle::ORDINAL, CreateConstructor<SweepAttackParticle>());
+    particleRegistry.RegisterConstructor(TotemOfUndyingParticle::ORDINAL, CreateConstructor<TotemOfUndyingParticle>());
+    particleRegistry.RegisterConstructor(UnderwaterParticle::ORDINAL, CreateConstructor<UnderwaterParticle>());
+    particleRegistry.RegisterConstructor(SplashParticle::ORDINAL, CreateConstructor<SplashParticle>());
+    particleRegistry.RegisterConstructor(WitchParticle::ORDINAL, CreateConstructor<WitchParticle>());
+    particleRegistry.RegisterConstructor(BubblePopParticle::ORDINAL, CreateConstructor<BubblePopParticle>());
+    particleRegistry.RegisterConstructor(CurrentDownParticle::ORDINAL, CreateConstructor<CurrentDownParticle>());
+    particleRegistry.RegisterConstructor(BubbleColumnUpParticle::ORDINAL, CreateConstructor<BubbleColumnUpParticle>());
+    particleRegistry.RegisterConstructor(NautilusParticle::ORDINAL, CreateConstructor<NautilusParticle>());
+    particleRegistry.RegisterConstructor(DolphinParticle::ORDINAL, CreateConstructor<DolphinParticle>());
+    particleRegistry.RegisterConstructor(CampfireCosySmokeParticle::ORDINAL, CreateConstructor<CampfireCosySmokeParticle>());
+    particleRegistry.RegisterConstructor(CampfireSignalSmokeParticle::ORDINAL, CreateConstructor<CampfireSignalSmokeParticle>());
+    particleRegistry.RegisterConstructor(DrippingHoneyParticle::ORDINAL, CreateConstructor<DrippingHoneyParticle>());
+    particleRegistry.RegisterConstructor(FallingHoneyParticle::ORDINAL, CreateConstructor<FallingHoneyParticle>());
+    particleRegistry.RegisterConstructor(LandingHoneyParticle::ORDINAL, CreateConstructor<LandingHoneyParticle>());
+    particleRegistry.RegisterConstructor(FallingNectarParticle::ORDINAL, CreateConstructor<FallingNectarParticle>());
+    particleRegistry.RegisterConstructor(FallingSporeBlossomParticle::ORDINAL, CreateConstructor<FallingSporeBlossomParticle>());
+    particleRegistry.RegisterConstructor(AshParticle::ORDINAL, CreateConstructor<AshParticle>());
+    particleRegistry.RegisterConstructor(CrimsonSporeParticle::ORDINAL, CreateConstructor<CrimsonSporeParticle>());
+    particleRegistry.RegisterConstructor(WarpedSporeParticle::ORDINAL, CreateConstructor<WarpedSporeParticle>());
+    particleRegistry.RegisterConstructor(SporeBlossomAirParticle::ORDINAL, CreateConstructor<SporeBlossomAirParticle>());
+    particleRegistry.RegisterConstructor(DrippingObsidianTearParticle::ORDINAL, CreateConstructor<DrippingObsidianTearParticle>());
+    particleRegistry.RegisterConstructor(FallingObsidianTearParticle::ORDINAL, CreateConstructor<FallingObsidianTearParticle>());
+    particleRegistry.RegisterConstructor(LandingObsidianTearParticle::ORDINAL, CreateConstructor<LandingObsidianTearParticle>());
+    particleRegistry.RegisterConstructor(ReversePortalParticle::ORDINAL, CreateConstructor<ReversePortalParticle>());
+    particleRegistry.RegisterConstructor(WhiteAshParticle::ORDINAL, CreateConstructor<WhiteAshParticle>());
+    particleRegistry.RegisterConstructor(SmallFlameParticle::ORDINAL, CreateConstructor<SmallFlameParticle>());
+    particleRegistry.RegisterConstructor(SnowflakeParticle::ORDINAL, CreateConstructor<SnowflakeParticle>());
+    particleRegistry.RegisterConstructor(DrippingDripstoneLavaParticle::ORDINAL, CreateConstructor<DrippingDripstoneLavaParticle>());
+    particleRegistry.RegisterConstructor(FallingDripstoneLavaParticle::ORDINAL, CreateConstructor<FallingDripstoneLavaParticle>());
+    particleRegistry.RegisterConstructor(DrippingDripstoneWaterParticle::ORDINAL, CreateConstructor<DrippingDripstoneWaterParticle>());
+    particleRegistry.RegisterConstructor(FallingDripstoneWaterParticle::ORDINAL, CreateConstructor<FallingDripstoneWaterParticle>());
+    particleRegistry.RegisterConstructor(GlowSquidInkParticle::ORDINAL, CreateConstructor<GlowSquidInkParticle>());
+    particleRegistry.RegisterConstructor(GlowParticle::ORDINAL, CreateConstructor<GlowParticle>());
+    particleRegistry.RegisterConstructor(WaxOnParticle::ORDINAL, CreateConstructor<WaxOnParticle>());
+    particleRegistry.RegisterConstructor(WaxOffParticle::ORDINAL, CreateConstructor<WaxOffParticle>());
+    particleRegistry.RegisterConstructor(ElectricSparkParticle::ORDINAL, CreateConstructor<ElectricSparkParticle>());
+    particleRegistry.RegisterConstructor(ScrapeParticle::ORDINAL, CreateConstructor<ScrapeParticle>());
 
-    ConstructorRegistry<AbstractParticle> registry(versionRegistry);
-
-    registry.RegisterConstructor(AmbientEntityEffectParticle::ORDINAL, CreateConstructor<AmbientEntityEffectParticle>());
-    registry.RegisterConstructor(AngryVillagerParticle::ORDINAL, CreateConstructor<AngryVillagerParticle>());
-    registry.RegisterConstructor(BlockParticle::ORDINAL, CreateConstructor<BlockParticle>(0));
-    registry.RegisterConstructor(BlockMarkerParticle::ORDINAL, CreateConstructor<BlockMarkerParticle>(0));
-    registry.RegisterConstructor(BubbleParticle::ORDINAL, CreateConstructor<BubbleParticle>());
-    registry.RegisterConstructor(CloudParticle::ORDINAL, CreateConstructor<CloudParticle>());
-    registry.RegisterConstructor(CritParticle::ORDINAL, CreateConstructor<CritParticle>());
-    registry.RegisterConstructor(DamageIndicatorParticle::ORDINAL, CreateConstructor<DamageIndicatorParticle>());
-    registry.RegisterConstructor(DragonBreathParticle::ORDINAL, CreateConstructor<DragonBreathParticle>());
-    registry.RegisterConstructor(DrippingLavaParticle::ORDINAL, CreateConstructor<DrippingLavaParticle>());
-    registry.RegisterConstructor(FallingLavaParticle::ORDINAL, CreateConstructor<FallingLavaParticle>());
-    registry.RegisterConstructor(LandingLavaParticle::ORDINAL, CreateConstructor<LandingLavaParticle>());
-    registry.RegisterConstructor(DrippingWaterParticle::ORDINAL, CreateConstructor<DrippingWaterParticle>());
-    registry.RegisterConstructor(FallingWaterParticle::ORDINAL, CreateConstructor<FallingWaterParticle>());
-    registry.RegisterConstructor(DustParticle::ORDINAL, CreateConstructor<DustParticle>(0, 0, 0, 0));
-    registry.RegisterConstructor(DustColorTransitionParticle::ORDINAL, CreateConstructor<DustColorTransitionParticle>(0, 0, 0, 0, 0, 0, 0));
-    registry.RegisterConstructor(EffectParticle::ORDINAL, CreateConstructor<EffectParticle>());
-    registry.RegisterConstructor(ElderGuardianParticle::ORDINAL, CreateConstructor<ElderGuardianParticle>());
-    registry.RegisterConstructor(EnchantedHitParticle::ORDINAL, CreateConstructor<EnchantedHitParticle>());
-    registry.RegisterConstructor(EnchantParticle::ORDINAL, CreateConstructor<EnchantParticle>());
-    registry.RegisterConstructor(EndRodParticle::ORDINAL, CreateConstructor<EndRodParticle>());
-    registry.RegisterConstructor(EntityEffectParticle::ORDINAL, CreateConstructor<EntityEffectParticle>());
-    registry.RegisterConstructor(ExplosionEmitterParticle::ORDINAL, CreateConstructor<ExplosionEmitterParticle>());
-    registry.RegisterConstructor(ExplosionParticle::ORDINAL, CreateConstructor<ExplosionParticle>());
-    registry.RegisterConstructor(FallingDustParticle::ORDINAL, CreateConstructor<FallingDustParticle>(0));
-    registry.RegisterConstructor(FireworkParticle::ORDINAL, CreateConstructor<FireworkParticle>());
-    registry.RegisterConstructor(FishingParticle::ORDINAL, CreateConstructor<FishingParticle>());
-    registry.RegisterConstructor(FlameParticle::ORDINAL, CreateConstructor<FlameParticle>());
-    registry.RegisterConstructor(SoulFireFlameParticle::ORDINAL, CreateConstructor<SoulFireFlameParticle>());
-    registry.RegisterConstructor(SoulParticle::ORDINAL, CreateConstructor<SoulParticle>());
-    registry.RegisterConstructor(FlashParticle::ORDINAL, CreateConstructor<FlashParticle>());
-    registry.RegisterConstructor(HappyVillagerParticle::ORDINAL, CreateConstructor<HappyVillagerParticle>());
-    registry.RegisterConstructor(ComposterParticle::ORDINAL, CreateConstructor<ComposterParticle>());
-    registry.RegisterConstructor(HeartParticle::ORDINAL, CreateConstructor<HeartParticle>());
-    registry.RegisterConstructor(InstantEffectParticle::ORDINAL, CreateConstructor<InstantEffectParticle>());
-    registry.RegisterConstructor(ItemParticle::ORDINAL, CreateConstructor<ItemParticle>(ItemStack {}));
-    registry.RegisterConstructor(VibrationParticle::ORDINAL, CreateConstructor<VibrationParticle>(std::string {}, 0));
-    registry.RegisterConstructor(ItemSlimeParticle::ORDINAL, CreateConstructor<ItemSlimeParticle>());
-    registry.RegisterConstructor(ItemSnowballParticle::ORDINAL, CreateConstructor<ItemSnowballParticle>());
-    registry.RegisterConstructor(LargeSmokeParticle::ORDINAL, CreateConstructor<LargeSmokeParticle>());
-    registry.RegisterConstructor(LavaParticle::ORDINAL, CreateConstructor<LavaParticle>());
-    registry.RegisterConstructor(MyceliumParticle::ORDINAL, CreateConstructor<MyceliumParticle>());
-    registry.RegisterConstructor(NoteParticle::ORDINAL, CreateConstructor<NoteParticle>());
-    registry.RegisterConstructor(PoofParticle::ORDINAL, CreateConstructor<PoofParticle>());
-    registry.RegisterConstructor(PortalParticle::ORDINAL, CreateConstructor<PortalParticle>());
-    registry.RegisterConstructor(RainParticle::ORDINAL, CreateConstructor<RainParticle>());
-    registry.RegisterConstructor(SmokeParticle::ORDINAL, CreateConstructor<SmokeParticle>());
-    registry.RegisterConstructor(SneezeParticle::ORDINAL, CreateConstructor<SneezeParticle>());
-    registry.RegisterConstructor(SpitParticle::ORDINAL, CreateConstructor<SpitParticle>());
-    registry.RegisterConstructor(SquidInkParticle::ORDINAL, CreateConstructor<SquidInkParticle>());
-    registry.RegisterConstructor(SweepAttackParticle::ORDINAL, CreateConstructor<SweepAttackParticle>());
-    registry.RegisterConstructor(TotemOfUndyingParticle::ORDINAL, CreateConstructor<TotemOfUndyingParticle>());
-    registry.RegisterConstructor(UnderwaterParticle::ORDINAL, CreateConstructor<UnderwaterParticle>());
-    registry.RegisterConstructor(SplashParticle::ORDINAL, CreateConstructor<SplashParticle>());
-    registry.RegisterConstructor(WitchParticle::ORDINAL, CreateConstructor<WitchParticle>());
-    registry.RegisterConstructor(BubblePopParticle::ORDINAL, CreateConstructor<BubblePopParticle>());
-    registry.RegisterConstructor(CurrentDownParticle::ORDINAL, CreateConstructor<CurrentDownParticle>());
-    registry.RegisterConstructor(BubbleColumnUpParticle::ORDINAL, CreateConstructor<BubbleColumnUpParticle>());
-    registry.RegisterConstructor(NautilusParticle::ORDINAL, CreateConstructor<NautilusParticle>());
-    registry.RegisterConstructor(DolphinParticle::ORDINAL, CreateConstructor<DolphinParticle>());
-    registry.RegisterConstructor(CampfireCosySmokeParticle::ORDINAL, CreateConstructor<CampfireCosySmokeParticle>());
-    registry.RegisterConstructor(CampfireSignalSmokeParticle::ORDINAL, CreateConstructor<CampfireSignalSmokeParticle>());
-    registry.RegisterConstructor(DrippingHoneyParticle::ORDINAL, CreateConstructor<DrippingHoneyParticle>());
-    registry.RegisterConstructor(FallingHoneyParticle::ORDINAL, CreateConstructor<FallingHoneyParticle>());
-    registry.RegisterConstructor(LandingHoneyParticle::ORDINAL, CreateConstructor<LandingHoneyParticle>());
-    registry.RegisterConstructor(FallingNectarParticle::ORDINAL, CreateConstructor<FallingNectarParticle>());
-    registry.RegisterConstructor(FallingSporeBlossomParticle::ORDINAL, CreateConstructor<FallingSporeBlossomParticle>());
-    registry.RegisterConstructor(AshParticle::ORDINAL, CreateConstructor<AshParticle>());
-    registry.RegisterConstructor(CrimsonSporeParticle::ORDINAL, CreateConstructor<CrimsonSporeParticle>());
-    registry.RegisterConstructor(WarpedSporeParticle::ORDINAL, CreateConstructor<WarpedSporeParticle>());
-    registry.RegisterConstructor(SporeBlossomAirParticle::ORDINAL, CreateConstructor<SporeBlossomAirParticle>());
-    registry.RegisterConstructor(DrippingObsidianTearParticle::ORDINAL, CreateConstructor<DrippingObsidianTearParticle>());
-    registry.RegisterConstructor(FallingObsidianTearParticle::ORDINAL, CreateConstructor<FallingObsidianTearParticle>());
-    registry.RegisterConstructor(LandingObsidianTearParticle::ORDINAL, CreateConstructor<LandingObsidianTearParticle>());
-    registry.RegisterConstructor(ReversePortalParticle::ORDINAL, CreateConstructor<ReversePortalParticle>());
-    registry.RegisterConstructor(WhiteAshParticle::ORDINAL, CreateConstructor<WhiteAshParticle>());
-    registry.RegisterConstructor(SmallFlameParticle::ORDINAL, CreateConstructor<SmallFlameParticle>());
-    registry.RegisterConstructor(SnowflakeParticle::ORDINAL, CreateConstructor<SnowflakeParticle>());
-    registry.RegisterConstructor(DrippingDripstoneLavaParticle::ORDINAL, CreateConstructor<DrippingDripstoneLavaParticle>());
-    registry.RegisterConstructor(FallingDripstoneLavaParticle::ORDINAL, CreateConstructor<FallingDripstoneLavaParticle>());
-    registry.RegisterConstructor(DrippingDripstoneWaterParticle::ORDINAL, CreateConstructor<DrippingDripstoneWaterParticle>());
-    registry.RegisterConstructor(FallingDripstoneWaterParticle::ORDINAL, CreateConstructor<FallingDripstoneWaterParticle>());
-    registry.RegisterConstructor(GlowSquidInkParticle::ORDINAL, CreateConstructor<GlowSquidInkParticle>());
-    registry.RegisterConstructor(GlowParticle::ORDINAL, CreateConstructor<GlowParticle>());
-    registry.RegisterConstructor(WaxOnParticle::ORDINAL, CreateConstructor<WaxOnParticle>());
-    registry.RegisterConstructor(WaxOffParticle::ORDINAL, CreateConstructor<WaxOffParticle>());
-    registry.RegisterConstructor(ElectricSparkParticle::ORDINAL, CreateConstructor<ElectricSparkParticle>());
-    registry.RegisterConstructor(ScrapeParticle::ORDINAL, CreateConstructor<ScrapeParticle>());
-
-    return registry;
+    return particleRegistry;
   }
 
   const ConstructorRegistry<AbstractParticle> PARTICLE_REGISTRY = GetParticleRegistry();

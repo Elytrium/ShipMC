@@ -2,14 +2,12 @@
 
 namespace Ship {
 
-  VersionRegistry::VersionRegistry() {
-  }
-
-  VersionRegistry::VersionRegistry(const std::vector<uint32_t>& ordinals) {
+  template<typename T>
+  VersionRegistry::VersionRegistry(const std::vector<T>& ordinals) {
     idToOrdinalMap = ordinals;
 
     int index = 0;
-    for (const auto& ordinal : ordinals) {
+    for (uint32_t ordinal : ordinals) {
       ordinalToIDMap[ordinal] = index++;
     }
   }
