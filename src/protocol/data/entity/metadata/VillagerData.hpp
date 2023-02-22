@@ -4,7 +4,7 @@
 
 namespace Ship {
 
-  enum class VillagerType {
+  enum class VillagerType : uint32_t {
     DESERT,
     JUNGLE,
     PLAINS,
@@ -14,7 +14,7 @@ namespace Ship {
     TAIGA,
   };
 
-  enum class VillagerProfession {
+  enum class VillagerProfession : uint32_t {
     NONE,
     ARMORER,
     BUTCHER,

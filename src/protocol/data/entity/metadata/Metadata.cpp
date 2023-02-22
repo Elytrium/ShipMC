@@ -356,115 +356,12 @@ namespace Ship {
   }
 
   ConstructorRegistry<MetadataEntry> GetMetadataRegistry() {
-    VersionRegistry* versionRegistry = ConstructorRegistry<MetadataEntry>::NewVersionRegistry();
-
-    VersionRegistry* registry1_12_2 = versionRegistry + ProtocolVersion::MINECRAFT_1_12_2.GetPacketIDOrdinal();
-    registry1_12_2->Register(ByteMetadataEntry::ORDINAL, 0);
-    registry1_12_2->Register(VarIntMetadataEntry::ORDINAL, 1);
-    registry1_12_2->Register(FloatMetadataEntry::ORDINAL, 2);
-    registry1_12_2->Register(StringMetadataEntry::ORDINAL, 3);
-    registry1_12_2->Register(ChatMetadataEntry::ORDINAL, 4);
-    registry1_12_2->Register(ItemStackMetadataEntry::ORDINAL, 5);
-    registry1_12_2->Register(BooleanMetadataEntry::ORDINAL, 6);
-    registry1_12_2->Register(RotationMetadataEntry::ORDINAL, 7);
-    registry1_12_2->Register(PositionMetadataEntry::ORDINAL, 8);
-    registry1_12_2->Register(OptPositionMetadataEntry::ORDINAL, 9);
-    registry1_12_2->Register(DirectionMetadataEntry::ORDINAL, 10);
-    registry1_12_2->Register(OptUUIDMetadataEntry::ORDINAL, 11);
-    registry1_12_2->Register(BlockIDMetadataEntry::ORDINAL, 12);
-    registry1_12_2->Register(NBTMetadataEntry::ORDINAL, 13);
-
-    for (uint32_t i = ProtocolVersion::MINECRAFT_1_13.GetOrdinal(); i <= ProtocolVersion::MINECRAFT_1_13_2.GetOrdinal(); ++i) {
-      versionRegistry[i].Register(ByteMetadataEntry::ORDINAL, 0);
-      versionRegistry[i].Register(VarIntMetadataEntry::ORDINAL, 1);
-      versionRegistry[i].Register(FloatMetadataEntry::ORDINAL, 2);
-      versionRegistry[i].Register(StringMetadataEntry::ORDINAL, 3);
-      versionRegistry[i].Register(ChatMetadataEntry::ORDINAL, 4);
-      versionRegistry[i].Register(OptChatMetadataEntry::ORDINAL, 5);
-      versionRegistry[i].Register(ItemStackMetadataEntry::ORDINAL, 6);
-      versionRegistry[i].Register(BooleanMetadataEntry::ORDINAL, 7);
-      versionRegistry[i].Register(RotationMetadataEntry::ORDINAL, 8);
-      versionRegistry[i].Register(PositionMetadataEntry::ORDINAL, 9);
-      versionRegistry[i].Register(OptPositionMetadataEntry::ORDINAL, 10);
-      versionRegistry[i].Register(DirectionMetadataEntry::ORDINAL, 11);
-      versionRegistry[i].Register(OptUUIDMetadataEntry::ORDINAL, 12);
-      versionRegistry[i].Register(BlockIDMetadataEntry::ORDINAL, 13);
-      versionRegistry[i].Register(NBTMetadataEntry::ORDINAL, 14);
-      versionRegistry[i].Register(ParticleMetadataEntry::ORDINAL, 15);
-    }
-
-    for (uint32_t i = ProtocolVersion::MINECRAFT_1_14.GetOrdinal(); i <= ProtocolVersion::MINECRAFT_1_17_1.GetOrdinal(); ++i) {
-      versionRegistry[i].Register(ByteMetadataEntry::ORDINAL, 0);
-      versionRegistry[i].Register(VarIntMetadataEntry::ORDINAL, 1);
-      versionRegistry[i].Register(FloatMetadataEntry::ORDINAL, 2);
-      versionRegistry[i].Register(StringMetadataEntry::ORDINAL, 3);
-      versionRegistry[i].Register(ChatMetadataEntry::ORDINAL, 4);
-      versionRegistry[i].Register(OptChatMetadataEntry::ORDINAL, 5);
-      versionRegistry[i].Register(ItemStackMetadataEntry::ORDINAL, 6);
-      versionRegistry[i].Register(BooleanMetadataEntry::ORDINAL, 7);
-      versionRegistry[i].Register(RotationMetadataEntry::ORDINAL, 8);
-      versionRegistry[i].Register(PositionMetadataEntry::ORDINAL, 9);
-      versionRegistry[i].Register(OptPositionMetadataEntry::ORDINAL, 10);
-      versionRegistry[i].Register(DirectionMetadataEntry::ORDINAL, 11);
-      versionRegistry[i].Register(OptUUIDMetadataEntry::ORDINAL, 12);
-      versionRegistry[i].Register(BlockIDMetadataEntry::ORDINAL, 13);
-      versionRegistry[i].Register(NBTMetadataEntry::ORDINAL, 14);
-      versionRegistry[i].Register(ParticleMetadataEntry::ORDINAL, 15);
-      versionRegistry[i].Register(VillagerDataMetadataEntry::ORDINAL, 16);
-      versionRegistry[i].Register(OptVarIntMetadataEntry::ORDINAL, 17);
-      versionRegistry[i].Register(PoseMetadataEntry::ORDINAL, 18);
-    }
-
-    VersionRegistry* registry1_19 = versionRegistry + ProtocolVersion::MINECRAFT_1_19.GetPacketIDOrdinal();
-    registry1_19->Register(ByteMetadataEntry::ORDINAL, 0);
-    registry1_19->Register(VarIntMetadataEntry::ORDINAL, 1);
-    registry1_19->Register(FloatMetadataEntry::ORDINAL, 2);
-    registry1_19->Register(StringMetadataEntry::ORDINAL, 3);
-    registry1_19->Register(ChatMetadataEntry::ORDINAL, 4);
-    registry1_19->Register(OptChatMetadataEntry::ORDINAL, 5);
-    registry1_19->Register(ItemStackMetadataEntry::ORDINAL, 6);
-    registry1_19->Register(BooleanMetadataEntry::ORDINAL, 7);
-    registry1_19->Register(RotationMetadataEntry::ORDINAL, 8);
-    registry1_19->Register(PositionMetadataEntry::ORDINAL, 9);
-    registry1_19->Register(OptPositionMetadataEntry::ORDINAL, 10);
-    registry1_19->Register(DirectionMetadataEntry::ORDINAL, 11);
-    registry1_19->Register(OptUUIDMetadataEntry::ORDINAL, 12);
-    registry1_19->Register(BlockIDMetadataEntry::ORDINAL, 13);
-    registry1_19->Register(NBTMetadataEntry::ORDINAL, 14);
-    registry1_19->Register(ParticleMetadataEntry::ORDINAL, 15);
-    registry1_19->Register(VillagerDataMetadataEntry::ORDINAL, 16);
-    registry1_19->Register(OptVarIntMetadataEntry::ORDINAL, 17);
-    registry1_19->Register(PoseMetadataEntry::ORDINAL, 18);
-    registry1_19->Register(CatVariantMetadataEntry::ORDINAL, 19);
-    registry1_19->Register(FrogVariantMetadataEntry::ORDINAL, 20);
-    registry1_19->Register(PaintingVariantMetadataEntry::ORDINAL, 21);
-
-    VersionRegistry* registry1_19_1 = versionRegistry + ProtocolVersion::MINECRAFT_1_19_1.GetPacketIDOrdinal();
-    registry1_19_1->Register(ByteMetadataEntry::ORDINAL, 0);
-    registry1_19_1->Register(VarIntMetadataEntry::ORDINAL, 1);
-    registry1_19_1->Register(FloatMetadataEntry::ORDINAL, 2);
-    registry1_19_1->Register(StringMetadataEntry::ORDINAL, 3);
-    registry1_19_1->Register(ChatMetadataEntry::ORDINAL, 4);
-    registry1_19_1->Register(OptChatMetadataEntry::ORDINAL, 5);
-    registry1_19_1->Register(ItemStackMetadataEntry::ORDINAL, 6);
-    registry1_19_1->Register(BooleanMetadataEntry::ORDINAL, 7);
-    registry1_19_1->Register(RotationMetadataEntry::ORDINAL, 8);
-    registry1_19_1->Register(PositionMetadataEntry::ORDINAL, 9);
-    registry1_19_1->Register(OptPositionMetadataEntry::ORDINAL, 10);
-    registry1_19_1->Register(DirectionMetadataEntry::ORDINAL, 11);
-    registry1_19_1->Register(OptUUIDMetadataEntry::ORDINAL, 12);
-    registry1_19_1->Register(BlockIDMetadataEntry::ORDINAL, 13);
-    registry1_19_1->Register(NBTMetadataEntry::ORDINAL, 14);
-    registry1_19_1->Register(ParticleMetadataEntry::ORDINAL, 15);
-    registry1_19_1->Register(VillagerDataMetadataEntry::ORDINAL, 16);
-    registry1_19_1->Register(OptVarIntMetadataEntry::ORDINAL, 17);
-    registry1_19_1->Register(PoseMetadataEntry::ORDINAL, 18);
-    registry1_19_1->Register(CatVariantMetadataEntry::ORDINAL, 19);
-    registry1_19_1->Register(FrogVariantMetadataEntry::ORDINAL, 20);
-    registry1_19_1->Register(GlobalPosMetadataEntry::ORDINAL, 21);
-    registry1_19_1->Register(PaintingVariantMetadataEntry::ORDINAL, 22);
-
-    ConstructorRegistry<MetadataEntry> dataRegistry(nullptr);
+    ConstructorRegistry<MetadataEntry> dataRegistry({
+      ProtocolVersion::MINECRAFT_1_12_2, ProtocolVersion::MINECRAFT_1_13, ProtocolVersion::MINECRAFT_1_14,
+      // TODO: MINECRAFT_1_18?
+      ProtocolVersion::MINECRAFT_1_19, ProtocolVersion::MINECRAFT_1_19_1
+      // TODO: MINECRAFT_1_19_3?
+    });
 
     dataRegistry.RegisterConstructor(ByteMetadataEntry::ORDINAL, CreateConstructor<ByteMetadataEntry>(0));
     dataRegistry.RegisterConstructor(VarIntMetadataEntry::ORDINAL, CreateConstructor<VarIntMetadataEntry>(0));
@@ -491,84 +388,87 @@ namespace Ship {
     dataRegistry.RegisterConstructor(GlobalPosMetadataEntry::ORDINAL, CreateConstructor<GlobalPosMetadataEntry>(std::string {}, 0, 0, 0));
     dataRegistry.RegisterConstructor(PaintingVariantMetadataEntry::ORDINAL, CreateConstructor<PaintingVariantMetadataEntry>(PaintingVariant {}));
 
+    dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
+      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+        ChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL, RotationMetadataEntry::ORDINAL,
+        PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL, OptUUIDMetadataEntry::ORDINAL,
+        BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL}));
+
+    dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_13,
+      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+        ChatMetadataEntry::ORDINAL, OptChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL,
+        RotationMetadataEntry::ORDINAL, PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL,
+        OptUUIDMetadataEntry::ORDINAL, BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL, ParticleMetadataEntry::ORDINAL}));
+
+    dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_14,
+      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+        ChatMetadataEntry::ORDINAL, OptChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL,
+        RotationMetadataEntry::ORDINAL, PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL,
+        OptUUIDMetadataEntry::ORDINAL, BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL, ParticleMetadataEntry::ORDINAL,
+        VillagerDataMetadataEntry::ORDINAL, OptVarIntMetadataEntry::ORDINAL, PoseMetadataEntry::ORDINAL}));
+
+    dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
+      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+        ChatMetadataEntry::ORDINAL, OptChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL,
+        RotationMetadataEntry::ORDINAL, PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL,
+        OptUUIDMetadataEntry::ORDINAL, BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL, ParticleMetadataEntry::ORDINAL,
+        VillagerDataMetadataEntry::ORDINAL, OptVarIntMetadataEntry::ORDINAL, PoseMetadataEntry::ORDINAL, CatVariantMetadataEntry::ORDINAL,
+        FrogVariantMetadataEntry::ORDINAL, PaintingVariantMetadataEntry::ORDINAL}));
+
+    dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_1,
+      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+        ChatMetadataEntry::ORDINAL, OptChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL,
+        RotationMetadataEntry::ORDINAL, PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL,
+        OptUUIDMetadataEntry::ORDINAL, BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL, ParticleMetadataEntry::ORDINAL,
+        VillagerDataMetadataEntry::ORDINAL, OptVarIntMetadataEntry::ORDINAL, PoseMetadataEntry::ORDINAL, CatVariantMetadataEntry::ORDINAL,
+        FrogVariantMetadataEntry::ORDINAL, GlobalPosMetadataEntry::ORDINAL, PaintingVariantMetadataEntry::ORDINAL}));
+
     return dataRegistry;
   }
 
   EnumRegistry<CatVariant> GetCatVariantRegistry() {
-    VersionRegistry* versionRegistry = EnumRegistry<CatVariant>::NewVersionRegistry();
+    EnumRegistry<CatVariant> catRegistry({
+      // TODO: Other versions
+      ProtocolVersion::MINECRAFT_1_19,
+      ProtocolVersion::MINECRAFT_1_19_3,
+    });
 
-    // TODO: Other versions
+    catRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
+      VersionRegistry(std::vector<CatVariant>({CatVariant::TABBY, CatVariant::BLACK, CatVariant::RED, CatVariant::SIAMESE, CatVariant::BRITISH_SHORTHAIR, CatVariant::CALICO,
+        CatVariant::PERSIAN, CatVariant::RAGDOLL, CatVariant::WHITE, CatVariant::JELLIE, CatVariant::ALL_BLACK})));
 
-    for (uint32_t i = ProtocolVersion::MINECRAFT_1_19.GetOrdinal(); i <= ProtocolVersion::MINECRAFT_1_19_1.GetOrdinal(); ++i) {
-      versionRegistry[i].Register((uint32_t) CatVariant::TABBY, 0);
-      versionRegistry[i].Register((uint32_t) CatVariant::BLACK, 1);
-      versionRegistry[i].Register((uint32_t) CatVariant::RED, 2);
-      versionRegistry[i].Register((uint32_t) CatVariant::SIAMESE, 3);
-      versionRegistry[i].Register((uint32_t) CatVariant::BRITISH_SHORTHAIR, 4);
-      versionRegistry[i].Register((uint32_t) CatVariant::CALICO, 5);
-      versionRegistry[i].Register((uint32_t) CatVariant::PERSIAN, 6);
-      versionRegistry[i].Register((uint32_t) CatVariant::RAGDOLL, 7);
-      versionRegistry[i].Register((uint32_t) CatVariant::WHITE, 8);
-      versionRegistry[i].Register((uint32_t) CatVariant::JELLIE, 9);
-      versionRegistry[i].Register((uint32_t) CatVariant::ALL_BLACK, 10);
-    }
-
-    return EnumRegistry<CatVariant>(versionRegistry);
+    return catRegistry;
   }
 
   EnumRegistry<FrogVariant> GetFrogVariantRegistry() {
-    VersionRegistry* versionRegistry = EnumRegistry<FrogVariant>::NewVersionRegistry();
+    EnumRegistry<FrogVariant> frogRegistry({
+      // TODO: Other versions
+      ProtocolVersion::MINECRAFT_1_19,
+      ProtocolVersion::MINECRAFT_1_19_3,
+    });
 
-    // TODO: Other versions
+    frogRegistry.RegisterVersion(
+      &ProtocolVersion::MINECRAFT_1_19, VersionRegistry(std::vector<FrogVariant>({FrogVariant::TEMPERATE, FrogVariant::WARM, FrogVariant::COLD})));
 
-    for (uint32_t i = ProtocolVersion::MINECRAFT_1_19.GetOrdinal(); i <= ProtocolVersion::MINECRAFT_1_19_1.GetOrdinal(); ++i) {
-      versionRegistry[i].Register((uint32_t) FrogVariant::TEMPERATE, 0);
-      versionRegistry[i].Register((uint32_t) FrogVariant::WARM, 1);
-      versionRegistry[i].Register((uint32_t) FrogVariant::COLD, 2);
-    }
-
-    return EnumRegistry<FrogVariant>(versionRegistry);
+    return frogRegistry;
   }
 
   EnumRegistry<PaintingVariant> GetPaintingVariantRegistry() {
-    VersionRegistry* versionRegistry = EnumRegistry<PaintingVariant>::NewVersionRegistry();
+    EnumRegistry<PaintingVariant> paintingRegistry({
+      // TODO: Other versions
+      ProtocolVersion::MINECRAFT_1_19,
+      ProtocolVersion::MINECRAFT_1_19_3,
+    });
 
-    // TODO: Other versions
+    paintingRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
+      VersionRegistry(std::vector<PaintingVariant>({PaintingVariant::KEBAB, PaintingVariant::AZTEC, PaintingVariant::ALBAN, PaintingVariant::AZTEC2,
+        PaintingVariant::BOMB, PaintingVariant::PLANT, PaintingVariant::WASTELAND, PaintingVariant::POOL, PaintingVariant::COURBET, PaintingVariant::SEA,
+        PaintingVariant::SUNSET, PaintingVariant::CREEBET, PaintingVariant::WANDERER, PaintingVariant::GRAHAM, PaintingVariant::MATCH,
+        PaintingVariant::BUST, PaintingVariant::STAGE, PaintingVariant::VOID, PaintingVariant::SKULL_AND_ROSES, PaintingVariant::WITHER,
+        PaintingVariant::FIGHTERS, PaintingVariant::POINTER, PaintingVariant::PIGSCENE, PaintingVariant::BURNING_SKULL, PaintingVariant::SKELETON,
+        PaintingVariant::EARTH, PaintingVariant::WIND, PaintingVariant::WATER, PaintingVariant::FIRE, PaintingVariant::DONKEY_KONG})));
 
-    for (uint32_t i = ProtocolVersion::MINECRAFT_1_19.GetOrdinal(); i <= ProtocolVersion::MINECRAFT_1_19_1.GetOrdinal(); ++i) {
-      versionRegistry[i].Register((uint32_t) PaintingVariant::KEBAB, 0);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::AZTEC, 1);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::ALBAN, 2);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::AZTEC2, 3);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::BOMB, 4);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::PLANT, 5);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::WASTELAND, 6);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::POOL, 7);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::COURBET, 8);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::SEA, 9);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::SUNSET, 10);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::CREEBET, 11);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::WANDERER, 12);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::GRAHAM, 13);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::MATCH, 14);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::BUST, 15);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::STAGE, 16);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::VOID, 17);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::SKULL_AND_ROSES, 18);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::WITHER, 19);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::FIGHTERS, 20);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::POINTER, 21);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::PIGSCENE, 22);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::BURNING_SKULL, 23);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::SKELETON, 24);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::EARTH, 25);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::WIND, 26);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::WATER, 27);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::FIRE, 28);
-      versionRegistry[i].Register((uint32_t) PaintingVariant::DONKEY_KONG, 29);
-    }
-
-    return EnumRegistry<PaintingVariant>(versionRegistry);
+    return paintingRegistry;
   }
 
   const ConstructorRegistry<MetadataEntry> METADATA_ENTRY_REGISTRY = GetMetadataRegistry();
