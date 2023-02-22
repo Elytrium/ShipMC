@@ -19,6 +19,8 @@ namespace Ship {
     std::vector<std::function<T*()>> ordinalToObjectMap;
 
    public:
+    explicit ConstructorRegistry(const std::set<ProtocolVersion>& versionMap) : VersionedRegistry(versionMap) {}
+
     void RegisterConstructor(uint32_t ordinal, const std::function<T*()>& constructor) {
       ResizeVectorAndSet(ordinalToObjectMap, ordinal, constructor);
     }

@@ -14,7 +14,8 @@ namespace Ship {
     std::vector<std::function<Packet*()>> ordinalToPacketMap;
 
    public:
-    uint32_t VersionToOrdinal(const ProtocolVersion* version) const override;
+    DirectionRegistry();
+
     void RegisterPacketConstructor(uint32_t ordinal, const std::function<Packet*()>& constructor);
     Packet* GetPacketByID(const ProtocolVersion* version, uint32_t ordinal) const;
     uint32_t GetIDByPacket(const ProtocolVersion* version, Packet* packet) const;

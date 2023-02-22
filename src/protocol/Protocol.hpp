@@ -22,7 +22,6 @@ namespace Ship {
   class ProtocolVersion {
    private:
     uint32_t ordinal;
-    uint32_t packetIDOrdinal;
     uint32_t protocolID;
     std::string displayVersion;
 
@@ -55,10 +54,9 @@ namespace Ship {
     static const ProtocolVersion MAXIMUM_VERSION;
 
     ProtocolVersion();
-    ProtocolVersion(uint32_t ordinal, uint32_t packet_id_ordinal, uint32_t protocol_id, std::string display_version);
+    ProtocolVersion(uint32_t ordinal, uint32_t protocol_id, std::string display_version);
 
     [[nodiscard]] uint32_t GetOrdinal() const;
-    [[nodiscard]] uint32_t GetPacketIDOrdinal() const;
     [[nodiscard]] uint32_t GetProtocolID() const;
     [[nodiscard]] const std::string& GetDisplayVersion() const;
 
@@ -80,6 +78,26 @@ namespace Ship {
 
     bool operator==(const ProtocolVersion* other) const {
       return this->protocolID == other->protocolID;
+    };
+
+    bool operator<(const ProtocolVersion& other) const {
+      return this->protocolID < other.protocolID;
+    };
+
+    bool operator>(const ProtocolVersion& other) const {
+      return this->protocolID > other.protocolID;
+    };
+
+    bool operator<=(const ProtocolVersion& other) const {
+      return this->protocolID <= other.protocolID;
+    };
+
+    bool operator>=(const ProtocolVersion& other) const {
+      return this->protocolID >= other.protocolID;
+    };
+
+    bool operator==(const ProtocolVersion& other) const {
+      return this->protocolID == other.protocolID;
     };
 
     static void Init();
