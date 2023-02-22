@@ -1,12 +1,24 @@
 #include "VersionedRegistry.hpp"
 
 namespace Ship {
+  VersionedRegistry::VersionedRegistry(const std::set<ProtocolVersion>& versionMap) {
+    int ordinal = 0;
+
+    auto previousIt = versionMap.begin();
+    for (auto it = versionMap.begin()++; it != versionMap.end(); it++) {
+      std::fill(versionToOrdinalMap + previousIt->GetOrdinal(), versionToOrdinalMap + it->GetOrdinal(), ordinal++);
+      previousIt = it;
+    }
+
+    std::fill(versionToOrdinalMap + previousIt->GetOrdinal(), versionToOrdinalMap + ProtocolVersion::MAXIMUM_VERSION.GetOrdinal() + 1, ordinal);
+  }
+
   void VersionedRegistry::RegisterVersion(const ProtocolVersion* version, VersionRegistry registry) {
-    versionRegistry[version->GetPacketIDOrdinal()] = std::move(registry);
+    versionRegistry[VersionToOrdinal(version)] = std::move(registry);
   }
 
   void VersionedRegistry::FillVersionRegistry(const VersionRegistry& registry) {
-    for (uint32_t i = ProtocolVersion::MINIMUM_VERSION.GetPacketIDOrdinal(); i <= ProtocolVersion::MAXIMUM_VERSION.GetPacketIDOrdinal(); ++i) {
+    for (uint32_t i = VersionToOrdinal(&ProtocolVersion::MINIMUM_VERSION); i <= VersionToOrdinal(&ProtocolVersion::MAXIMUM_VERSION); ++i) {
       versionRegistry[i] = registry;
     }
   }
@@ -17,5 +29,9 @@ namespace Ship {
 
   uint32_t VersionedRegistry::GetIDByOrdinal(const ProtocolVersion* version, uint32_t ordinal) const {
     return versionRegistry[VersionToOrdinal(version)].GetIDByOrdinal(ordinal);
+  }
+
+  uint32_t VersionedRegistry::VersionToOrdinal(const ProtocolVersion* version) const {
+    return versionToOrdinalMap[version->GetOrdinal()];
   }
 } // Ship

@@ -1,6 +1,23 @@
 #include "PacketRegistry.hpp"
 
 namespace Ship {
+  DirectionRegistry::DirectionRegistry()
+    : ConstructorRegistry<Packet>({
+      ProtocolVersion::MINECRAFT_1_12_2,
+      ProtocolVersion::MINECRAFT_1_13,
+      ProtocolVersion::MINECRAFT_1_14,
+      ProtocolVersion::MINECRAFT_1_15,
+      ProtocolVersion::MINECRAFT_1_16_2,
+      ProtocolVersion::MINECRAFT_1_16_2,
+      ProtocolVersion::MINECRAFT_1_17,
+      ProtocolVersion::MINECRAFT_1_18,
+      ProtocolVersion::MINECRAFT_1_18_2,
+      ProtocolVersion::MINECRAFT_1_19,
+      ProtocolVersion::MINECRAFT_1_19_1,
+      ProtocolVersion::MINECRAFT_1_19_3,
+    }) {
+  }
+
   void DirectionRegistry::RegisterPacketConstructor(uint32_t ordinal, const std::function<Packet*()>& constructor) {
     ResizeVectorAndSet(ordinalToPacketMap, ordinal, constructor);
   }
@@ -11,10 +28,6 @@ namespace Ship {
 
   uint32_t DirectionRegistry::GetIDByPacket(const ProtocolVersion* version, Packet* packet) const {
     return GetIDByOrdinal(version, packet->GetOrdinal());
-  }
-
-  uint32_t DirectionRegistry::VersionToOrdinal(const ProtocolVersion* version) const {
-    return version->GetPacketIDOrdinal();
   }
 
   PacketRegistry::PacketRegistry(const DirectionRegistry* clientbound_registry, const DirectionRegistry* serverbound_registry)
