@@ -8,7 +8,6 @@ namespace Ship {
       ProtocolVersion::MINECRAFT_1_14,
       ProtocolVersion::MINECRAFT_1_15,
       ProtocolVersion::MINECRAFT_1_16_2,
-      ProtocolVersion::MINECRAFT_1_16_2,
       ProtocolVersion::MINECRAFT_1_17,
       ProtocolVersion::MINECRAFT_1_18,
       ProtocolVersion::MINECRAFT_1_18_2,
