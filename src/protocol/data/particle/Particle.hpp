@@ -28,6 +28,8 @@ namespace Ship {
 
   DefineSimpleParticle(AmbientEntityEffectParticle, "minecraft:ambient_entity_effect");
   DefineSimpleParticle(AngryVillagerParticle, "minecraft:angry_villager");
+  DefineSimpleParticle(BarrierParticle, "minecraft:barrier");
+  DefineSimpleParticle(LightParticle, "minecraft:light");
   DefineSimpleParticle(BubbleParticle, "minecraft:bubble");
   DefineSimpleParticle(CloudParticle, "minecraft:cloud");
   DefineSimpleParticle(CritParticle, "minecraft:crit");
@@ -46,9 +48,13 @@ namespace Ship {
   DefineSimpleParticle(EntityEffectParticle, "minecraft:entity_effect");
   DefineSimpleParticle(ExplosionEmitterParticle, "minecraft:explosion_emitter");
   DefineSimpleParticle(ExplosionParticle, "minecraft:explosion");
+  DefineSimpleParticle(SonicBoomParticle, "minecraft:sonic_boom");
   DefineSimpleParticle(FireworkParticle, "minecraft:firework");
   DefineSimpleParticle(FishingParticle, "minecraft:fishing");
   DefineSimpleParticle(FlameParticle, "minecraft:flame");
+  DefineSimpleParticle(SculkSoulParticle, "minecraft:sculk_soul");
+  DefineSimpleParticle(SculkChargeParticle, "minecraft:sculk_charge");
+  DefineSimpleParticle(SculkChargePopParticle, "minecraft:sculk_charge_pop");
   DefineSimpleParticle(SoulFireFlameParticle, "minecraft:soul_fire_flame");
   DefineSimpleParticle(SoulParticle, "minecraft:soul");
   DefineSimpleParticle(FlashParticle, "minecraft:flash");
@@ -107,6 +113,9 @@ namespace Ship {
   DefineSimpleParticle(WaxOffParticle, "minecraft:wax_off");
   DefineSimpleParticle(ElectricSparkParticle, "minecraft:electric_spark");
   DefineSimpleParticle(ScrapeParticle, "minecraft:scrape");
+  DefineSimpleParticle(ShriekParticle, "minecraft:shriek");
+  DefineSimpleParticle(FootstepParticle, "legacy:footstep");
+  DefineSimpleParticle(TakeParticle, "legacy:take");
 
 #undef DefineSimpleParticle
 

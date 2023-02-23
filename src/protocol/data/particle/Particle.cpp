@@ -4,12 +4,110 @@ namespace Ship {
 
   ConstructorRegistry<AbstractParticle> GetParticleRegistry() {
     ConstructorRegistry<AbstractParticle> particleRegistry({
-      // TODO: Other versions
+      ProtocolVersion::MINECRAFT_1_12_2,
+      ProtocolVersion::MINECRAFT_1_13,
+      ProtocolVersion::MINECRAFT_1_14,
+      ProtocolVersion::MINECRAFT_1_15,
+      ProtocolVersion::MINECRAFT_1_16_2,
+      ProtocolVersion::MINECRAFT_1_17,
+      ProtocolVersion::MINECRAFT_1_18,
       ProtocolVersion::MINECRAFT_1_19,
-      ProtocolVersion::MINECRAFT_1_19_3,
     });
 
-    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
+    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
+      new VersionRegistry({PoofParticle::ORDINAL, ExplosionParticle::ORDINAL, ExplosionEmitterParticle::ORDINAL, FireworkParticle::ORDINAL,
+        BubbleParticle::ORDINAL, SplashParticle::ORDINAL, FishingParticle::ORDINAL, UnderwaterParticle::ORDINAL, UnderwaterParticle::ORDINAL,
+        CritParticle::ORDINAL, EnchantedHitParticle::ORDINAL, SmokeParticle::ORDINAL, LargeSmokeParticle::ORDINAL, EffectParticle::ORDINAL,
+        InstantEffectParticle::ORDINAL, EntityEffectParticle::ORDINAL, AmbientEntityEffectParticle::ORDINAL, WitchParticle::ORDINAL,
+        DrippingWaterParticle::ORDINAL, DrippingLavaParticle::ORDINAL, AngryVillagerParticle::ORDINAL, HappyVillagerParticle::ORDINAL,
+        MyceliumParticle::ORDINAL, NoteParticle::ORDINAL, PortalParticle::ORDINAL, EnchantParticle::ORDINAL, FlameParticle::ORDINAL, LavaParticle::ORDINAL,
+        FootstepParticle::ORDINAL, CloudParticle::ORDINAL, DustParticle::ORDINAL, PoofParticle::ORDINAL, ItemSnowballParticle::ORDINAL,
+        ItemSlimeParticle::ORDINAL, HeartParticle::ORDINAL, BarrierParticle::ORDINAL, ItemParticle::ORDINAL, BlockParticle::ORDINAL,
+        BlockParticle::ORDINAL, RainParticle::ORDINAL, TakeParticle::ORDINAL, ElderGuardianParticle::ORDINAL, DragonBreathParticle::ORDINAL,
+        EndRodParticle::ORDINAL, SweepAttackParticle::ORDINAL, FallingDustParticle::ORDINAL, TotemOfUndyingParticle::ORDINAL, SpitParticle::ORDINAL}));
+
+    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_13,
+      new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, BlockParticle::ORDINAL,
+        BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
+        DrippingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL, DustParticle::ORDINAL, EffectParticle::ORDINAL, ElderGuardianParticle::ORDINAL,
+        EnchantedHitParticle::ORDINAL, EnchantParticle::ORDINAL, EndRodParticle::ORDINAL, EntityEffectParticle::ORDINAL, ExplosionEmitterParticle::ORDINAL,
+        ExplosionParticle::ORDINAL, FallingDustParticle::ORDINAL, FireworkParticle::ORDINAL, FishingParticle::ORDINAL, FlameParticle::ORDINAL,
+        HappyVillagerParticle::ORDINAL, HeartParticle::ORDINAL, InstantEffectParticle::ORDINAL, ItemParticle::ORDINAL, ItemSlimeParticle::ORDINAL,
+        ItemSnowballParticle::ORDINAL, LargeSmokeParticle::ORDINAL, LavaParticle::ORDINAL, MyceliumParticle::ORDINAL, NoteParticle::ORDINAL,
+        PoofParticle::ORDINAL, PortalParticle::ORDINAL, RainParticle::ORDINAL, SmokeParticle::ORDINAL, SpitParticle::ORDINAL, SquidInkParticle::ORDINAL,
+        SweepAttackParticle::ORDINAL, TotemOfUndyingParticle::ORDINAL, UnderwaterParticle::ORDINAL, SplashParticle::ORDINAL, WitchParticle::ORDINAL,
+        BubblePopParticle::ORDINAL, CurrentDownParticle::ORDINAL, BubbleColumnUpParticle::ORDINAL, NautilusParticle::ORDINAL, DolphinParticle::ORDINAL}));
+
+    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_14,
+      new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, BlockParticle::ORDINAL,
+        BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
+        DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
+        FallingWaterParticle::ORDINAL, DustParticle::ORDINAL, EffectParticle::ORDINAL, ElderGuardianParticle::ORDINAL, EnchantedHitParticle::ORDINAL,
+        EnchantParticle::ORDINAL, EndRodParticle::ORDINAL, EntityEffectParticle::ORDINAL, ExplosionEmitterParticle::ORDINAL, ExplosionParticle::ORDINAL,
+        FallingDustParticle::ORDINAL, FireworkParticle::ORDINAL, FishingParticle::ORDINAL, FlameParticle::ORDINAL, FlashParticle::ORDINAL,
+        HappyVillagerParticle::ORDINAL, ComposterParticle::ORDINAL, HeartParticle::ORDINAL, InstantEffectParticle::ORDINAL, ItemParticle::ORDINAL,
+        ItemSlimeParticle::ORDINAL, ItemSnowballParticle::ORDINAL, LargeSmokeParticle::ORDINAL, LavaParticle::ORDINAL, MyceliumParticle::ORDINAL,
+        NoteParticle::ORDINAL, PoofParticle::ORDINAL, PortalParticle::ORDINAL, RainParticle::ORDINAL, SmokeParticle::ORDINAL, SneezeParticle::ORDINAL,
+        SpitParticle::ORDINAL, SquidInkParticle::ORDINAL, SweepAttackParticle::ORDINAL, TotemOfUndyingParticle::ORDINAL, UnderwaterParticle::ORDINAL,
+        SplashParticle::ORDINAL, WitchParticle::ORDINAL, BubblePopParticle::ORDINAL, CurrentDownParticle::ORDINAL, BubbleColumnUpParticle::ORDINAL,
+        NautilusParticle::ORDINAL, DolphinParticle::ORDINAL, CampfireCosySmokeParticle::ORDINAL, CampfireSignalSmokeParticle::ORDINAL}));
+
+    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_15,
+      new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, BlockParticle::ORDINAL,
+        BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
+        DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
+        FallingWaterParticle::ORDINAL, DustParticle::ORDINAL, EffectParticle::ORDINAL, ElderGuardianParticle::ORDINAL, EnchantedHitParticle::ORDINAL,
+        EnchantParticle::ORDINAL, EndRodParticle::ORDINAL, EntityEffectParticle::ORDINAL, ExplosionEmitterParticle::ORDINAL, ExplosionParticle::ORDINAL,
+        FallingDustParticle::ORDINAL, FireworkParticle::ORDINAL, FishingParticle::ORDINAL, FlameParticle::ORDINAL, FlashParticle::ORDINAL,
+        HappyVillagerParticle::ORDINAL, ComposterParticle::ORDINAL, HeartParticle::ORDINAL, InstantEffectParticle::ORDINAL, ItemParticle::ORDINAL,
+        ItemSlimeParticle::ORDINAL, ItemSnowballParticle::ORDINAL, LargeSmokeParticle::ORDINAL, LavaParticle::ORDINAL, MyceliumParticle::ORDINAL,
+        NoteParticle::ORDINAL, PoofParticle::ORDINAL, PortalParticle::ORDINAL, RainParticle::ORDINAL, SmokeParticle::ORDINAL, SneezeParticle::ORDINAL,
+        SpitParticle::ORDINAL, SquidInkParticle::ORDINAL, SweepAttackParticle::ORDINAL, TotemOfUndyingParticle::ORDINAL, UnderwaterParticle::ORDINAL,
+        SplashParticle::ORDINAL, WitchParticle::ORDINAL, BubblePopParticle::ORDINAL, CurrentDownParticle::ORDINAL, BubbleColumnUpParticle::ORDINAL,
+        NautilusParticle::ORDINAL, DolphinParticle::ORDINAL, CampfireCosySmokeParticle::ORDINAL, CampfireSignalSmokeParticle::ORDINAL,
+        DrippingHoneyParticle::ORDINAL, FallingHoneyParticle::ORDINAL, LandingHoneyParticle::ORDINAL, FallingNectarParticle::ORDINAL}));
+
+    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_16_2,
+      new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, BlockParticle::ORDINAL,
+        BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
+        DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
+        FallingWaterParticle::ORDINAL, DustParticle::ORDINAL, EffectParticle::ORDINAL, ElderGuardianParticle::ORDINAL, EnchantedHitParticle::ORDINAL,
+        EnchantParticle::ORDINAL, EndRodParticle::ORDINAL, EntityEffectParticle::ORDINAL, ExplosionEmitterParticle::ORDINAL, ExplosionParticle::ORDINAL,
+        FallingDustParticle::ORDINAL, FireworkParticle::ORDINAL, FishingParticle::ORDINAL, FlameParticle::ORDINAL, SoulFireFlameParticle::ORDINAL,
+        SoulParticle::ORDINAL, FlashParticle::ORDINAL, HappyVillagerParticle::ORDINAL, ComposterParticle::ORDINAL, HeartParticle::ORDINAL,
+        InstantEffectParticle::ORDINAL, ItemParticle::ORDINAL, ItemSlimeParticle::ORDINAL, ItemSnowballParticle::ORDINAL, LargeSmokeParticle::ORDINAL,
+        LavaParticle::ORDINAL, MyceliumParticle::ORDINAL, NoteParticle::ORDINAL, PoofParticle::ORDINAL, PortalParticle::ORDINAL, RainParticle::ORDINAL,
+        SmokeParticle::ORDINAL, SneezeParticle::ORDINAL, SpitParticle::ORDINAL, SquidInkParticle::ORDINAL, SweepAttackParticle::ORDINAL,
+        TotemOfUndyingParticle::ORDINAL, UnderwaterParticle::ORDINAL, SplashParticle::ORDINAL, WitchParticle::ORDINAL, BubblePopParticle::ORDINAL,
+        CurrentDownParticle::ORDINAL, BubbleColumnUpParticle::ORDINAL, NautilusParticle::ORDINAL, DolphinParticle::ORDINAL,
+        CampfireCosySmokeParticle::ORDINAL, CampfireSignalSmokeParticle::ORDINAL, DrippingHoneyParticle::ORDINAL, FallingHoneyParticle::ORDINAL,
+        LandingHoneyParticle::ORDINAL, FallingNectarParticle::ORDINAL, AshParticle::ORDINAL, CrimsonSporeParticle::ORDINAL, WarpedSporeParticle::ORDINAL,
+        DrippingObsidianTearParticle::ORDINAL, FallingObsidianTearParticle::ORDINAL, LandingObsidianTearParticle::ORDINAL, ReversePortalParticle::ORDINAL,
+        WhiteAshParticle::ORDINAL}));
+
+    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_17,
+      new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, LightParticle::ORDINAL,
+        BlockParticle::ORDINAL, BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL,
+        DragonBreathParticle::ORDINAL, DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL,
+        DrippingWaterParticle::ORDINAL, FallingWaterParticle::ORDINAL, DustParticle::ORDINAL, DustColorTransitionParticle::ORDINAL,
+        EffectParticle::ORDINAL, ElderGuardianParticle::ORDINAL, EnchantedHitParticle::ORDINAL, EnchantParticle::ORDINAL, EndRodParticle::ORDINAL,
+        EntityEffectParticle::ORDINAL, ExplosionEmitterParticle::ORDINAL, ExplosionParticle::ORDINAL, FallingDustParticle::ORDINAL,
+        FireworkParticle::ORDINAL, FishingParticle::ORDINAL, FlameParticle::ORDINAL, SoulFireFlameParticle::ORDINAL, SoulParticle::ORDINAL,
+        FlashParticle::ORDINAL, HappyVillagerParticle::ORDINAL, ComposterParticle::ORDINAL, HeartParticle::ORDINAL, InstantEffectParticle::ORDINAL,
+        ItemParticle::ORDINAL, VibrationParticle::ORDINAL, ItemSlimeParticle::ORDINAL, ItemSnowballParticle::ORDINAL, LargeSmokeParticle::ORDINAL,
+        LavaParticle::ORDINAL, MyceliumParticle::ORDINAL, NoteParticle::ORDINAL, PoofParticle::ORDINAL, PortalParticle::ORDINAL, RainParticle::ORDINAL,
+        SmokeParticle::ORDINAL, SneezeParticle::ORDINAL, SpitParticle::ORDINAL, SquidInkParticle::ORDINAL, SweepAttackParticle::ORDINAL,
+        TotemOfUndyingParticle::ORDINAL, UnderwaterParticle::ORDINAL, SplashParticle::ORDINAL, WitchParticle::ORDINAL, BubblePopParticle::ORDINAL,
+        CurrentDownParticle::ORDINAL, BubbleColumnUpParticle::ORDINAL, NautilusParticle::ORDINAL, DolphinParticle::ORDINAL,
+        CampfireCosySmokeParticle::ORDINAL, CampfireSignalSmokeParticle::ORDINAL, DrippingHoneyParticle::ORDINAL, FallingHoneyParticle::ORDINAL,
+        LandingHoneyParticle::ORDINAL, FallingNectarParticle::ORDINAL, FallingSporeBlossomParticle::ORDINAL, AshParticle::ORDINAL,
+        CrimsonSporeParticle::ORDINAL, WarpedSporeParticle::ORDINAL, SporeBlossomAirParticle::ORDINAL, DrippingObsidianTearParticle::ORDINAL,
+        FallingObsidianTearParticle::ORDINAL, LandingObsidianTearParticle::ORDINAL, ReversePortalParticle::ORDINAL, WhiteAshParticle::ORDINAL,
+        SmallFlameParticle::ORDINAL, SnowflakeParticle::ORDINAL, DrippingDripstoneLavaParticle::ORDINAL, FallingDripstoneLavaParticle::ORDINAL,
+        DrippingDripstoneWaterParticle::ORDINAL, FallingDripstoneWaterParticle::ORDINAL, GlowSquidInkParticle::ORDINAL, GlowParticle::ORDINAL,
+        WaxOnParticle::ORDINAL, WaxOffParticle::ORDINAL, ElectricSparkParticle::ORDINAL, ScrapeParticle::ORDINAL}));
+
+    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_18,
       new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BlockParticle::ORDINAL, BlockMarkerParticle::ORDINAL,
         BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
         DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
@@ -31,8 +129,33 @@ namespace Ship {
         FallingDripstoneWaterParticle::ORDINAL, GlowSquidInkParticle::ORDINAL, GlowParticle::ORDINAL, WaxOnParticle::ORDINAL, WaxOffParticle::ORDINAL,
         ElectricSparkParticle::ORDINAL, ScrapeParticle::ORDINAL}));
 
+    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
+      new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BlockParticle::ORDINAL, BlockMarkerParticle::ORDINAL,
+        BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
+        DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
+        FallingWaterParticle::ORDINAL, DustParticle::ORDINAL, DustColorTransitionParticle::ORDINAL, EffectParticle::ORDINAL,
+        ElderGuardianParticle::ORDINAL, EnchantedHitParticle::ORDINAL, EnchantParticle::ORDINAL, EndRodParticle::ORDINAL, EntityEffectParticle::ORDINAL,
+        ExplosionEmitterParticle::ORDINAL, ExplosionParticle::ORDINAL, SonicBoomParticle::ORDINAL, FallingDustParticle::ORDINAL, FireworkParticle::ORDINAL,
+        FishingParticle::ORDINAL, FlameParticle::ORDINAL, SculkSoulParticle::ORDINAL, SculkChargeParticle::ORDINAL, SculkChargePopParticle::ORDINAL,
+        SoulFireFlameParticle::ORDINAL, SoulParticle::ORDINAL, FlashParticle::ORDINAL, HappyVillagerParticle::ORDINAL, ComposterParticle::ORDINAL,
+        HeartParticle::ORDINAL, InstantEffectParticle::ORDINAL, ItemParticle::ORDINAL, VibrationParticle::ORDINAL, ItemSlimeParticle::ORDINAL,
+        ItemSnowballParticle::ORDINAL, LargeSmokeParticle::ORDINAL, LavaParticle::ORDINAL, MyceliumParticle::ORDINAL, NoteParticle::ORDINAL,
+        PoofParticle::ORDINAL, PortalParticle::ORDINAL, RainParticle::ORDINAL, SmokeParticle::ORDINAL, SneezeParticle::ORDINAL, SpitParticle::ORDINAL,
+        SquidInkParticle::ORDINAL, SweepAttackParticle::ORDINAL, TotemOfUndyingParticle::ORDINAL, UnderwaterParticle::ORDINAL, SplashParticle::ORDINAL,
+        WitchParticle::ORDINAL, BubblePopParticle::ORDINAL, CurrentDownParticle::ORDINAL, BubbleColumnUpParticle::ORDINAL, NautilusParticle::ORDINAL,
+        DolphinParticle::ORDINAL, CampfireCosySmokeParticle::ORDINAL, CampfireSignalSmokeParticle::ORDINAL, DrippingHoneyParticle::ORDINAL,
+        FallingHoneyParticle::ORDINAL, LandingHoneyParticle::ORDINAL, FallingNectarParticle::ORDINAL, FallingSporeBlossomParticle::ORDINAL,
+        AshParticle::ORDINAL, CrimsonSporeParticle::ORDINAL, WarpedSporeParticle::ORDINAL, SporeBlossomAirParticle::ORDINAL,
+        DrippingObsidianTearParticle::ORDINAL, FallingObsidianTearParticle::ORDINAL, LandingObsidianTearParticle::ORDINAL, ReversePortalParticle::ORDINAL,
+        WhiteAshParticle::ORDINAL, SmallFlameParticle::ORDINAL, SnowflakeParticle::ORDINAL, DrippingDripstoneLavaParticle::ORDINAL,
+        FallingDripstoneLavaParticle::ORDINAL, DrippingDripstoneWaterParticle::ORDINAL, FallingDripstoneWaterParticle::ORDINAL,
+        GlowSquidInkParticle::ORDINAL, GlowParticle::ORDINAL, WaxOnParticle::ORDINAL, WaxOffParticle::ORDINAL, ElectricSparkParticle::ORDINAL,
+        ShriekParticle::ORDINAL}));
+
     particleRegistry.RegisterConstructor(AmbientEntityEffectParticle::ORDINAL, CreateConstructor<AmbientEntityEffectParticle>());
     particleRegistry.RegisterConstructor(AngryVillagerParticle::ORDINAL, CreateConstructor<AngryVillagerParticle>());
+    particleRegistry.RegisterConstructor(BarrierParticle::ORDINAL, CreateConstructor<BarrierParticle>());
+    particleRegistry.RegisterConstructor(LightParticle::ORDINAL, CreateConstructor<LightParticle>());
     particleRegistry.RegisterConstructor(BlockParticle::ORDINAL, CreateConstructor<BlockParticle>(0));
     particleRegistry.RegisterConstructor(BlockMarkerParticle::ORDINAL, CreateConstructor<BlockMarkerParticle>(0));
     particleRegistry.RegisterConstructor(BubbleParticle::ORDINAL, CreateConstructor<BubbleParticle>());
@@ -55,10 +178,14 @@ namespace Ship {
     particleRegistry.RegisterConstructor(EntityEffectParticle::ORDINAL, CreateConstructor<EntityEffectParticle>());
     particleRegistry.RegisterConstructor(ExplosionEmitterParticle::ORDINAL, CreateConstructor<ExplosionEmitterParticle>());
     particleRegistry.RegisterConstructor(ExplosionParticle::ORDINAL, CreateConstructor<ExplosionParticle>());
+    particleRegistry.RegisterConstructor(SonicBoomParticle::ORDINAL, CreateConstructor<SonicBoomParticle>());
     particleRegistry.RegisterConstructor(FallingDustParticle::ORDINAL, CreateConstructor<FallingDustParticle>(0));
     particleRegistry.RegisterConstructor(FireworkParticle::ORDINAL, CreateConstructor<FireworkParticle>());
     particleRegistry.RegisterConstructor(FishingParticle::ORDINAL, CreateConstructor<FishingParticle>());
     particleRegistry.RegisterConstructor(FlameParticle::ORDINAL, CreateConstructor<FlameParticle>());
+    particleRegistry.RegisterConstructor(SculkSoulParticle::ORDINAL, CreateConstructor<SculkSoulParticle>());
+    particleRegistry.RegisterConstructor(SculkChargeParticle::ORDINAL, CreateConstructor<SculkChargeParticle>());
+    particleRegistry.RegisterConstructor(SculkChargePopParticle::ORDINAL, CreateConstructor<SculkChargePopParticle>());
     particleRegistry.RegisterConstructor(SoulFireFlameParticle::ORDINAL, CreateConstructor<SoulFireFlameParticle>());
     particleRegistry.RegisterConstructor(SoulParticle::ORDINAL, CreateConstructor<SoulParticle>());
     particleRegistry.RegisterConstructor(FlashParticle::ORDINAL, CreateConstructor<FlashParticle>());
@@ -119,6 +246,9 @@ namespace Ship {
     particleRegistry.RegisterConstructor(WaxOffParticle::ORDINAL, CreateConstructor<WaxOffParticle>());
     particleRegistry.RegisterConstructor(ElectricSparkParticle::ORDINAL, CreateConstructor<ElectricSparkParticle>());
     particleRegistry.RegisterConstructor(ScrapeParticle::ORDINAL, CreateConstructor<ScrapeParticle>());
+    particleRegistry.RegisterConstructor(ShriekParticle::ORDINAL, CreateConstructor<ShriekParticle>());
+    particleRegistry.RegisterConstructor(TakeParticle::ORDINAL, CreateConstructor<TakeParticle>());
+    particleRegistry.RegisterConstructor(FootstepParticle::ORDINAL, CreateConstructor<FootstepParticle>());
 
     return particleRegistry;
   }
