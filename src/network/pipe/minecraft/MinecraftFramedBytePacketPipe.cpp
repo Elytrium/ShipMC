@@ -1,3 +1,4 @@
+#include "../../../Ship.hpp"
 #include "../../../protocol/packets/prepared/PreparedPacket.hpp"
 #include "../../../protocol/packets/prepared/SingleVersionPreparedPacket.hpp"
 #include "../../../protocol/registry/PacketRegistry.hpp"
@@ -63,6 +64,7 @@ namespace Ship {
   }
 
   Packet* MinecraftFramedBytePacketPipe::ReadPacket(ByteBuffer* in, uint32_t frame_size) {
+    uint32_t oldReadableBytes = in->GetReadableBytes();
     uint32_t packetID = in->ReadVarInt();
     Packet* packet = readerRegistry->GetPacketByID(version, packetID);
 
@@ -76,10 +78,9 @@ namespace Ship {
       return packet;
     }
 
-    uint32_t oldReadableBytes = in->GetReadableBytes();
     packet->Read(version, in);
 
-    if (in->GetReadableBytes() - oldReadableBytes != frame_size) {
+    if (oldReadableBytes - in->GetReadableBytes() != frame_size) {
       throw InvalidArgumentException("Invalid packet size: ", frame_size);
     }
 

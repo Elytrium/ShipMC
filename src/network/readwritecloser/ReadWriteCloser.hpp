@@ -18,9 +18,12 @@ namespace Ship {
   class UnixReadWriteCloser : public ReadWriteCloser {
    private:
     int socketFileDescriptor;
+    bool closed = false;
+    inline void unixClose();
 
    public:
     explicit UnixReadWriteCloser(int socket_file_descriptor);
+    ~UnixReadWriteCloser() override;
 
     void Write(ByteBuffer* buffer) override;
     ssize_t Read(uint8_t* buffer, size_t buffer_size) override;

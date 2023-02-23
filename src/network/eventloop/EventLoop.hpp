@@ -33,6 +33,11 @@ namespace Ship {
     }
   };
 
+  class GracefulDisconnectException : public Exception {
+   public:
+    GracefulDisconnectException() : Exception("Gracefully disconnected") {}
+  };
+
   class UnixEventLoop : public EventLoop {
    public:
     explicit UnixEventLoop(std::function<Connection*(ReadWriteCloser*)> initializer)

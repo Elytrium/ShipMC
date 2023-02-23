@@ -8,6 +8,10 @@ namespace Ship {
   }
 
   void UnixReadWriteCloser::Write(ByteBuffer* buffer) {
+    if (closed) {
+      return;
+    }
+
     size_t singleCapacity = buffer->GetSingleCapacity();
     size_t readableBytesInSingleBuffer = singleCapacity - buffer->GetReaderIndex();
     if (readableBytesInSingleBuffer != 0) {
@@ -33,10 +37,25 @@ namespace Ship {
   }
 
   ssize_t UnixReadWriteCloser::Read(uint8_t* buffer, size_t buffer_size) {
-    return read(socketFileDescriptor, buffer, buffer_size);
+    if (!closed) {
+      return read(socketFileDescriptor, buffer, buffer_size);
+    } else {
+      return 0;
+    }
+  }
+
+  UnixReadWriteCloser::~UnixReadWriteCloser() {
+    unixClose();
   }
 
   void UnixReadWriteCloser::Close() {
-    close(socketFileDescriptor);
+    unixClose();
+  }
+
+  inline void UnixReadWriteCloser::unixClose() {
+    if (!closed) {
+      closed = true;
+      close(socketFileDescriptor);
+    }
   }
 }

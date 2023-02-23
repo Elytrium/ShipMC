@@ -1,7 +1,6 @@
 #include "../../utils/exceptions/ErrnoException.hpp"
 #include "Connector.hpp"
 #include <arpa/inet.h>
-#include <cstring>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 

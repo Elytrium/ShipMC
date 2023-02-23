@@ -1,7 +1,11 @@
+#include "../../../Ship.hpp"
 #include "../../../utils/exceptions/InvalidArgumentException.hpp"
 #include "MinecraftPipe.hpp"
 
 namespace Ship {
+  thread_local uint8_t* localCompressionOutputBuffer = new uint8_t[MAX_PACKET_SIZE];
+  thread_local uint8_t* localDecompressionOutputBuffer = new uint8_t[MAX_PACKET_SIZE];
+
   void CompressionPipe::EncodeFrame(ByteBuffer* in, uint32_t frame_size) {
     ByteBuffer* buffer = GetWriterBuffer();
 
@@ -21,12 +25,11 @@ namespace Ship {
     }
 
     size_t compressionSizeAvailable = frame_size + 2 + 4 + 4; // uncompressed (frame_size), zlib header (2), dict id (4), checksum (4)
-    auto* compressionOutputAddress = new uint8_t[compressionSizeAvailable];
-    size_t compressedSize = libdeflate_zlib_compress(compressor, compressionInputAddress, frame_size, compressionOutputAddress, compressionSizeAvailable);
+    size_t compressedSize = libdeflate_zlib_compress(compressor, compressionInputAddress, frame_size, localCompressionOutputBuffer, compressionSizeAvailable);
 
     buffer->WriteVarInt(compressedSize + ByteBuffer::VarIntBytes(frame_size));
     buffer->WriteVarInt(frame_size);
-    buffer->WriteBytesAndDelete(compressionOutputAddress, compressedSize);
+    buffer->WriteBytes(localCompressionOutputBuffer, compressedSize);
 
     if (!directRead) {
       delete[] compressionInputAddress;
@@ -63,7 +66,7 @@ namespace Ship {
     if (directWrite) {
       compressionOutputAddress = buffer->GetDirectWriteAddress();
     } else {
-      compressionOutputAddress = new uint8_t[decompressedSize];
+      compressionOutputAddress = localDecompressionOutputBuffer;
     }
 
     libdeflate_zlib_decompress(decompressor, compressionInputAddress, compressedSize, compressionOutputAddress, decompressedSize, nullptr);
@@ -73,7 +76,7 @@ namespace Ship {
     }
 
     if (!directWrite) {
-      buffer->WriteBytesAndDelete(compressionOutputAddress, decompressedSize);
+      buffer->WriteBytes(compressionOutputAddress, decompressedSize);
     }
   }
 

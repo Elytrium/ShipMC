@@ -1,13 +1,13 @@
 #ifdef __linux__
-#include "../../utils/exceptions/ErrnoException.hpp"
-#include "../readwritecloser/ReadWriteCloser.hpp"
-#include "EventLoop.hpp"
-#include <cstring>
-#include <fcntl.h>
-#include <sys/epoll.h>
-#include <thread>
-#include <unistd.h>
-#include <utility>
+  #include "../../utils/exceptions/ErrnoException.hpp"
+  #include "../readwritecloser/ReadWriteCloser.hpp"
+  #include "EventLoop.hpp"
+  #include <cstring>
+  #include <fcntl.h>
+  #include <sys/epoll.h>
+  #include <thread>
+  #include <unistd.h>
+  #include <utility>
 
 namespace Ship {
   EpollEventLoop::EpollEventLoop(std::function<Connection*(ReadWriteCloser* writer)> initializer, int max_events, int timeout, int buffer_size)
@@ -31,7 +31,6 @@ namespace Ship {
 
     if (epoll_ctl(epollFileDescriptor, EPOLL_CTL_ADD, fileDescriptor, (epoll_event*) &epollEvent) == -1) {
       auto connection = (Connection*) epollEvent.data.ptr;
-      connection->GetReadWriteCloser()->Close();
       delete connection;
     }
   }
@@ -46,36 +45,37 @@ namespace Ship {
 
       for (int i = 0; i < amount; ++i) {
         event = events[i];
-        bool shouldClose = false;
         auto connection = (Connection*) event.data.ptr;
 
-        if (!(event.events & EPOLLIN) || (event.events & EPOLLERR) || (event.events & EPOLLHUP)) {
-          // TODO: Log error
-          shouldClose = true;
-        } else if (event.events & EPOLLRDHUP) {
-          shouldClose = true;
-        } else {
-          while (true) {
-            ssize_t count = connection->GetReadWriteCloser()->Read(buffer, bufferSize);
+        try {
+          if (!(event.events & EPOLLIN) || (event.events & EPOLLERR) || (event.events & EPOLLHUP)) {
+            throw InvalidArgumentException("Got unknown epoll events: ", event.events);
+          } else if (event.events & EPOLLRDHUP) {
+            throw GracefulDisconnectException();
+          } else {
+            while (true) {
+              ssize_t count = connection->GetReadWriteCloser()->Read(buffer, bufferSize);
 
-            if (count == -1) {
-              if (errno != EAGAIN) {
-                throw ErrnoException(errorBuffer, 64);
+              if (count == -1) {
+                if (errno != EAGAIN) {
+                  throw ErrnoException(errorBuffer, 64);
+                }
+
+                break;
+              } else if (count == 0) {
+                throw GracefulDisconnectException();
+              } else {
+                connection->HandleNewBytes(buffer, (size_t) count);
               }
-
-              break;
-            } else if (count == 0) {
-              shouldClose = true;
-            } else {
-              connection->HandleNewBytes(buffer, (size_t) count);
             }
           }
-        }
-
-        if (shouldClose) {
-          connection->GetReadWriteCloser()->Close();
+        } catch (const GracefulDisconnectException& exception) {
           delete connection;
         }
+        /* catch (const std::exception& exception) {
+          delete connection;
+          // TODO: Log exception via logger class
+        } */
       }
     }
   }

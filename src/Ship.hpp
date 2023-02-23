@@ -1,0 +1,4 @@
+#pragma once
+
+#define MAX_PACKET_SIZE (8 * 1024 * 1024)
+#define LONG_PACKET_BUFFER_CAPACITY 1024

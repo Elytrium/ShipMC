@@ -9,7 +9,11 @@ namespace Ship {
         return;
       }
 
-      nextWriteFrameLength = in->ReadVarInt();
+      try {
+        nextWriteFrameLength = in->ReadVarInt();
+      } catch (const IncompleteVarIntException& exception) {
+        return;
+      }
     }
 
     if (readableBytes >= nextWriteFrameLength) {
@@ -20,7 +24,11 @@ namespace Ship {
 
   void FramedByteBytePipe::Read(ByteBuffer* in) {
     if (nextReadFrameLength == 0) {
-      nextReadFrameLength = in->ReadVarInt();
+      try {
+        nextReadFrameLength = in->ReadVarInt();
+      } catch (const IncompleteVarIntException& exception) {
+        return;
+      }
 
       if (nextReadFrameLength > maxReadSize) {
         throw InvalidArgumentException("Invalid frame size: ", nextReadFrameLength);

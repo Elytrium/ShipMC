@@ -9,9 +9,13 @@ namespace Ship {
         return nullptr;
       }
 
-      nextReadFrameLength = in->ReadVarInt();
-      if (nextReadFrameLength > maxReadSize) {
-        throw InvalidArgumentException("Invalid packet size: ", nextReadFrameLength);
+      try {
+        nextReadFrameLength = in->ReadVarInt();
+        if (nextReadFrameLength > maxReadSize) {
+          throw InvalidArgumentException("Invalid packet size: ", nextReadFrameLength);
+        }
+      } catch (const IncompleteVarIntException& exception) {
+        return nullptr;
       }
     }
 

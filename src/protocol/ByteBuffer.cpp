@@ -222,6 +222,10 @@ namespace Ship {
   uint32_t ByteBuffer::ReadVarInt() {
     uint32_t decodedVarInt = 0;
     for (uint32_t byteIndex = 0; byteIndex < 5; ++byteIndex) {
+      if (GetReadableBytes() < 1) {
+        throw IncompleteVarIntException();
+      }
+
       uint8_t byte = ReadByteUnsafe();
       decodedVarInt |= (byte & 0x7F) << byteIndex * 7;
       if ((byte & 0x80) == 0) {

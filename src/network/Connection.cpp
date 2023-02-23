@@ -1,5 +1,4 @@
 #include "Connection.hpp"
-#include <iostream>
 
 namespace Ship {
   Connection::Connection(BytePacketPipe* bytePacketPipe, size_t reader_buffer_length, size_t writer_buffer_length, ReadWriteCloser* read_write_closer)

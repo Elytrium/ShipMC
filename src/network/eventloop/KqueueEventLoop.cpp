@@ -33,7 +33,6 @@ namespace Ship {
     kevent.udata = NewConnection(new UnixReadWriteCloser(fileDescriptor));
     if (::kevent(kqueueFileDescriptor, &kevent, 1, nullptr, 0, nullptr) == -1) {
       auto connection = (Connection*) kevent.udata;
-      connection->GetReadWriteCloser()->Close();
       delete connection;
     }
   }
@@ -48,33 +47,36 @@ namespace Ship {
 
       for (int i = 0; i < amount; ++i) {
         event = events[i];
-        bool shouldClose = false;
         auto connection = (Connection*) event.udata;
 
-        if (event.flags & EV_EOF) {
-          shouldClose = true;
-        } else {
-          while (true) {
-            ssize_t count = connection->GetReadWriteCloser()->Read(buffer, bufferSize);
+        try {
+          if (event.flags & EV_EOF) {
+            throw GracefulDisconnectException();
+          } else {
+            while (true) {
+              ssize_t count = connection->GetReadWriteCloser()->Read(buffer, bufferSize);
 
-            if (count == -1) {
-              if (errno != EAGAIN) {
-                throw ErrnoException(errorBuffer, 64);
+              if (count == -1) {
+                if (errno != EAGAIN) {
+                  throw ErrnoException(errorBuffer, 64);
+                }
+
+                break;
+              } else if (count == 0) {
+                throw GracefulDisconnectException();
+              } else {
+                connection->HandleNewBytes(buffer, (size_t) count);
               }
-
-              break;
-            } else if (count == 0) {
-              shouldClose = true;
-            } else {
-              connection->HandleNewBytes(buffer, (size_t) count);
             }
           }
-        }
-
-        if (shouldClose) {
-          connection->GetReadWriteCloser()->Close();
+        } catch (const GracefulDisconnectException& exception) {
           delete connection;
         }
+
+        /* catch (const std::exception& exception) {
+          delete connection;
+          // TODO: Log exception via logger class
+        } */
       }
     }
   }

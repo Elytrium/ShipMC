@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../utils/exceptions/Exception.hpp"
 #include "../utils/exceptions/InvalidArgumentException.hpp"
 #include "data/profile/GameProfile.hpp"
 #include "data/uuid/UUID.hpp"
@@ -204,6 +205,11 @@ namespace Ship {
     static const uint32_t POSITION_SIZE;
     static const uint32_t ANGLE_SIZE;
     static const uint32_t UUID_SIZE;
+  };
+
+  class IncompleteVarIntException : public Exception {
+   public:
+    IncompleteVarIntException() : Exception("ByteBuffer doesn't contain enough data to read VarInt correctly") {}
   };
 
   class ByteBufferImpl : public ByteBuffer {

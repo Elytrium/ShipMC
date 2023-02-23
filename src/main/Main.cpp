@@ -11,9 +11,10 @@ namespace Ship {
 
     auto* eventLoop = new SystemEventLoop(
       [](ReadWriteCloser* writer) {
-        return new Connection(
-          new MinecraftFramedBytePacketPipe(&BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, 65536,
-            SERVERBOUND, CLIENTBOUND, 1024), 1024, 1024, writer);
+        auto pipe = new MinecraftFramedBytePacketPipe(&BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, 65536, SERVERBOUND, CLIENTBOUND, 1024);
+        Connection* connection = new Connection(pipe, 1024, 1024, writer);
+
+        return connection;
       },
       64, NO_TIMEOUT, 1024);
 
