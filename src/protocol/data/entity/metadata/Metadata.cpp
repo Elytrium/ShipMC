@@ -445,11 +445,7 @@ namespace Ship {
   }
 
   EnumRegistry<CatVariant> GetCatVariantRegistry() {
-    EnumRegistry<CatVariant> catRegistry({
-      // TODO: Other versions
-      ProtocolVersion::MINECRAFT_1_19,
-      ProtocolVersion::MINECRAFT_1_19_3,
-    });
+    EnumRegistry<CatVariant> catRegistry({ProtocolVersion::MINECRAFT_1_19});
 
     catRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
       new VersionRegistry(
@@ -460,11 +456,7 @@ namespace Ship {
   }
 
   EnumRegistry<FrogVariant> GetFrogVariantRegistry() {
-    EnumRegistry<FrogVariant> frogRegistry({
-      // TODO: Other versions
-      ProtocolVersion::MINECRAFT_1_19,
-      ProtocolVersion::MINECRAFT_1_19_3,
-    });
+    EnumRegistry<FrogVariant> frogRegistry({ProtocolVersion::MINECRAFT_1_19});
 
     frogRegistry.RegisterVersion(
       &ProtocolVersion::MINECRAFT_1_19, new VersionRegistry(std::vector<FrogVariant>({FrogVariant::TEMPERATE, FrogVariant::WARM, FrogVariant::COLD})));
@@ -474,10 +466,17 @@ namespace Ship {
 
   EnumRegistry<PaintingVariant> GetPaintingVariantRegistry() {
     EnumRegistry<PaintingVariant> paintingRegistry({
-      // TODO: Other versions
+      ProtocolVersion::MINECRAFT_1_12_2,
       ProtocolVersion::MINECRAFT_1_19,
-      ProtocolVersion::MINECRAFT_1_19_3,
     });
+
+    paintingRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
+      new VersionRegistry(std::vector<PaintingVariant>(
+        {PaintingVariant::KEBAB, PaintingVariant::AZTEC, PaintingVariant::ALBAN, PaintingVariant::AZTEC2, PaintingVariant::BOMB, PaintingVariant::PLANT,
+          PaintingVariant::WASTELAND, PaintingVariant::POOL, PaintingVariant::COURBET, PaintingVariant::SEA, PaintingVariant::SUNSET,
+          PaintingVariant::CREEBET, PaintingVariant::WANDERER, PaintingVariant::GRAHAM, PaintingVariant::MATCH, PaintingVariant::BUST,
+          PaintingVariant::STAGE, PaintingVariant::VOID, PaintingVariant::SKULL_AND_ROSES, PaintingVariant::WITHER, PaintingVariant::FIGHTERS,
+          PaintingVariant::POINTER, PaintingVariant::PIGSCENE, PaintingVariant::BURNING_SKULL, PaintingVariant::SKELETON, PaintingVariant::DONKEY_KONG})));
 
     paintingRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
       new VersionRegistry(std::vector<PaintingVariant>({PaintingVariant::KEBAB, PaintingVariant::AZTEC, PaintingVariant::ALBAN, PaintingVariant::AZTEC2,
