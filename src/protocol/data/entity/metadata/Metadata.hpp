@@ -84,6 +84,7 @@ namespace Ship {
   enum class MetadataEntryType {
     BYTE,
     VARINT,
+    LONG,
     FLOAT,
     STRING,
     CHAT,
@@ -149,6 +150,24 @@ namespace Ship {
 
     [[nodiscard]] uint32_t GetValue() const;
     void SetValue(uint32_t newValue);
+  };
+
+  class LongMetadataEntry : public MetadataEntry {
+   private:
+    uint32_t value;
+
+   public:
+    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+
+    explicit LongMetadataEntry(uint64_t value);
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    [[nodiscard]] MetadataEntryType GetType() const override;
+    [[nodiscard]] uint32_t GetOrdinal() const override;
+
+    [[nodiscard]] uint64_t GetValue() const;
+    void SetValue(uint64_t newValue);
   };
 
   class FloatMetadataEntry : public MetadataEntry {
@@ -616,6 +635,7 @@ namespace Ship {
 
     [[nodiscard]] std::optional<uint8_t> GetByte(uint8_t index) const;
     [[nodiscard]] std::optional<uint32_t> GetVarInt(uint8_t index) const;
+    [[nodiscard]] std::optional<uint64_t> GetLong(uint8_t index) const;
     [[nodiscard]] std::optional<float> GetFloat(uint8_t index) const;
     [[nodiscard]] std::optional<std::string> GetString(uint8_t index) const;
     [[nodiscard]] std::optional<std::string> GetChat(uint8_t index) const;

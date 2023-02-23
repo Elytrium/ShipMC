@@ -75,6 +75,19 @@ namespace Ship {
     return entry->GetValue();
   }
 
+  std::optional<uint64_t> Metadata::GetLong(uint8_t index) const {
+    auto* entry = Get<LongMetadataEntry>(index);
+    if (!entry) {
+      return std::nullopt;
+    }
+
+    if (entry->GetType() != MetadataEntryType::LONG) {
+      throw Exception("The requested type (Long) doesn't match the actual type");
+    }
+
+    return entry->GetValue();
+  }
+
   std::optional<float> Metadata::GetFloat(uint8_t index) const {
     auto* entry = Get<FloatMetadataEntry>(index);
     if (!entry) {
@@ -356,15 +369,12 @@ namespace Ship {
   }
 
   ConstructorRegistry<MetadataEntry> GetMetadataRegistry() {
-    ConstructorRegistry<MetadataEntry> dataRegistry({
-      ProtocolVersion::MINECRAFT_1_12_2, ProtocolVersion::MINECRAFT_1_13, ProtocolVersion::MINECRAFT_1_14,
-      // TODO: MINECRAFT_1_18?
-      ProtocolVersion::MINECRAFT_1_19, ProtocolVersion::MINECRAFT_1_19_1
-      // TODO: MINECRAFT_1_19_3?
-    });
+    ConstructorRegistry<MetadataEntry> dataRegistry({ProtocolVersion::MINECRAFT_1_12_2, ProtocolVersion::MINECRAFT_1_13, ProtocolVersion::MINECRAFT_1_14,
+      ProtocolVersion::MINECRAFT_1_19, ProtocolVersion::MINECRAFT_1_19_1, ProtocolVersion::MINECRAFT_1_19_3});
 
     dataRegistry.RegisterConstructor(ByteMetadataEntry::ORDINAL, CreateConstructor<ByteMetadataEntry>(0));
     dataRegistry.RegisterConstructor(VarIntMetadataEntry::ORDINAL, CreateConstructor<VarIntMetadataEntry>(0));
+    dataRegistry.RegisterConstructor(LongMetadataEntry::ORDINAL, CreateConstructor<LongMetadataEntry>(0));
     dataRegistry.RegisterConstructor(FloatMetadataEntry::ORDINAL, CreateConstructor<FloatMetadataEntry>(0));
     dataRegistry.RegisterConstructor(StringMetadataEntry::ORDINAL, CreateConstructor<StringMetadataEntry>(std::string {}));
     dataRegistry.RegisterConstructor(ChatMetadataEntry::ORDINAL, CreateConstructor<ChatMetadataEntry>(std::string {}));
@@ -423,6 +433,14 @@ namespace Ship {
         VillagerDataMetadataEntry::ORDINAL, OptVarIntMetadataEntry::ORDINAL, PoseMetadataEntry::ORDINAL, CatVariantMetadataEntry::ORDINAL,
         FrogVariantMetadataEntry::ORDINAL, GlobalPosMetadataEntry::ORDINAL, PaintingVariantMetadataEntry::ORDINAL}));
 
+    dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_3,
+      new VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, LongMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL,
+        StringMetadataEntry::ORDINAL, ChatMetadataEntry::ORDINAL, OptChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL,
+        BooleanMetadataEntry::ORDINAL, RotationMetadataEntry::ORDINAL, PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL,
+        DirectionMetadataEntry::ORDINAL, OptUUIDMetadataEntry::ORDINAL, BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL,
+        ParticleMetadataEntry::ORDINAL, VillagerDataMetadataEntry::ORDINAL, OptVarIntMetadataEntry::ORDINAL, PoseMetadataEntry::ORDINAL,
+        CatVariantMetadataEntry::ORDINAL, FrogVariantMetadataEntry::ORDINAL, GlobalPosMetadataEntry::ORDINAL, PaintingVariantMetadataEntry::ORDINAL}));
+
     return dataRegistry;
   }
 
@@ -434,8 +452,9 @@ namespace Ship {
     });
 
     catRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
-      new VersionRegistry(std::vector<CatVariant>({CatVariant::TABBY, CatVariant::BLACK, CatVariant::RED, CatVariant::SIAMESE, CatVariant::BRITISH_SHORTHAIR, CatVariant::CALICO,
-        CatVariant::PERSIAN, CatVariant::RAGDOLL, CatVariant::WHITE, CatVariant::JELLIE, CatVariant::ALL_BLACK})));
+      new VersionRegistry(
+        std::vector<CatVariant>({CatVariant::TABBY, CatVariant::BLACK, CatVariant::RED, CatVariant::SIAMESE, CatVariant::BRITISH_SHORTHAIR,
+          CatVariant::CALICO, CatVariant::PERSIAN, CatVariant::RAGDOLL, CatVariant::WHITE, CatVariant::JELLIE, CatVariant::ALL_BLACK})));
 
     return catRegistry;
   }
