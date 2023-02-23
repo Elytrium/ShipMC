@@ -7,7 +7,7 @@
 namespace Ship {
 
   class Exception : public std::exception {
-   private:
+   protected:
     std::string text;
 
    public:

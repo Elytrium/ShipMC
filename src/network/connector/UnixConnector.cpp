@@ -1,4 +1,4 @@
-#include "../../utils/exceptions/Exception.hpp"
+#include "../../utils/exceptions/ErrnoException.hpp"
 #include "Connector.hpp"
 #include <arpa/inet.h>
 #include <cstring>
@@ -6,17 +6,17 @@
 #include <sys/socket.h>
 
 namespace Ship {
-  EpollConnector::EpollConnector(EpollEventLoop* eventLoop) : eventLoop(eventLoop) {
+  UnixConnector::UnixConnector(UnixEventLoop* eventLoop) : eventLoop(eventLoop) {
   }
 
-  void EpollConnector::Connect(char* bind_address, int16_t port) {
+  void UnixConnector::Connect(char* bind_address, int16_t port) {
     int socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFileDescriptor == -1) {
       throw Exception("Error while creating socket. No permissions?");
     }
 
     if (ioctl(socketFileDescriptor, FIONBIO) == -1) {
-      throw Exception(strerror_r(errno, errorBuffer, 64));
+      throw ErrnoException(errorBuffer, 64);
     }
 
     sockaddr_in bindAddress {};

@@ -56,6 +56,7 @@
 #include "../packets/play/DefaultSpawnPosition.hpp"
 #include "../packets/play/Digging.hpp"
 #include "../packets/play/Disconnect.hpp"
+#include "../packets/play/DisguisedChatMessage.hpp"
 #include "../packets/play/DisplayObjective.hpp"
 #include "../packets/play/EditBook.hpp"
 #include "../packets/play/EditSign.hpp"
@@ -81,6 +82,7 @@
 #include "../packets/play/EntityVelocity.hpp"
 #include "../packets/play/Experience.hpp"
 #include "../packets/play/Explosion.hpp"
+#include "../packets/play/FeatureFlags.hpp"
 #include "../packets/play/GameEvent.hpp"
 #include "../packets/play/GenerateStructure.hpp"
 #include "../packets/play/HardcodedSoundEffect.hpp"
@@ -102,6 +104,7 @@
 #include "../packets/play/LegacyWorldBorder.hpp"
 #include "../packets/play/LockDifficulty.hpp"
 #include "../packets/play/MapData.hpp"
+#include "../packets/play/MessageAcknowledgment.hpp"
 #include "../packets/play/MessageHeader.hpp"
 #include "../packets/play/Move.hpp"
 #include "../packets/play/MoveGroundOnly.hpp"
@@ -123,6 +126,7 @@
 #include "../packets/play/PlayerFace.hpp"
 #include "../packets/play/PlayerInput.hpp"
 #include "../packets/play/PlayerListItem.hpp"
+#include "../packets/play/PlayerRemove.hpp"
 #include "../packets/play/PluginMessage.hpp"
 #include "../packets/play/PositionRotation.hpp"
 #include "../packets/play/ProgramCommandBlock.hpp"
@@ -135,6 +139,7 @@
 #include "../packets/play/ResourcePackResponse.hpp"
 #include "../packets/play/Respawn.hpp"
 #include "../packets/play/Score.hpp"
+#include "../packets/play/SculkVibration.hpp"
 #include "../packets/play/SectionBlocks.hpp"
 #include "../packets/play/SeenRecipe.hpp"
 #include "../packets/play/SelectAdvancementsTab.hpp"
@@ -144,6 +149,7 @@
 #include "../packets/play/ServerData.hpp"
 #include "../packets/play/ServerPlayerAbilities.hpp"
 #include "../packets/play/ServerPlayerChat.hpp"
+#include "../packets/play/SetDisplayChatPreview.hpp"
 #include "../packets/play/SimulationDistance.hpp"
 #include "../packets/play/SpawnEntity.hpp"
 #include "../packets/play/SpawnExperienceOrb.hpp"
@@ -180,7 +186,7 @@ namespace Ship {
   PacketRegistry GetHandshakeRegistry() {
     auto* serverbound = new DirectionRegistry();
     serverbound->RegisterPacketConstructor(Handshake::PACKET_ORDINAL, CreateConstructor<Handshake>());
-    serverbound->FillVersionRegistry(VersionRegistry({Handshake::PACKET_ORDINAL}));
+    serverbound->FillVersionRegistry(new VersionRegistry({Handshake::PACKET_ORDINAL}));
 
     return {nullptr, serverbound};
   }
@@ -189,12 +195,12 @@ namespace Ship {
     auto* clientbound = new DirectionRegistry();
     clientbound->RegisterPacketConstructor(StatusResponse::PACKET_ORDINAL, CreateConstructor<StatusResponse>(std::string {}));
     clientbound->RegisterPacketConstructor(StatusPing::PACKET_ORDINAL, CreateConstructor<StatusPing>(0));
-    clientbound->FillVersionRegistry(VersionRegistry({StatusResponse::PACKET_ORDINAL, StatusPing::PACKET_ORDINAL}));
+    clientbound->FillVersionRegistry(new VersionRegistry({StatusResponse::PACKET_ORDINAL, StatusPing::PACKET_ORDINAL}));
 
     auto* serverbound = new DirectionRegistry();
     serverbound->RegisterPacketConstructor(StatusRequest::PACKET_ORDINAL, CreateConstructor<StatusRequest>());
     serverbound->RegisterPacketConstructor(StatusPing::PACKET_ORDINAL, CreateConstructor<StatusPing>(0));
-    serverbound->FillVersionRegistry(VersionRegistry({StatusRequest::PACKET_ORDINAL, StatusPing::PACKET_ORDINAL}));
+    serverbound->FillVersionRegistry(new VersionRegistry({StatusRequest::PACKET_ORDINAL, StatusPing::PACKET_ORDINAL}));
 
     return {clientbound, serverbound};
   }
@@ -207,7 +213,7 @@ namespace Ship {
       LoginSuccess::PACKET_ORDINAL, CreateConstructor<LoginSuccess>(UUID {}, std::string {}, std::vector<GameProfileProperty> {}));
     clientbound->RegisterPacketConstructor(SetCompression::PACKET_ORDINAL, CreateConstructor<SetCompression>(0));
     clientbound->RegisterPacketConstructor(LoginPluginMessage::PACKET_ORDINAL, CreateConstructor<LoginPluginMessage>());
-    clientbound->FillVersionRegistry(VersionRegistry({Disconnect::PACKET_ORDINAL, EncryptionRequest::PACKET_ORDINAL, LoginSuccess::PACKET_ORDINAL,
+    clientbound->FillVersionRegistry(new VersionRegistry({Disconnect::PACKET_ORDINAL, EncryptionRequest::PACKET_ORDINAL, LoginSuccess::PACKET_ORDINAL,
       SetCompression::PACKET_ORDINAL, LoginPluginMessage::PACKET_ORDINAL}));
 
     auto* serverbound = new DirectionRegistry();
@@ -215,7 +221,7 @@ namespace Ship {
     serverbound->RegisterPacketConstructor(EncryptionResponse::PACKET_ORDINAL, CreateConstructor<EncryptionResponse>());
     serverbound->RegisterPacketConstructor(LoginPluginResponse::PACKET_ORDINAL, CreateConstructor<LoginPluginResponse>());
     serverbound->FillVersionRegistry(
-      VersionRegistry({LoginStart::PACKET_ORDINAL, EncryptionResponse::PACKET_ORDINAL, LoginPluginResponse::PACKET_ORDINAL}));
+      new VersionRegistry({LoginStart::PACKET_ORDINAL, EncryptionResponse::PACKET_ORDINAL, LoginPluginResponse::PACKET_ORDINAL}));
 
     return {clientbound, serverbound};
   }
@@ -355,7 +361,7 @@ namespace Ship {
     clientbound->RegisterPacketConstructor(Tags::PACKET_ORDINAL, CreateConstructor<Tags>());
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
         SpawnPainting::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL,
         BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL, CommandSuggestionResponse::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL,
@@ -376,7 +382,7 @@ namespace Ship {
         EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL, EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_13,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
         SpawnPainting::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL,
         BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, SectionBlocks::PACKET_ORDINAL,
@@ -399,7 +405,7 @@ namespace Ship {
         Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_14,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
         SpawnPainting::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL,
         BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, SectionBlocks::PACKET_ORDINAL,
@@ -424,7 +430,7 @@ namespace Ship {
         AcknowledgePlayerDigging::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_15,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
         SpawnPainting::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         AcknowledgePlayerDigging::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL,
         BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL,
@@ -448,7 +454,7 @@ namespace Ship {
         EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_16_2,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnPainting::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnPainting::PACKET_ORDINAL,
         SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL, AcknowledgePlayerDigging::PACKET_ORDINAL,
         BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL,
         BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, SectionBlocks::PACKET_ORDINAL,
@@ -472,9 +478,9 @@ namespace Ship {
         EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_17,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnPainting::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnPainting::PACKET_ORDINAL,
         SpawnPlayer::PACKET_ORDINAL,
-        SkulkVibration::PACKET_ORDINAL, // TODO: SkulkVibration
+        SkulkVibration::PACKET_ORDINAL,
         EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL, AcknowledgePlayerDigging::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL,
         BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL,
         ServerChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, ClearTitle::PACKET_ORDINAL, CommandSuggestionResponse::PACKET_ORDINAL,
@@ -500,9 +506,9 @@ namespace Ship {
         EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_18,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnPainting::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnPainting::PACKET_ORDINAL,
         SpawnPlayer::PACKET_ORDINAL,
-        SkulkVibration::PACKET_ORDINAL, // TODO: SkulkVibration
+        SkulkVibration::PACKET_ORDINAL,
         EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL, AcknowledgePlayerDigging::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL,
         BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL,
         ServerChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, ClearTitle::PACKET_ORDINAL, CommandSuggestionResponse::PACKET_ORDINAL,
@@ -528,7 +534,7 @@ namespace Ship {
         Advancements::PACKET_ORDINAL, EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL,
         AwardStatistics::PACKET_ORDINAL, AcknowledgeBlockChange::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL,
         BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL,
         ServerChatPreview::PACKET_ORDINAL, ClearTitle::PACKET_ORDINAL, CommandSuggestionResponse::PACKET_ORDINAL, DeclareCommands::PACKET_ORDINAL,
@@ -555,7 +561,7 @@ namespace Ship {
         EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_1,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL,
         AwardStatistics::PACKET_ORDINAL, AcknowledgeBlockChange::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL,
         BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL,
         ServerChatPreview::PACKET_ORDINAL, ClearTitle::PACKET_ORDINAL, CommandSuggestionResponse::PACKET_ORDINAL, DeclareCommands::PACKET_ORDINAL,
@@ -574,7 +580,7 @@ namespace Ship {
         ServerData::PACKET_ORDINAL, ActionBar::PACKET_ORDINAL, BorderCenter::PACKET_ORDINAL, BorderRadiusSpeed::PACKET_ORDINAL,
         BorderRadius::PACKET_ORDINAL, BorderWarningTime::PACKET_ORDINAL, BorderWarningRadius::PACKET_ORDINAL, Camera::PACKET_ORDINAL,
         HeldSlot::PACKET_ORDINAL, ViewPosition::PACKET_ORDINAL, ViewDistance::PACKET_ORDINAL, DefaultSpawnPosition::PACKET_ORDINAL,
-        SetDisplayChatPreview::PACKET_ORDINAL, // TODO: SetDisplayChatPreview
+        SetDisplayChatPreview::PACKET_ORDINAL,
         DisplayObjective::PACKET_ORDINAL, EntityMetadata::PACKET_ORDINAL, LeadEntities::PACKET_ORDINAL, EntityVelocity::PACKET_ORDINAL,
         EntityEquipment::PACKET_ORDINAL, Experience::PACKET_ORDINAL, Health::PACKET_ORDINAL, Objectives::PACKET_ORDINAL, Passengers::PACKET_ORDINAL,
         Teams::PACKET_ORDINAL, Score::PACKET_ORDINAL, SimulationDistance::PACKET_ORDINAL, Subtitle::PACKET_ORDINAL, WorldTime::PACKET_ORDINAL,
@@ -584,7 +590,7 @@ namespace Ship {
         EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_3,
-      VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL,
+      new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL,
         AwardStatistics::PACKET_ORDINAL, AcknowledgeBlockChange::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL,
         BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL,
         ClearTitle::PACKET_ORDINAL, CommandSuggestionResponse::PACKET_ORDINAL, DeclareCommands::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL,
@@ -597,7 +603,7 @@ namespace Ship {
         EntityRotation::PACKET_ORDINAL, MoveVehicle::PACKET_ORDINAL, OpenBook::PACKET_ORDINAL, OpenInventory::PACKET_ORDINAL,
         OpenSignEditor::PACKET_ORDINAL, Ping::PACKET_ORDINAL, CraftRecipeResponse::PACKET_ORDINAL, ServerPlayerAbilities::PACKET_ORDINAL,
         ServerPlayerChat::PACKET_ORDINAL, EndCombatEvent::PACKET_ORDINAL, EnterCombatEvent::PACKET_ORDINAL, DeathCombatEvent::PACKET_ORDINAL,
-        PlayerRemove::PACKET_ORDINAL, // TODO: PlayerRemove
+        PlayerRemove::PACKET_ORDINAL,
         PlayerListItem::PACKET_ORDINAL, PlayerFace::PACKET_ORDINAL, PositionRotation::PACKET_ORDINAL, UnlockRecipes::PACKET_ORDINAL,
         EntityRemove::PACKET_ORDINAL, EntityEffectRemove::PACKET_ORDINAL, ResourcePackRequest::PACKET_ORDINAL, Respawn::PACKET_ORDINAL,
         EntityLookAt::PACKET_ORDINAL, SectionBlocks::PACKET_ORDINAL, SelectAdvancementsTab::PACKET_ORDINAL, ServerData::PACKET_ORDINAL,
@@ -670,7 +676,7 @@ namespace Ship {
     serverbound->RegisterPacketConstructor(UseItem::PACKET_ORDINAL, CreateConstructor<UseItem>());
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
-      VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
+      new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
         ClientSettings::PACKET_ORDINAL, ConfirmTransaction::PACKET_ORDINAL, LegacyEnchant::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL,
         CloseInventory::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL, EntityInteract::PACKET_ORDINAL, KeepAlive::PACKET_ORDINAL,
         MoveGroundOnly::PACKET_ORDINAL, MovePositionOnly::PACKET_ORDINAL, Move::PACKET_ORDINAL, MoveRotationOnly::PACKET_ORDINAL,
@@ -680,7 +686,7 @@ namespace Ship {
         SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, Camera::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_13,
-      VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
+      new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
         ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ConfirmTransaction::PACKET_ORDINAL, LegacyEnchant::PACKET_ORDINAL,
         ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL,
         TagQueryRequest::PACKET_ORDINAL, EntityInteract::PACKET_ORDINAL, KeepAlive::PACKET_ORDINAL, MoveGroundOnly::PACKET_ORDINAL,
@@ -693,7 +699,7 @@ namespace Ship {
         UseItem::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_14,
-      VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
+      new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
         LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL,
         ConfirmTransaction::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL,
         PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL, TagQueryRequest::PACKET_ORDINAL, EntityInteract::PACKET_ORDINAL,
@@ -717,10 +723,10 @@ namespace Ship {
       ResourcePackResponse::PACKET_ORDINAL, SelectAdvancementsTab::PACKET_ORDINAL, SelectTrade::PACKET_ORDINAL, BeaconEffect::PACKET_ORDINAL,
       HeldSlot::PACKET_ORDINAL, ProgramCommandBlock::PACKET_ORDINAL, ProgramCommandBlockMinecart::PACKET_ORDINAL, CreativeSlot::PACKET_ORDINAL,
       ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL, SwingArm::PACKET_ORDINAL,
-      Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
+      Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL});
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_16_2,
-      VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
+      new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
         LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL,
         ConfirmTransaction::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL,
         PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL, TagQueryRequest::PACKET_ORDINAL, EntityInteract::PACKET_ORDINAL,
@@ -734,7 +740,7 @@ namespace Ship {
         SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_17,
-      VersionRegistry(
+      new VersionRegistry(
         {ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL,
           ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL,
           ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL,
@@ -749,7 +755,7 @@ namespace Ship {
           SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_18,
-      VersionRegistry(
+      new VersionRegistry(
         {ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL,
           ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL,
           ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL,
@@ -764,7 +770,7 @@ namespace Ship {
           SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
-      VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
+      new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
         Command::PACKET_ORDINAL, ClientPlayerChat::PACKET_ORDINAL, ClientChatPreview::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
         ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL,
         CloseInventory::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL, TagQueryRequest::PACKET_ORDINAL,
@@ -779,7 +785,7 @@ namespace Ship {
         UseItem::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_1,
-      VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
+      new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
         MessageAcknowledgment::PACKET_ORDINAL, // TODO: MessageAcknowledgment
         Command::PACKET_ORDINAL, ClientPlayerChat::PACKET_ORDINAL, ClientChatPreview::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
         ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL,
@@ -795,20 +801,19 @@ namespace Ship {
         UseItem::PACKET_ORDINAL}));
 
     clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_3,
-      VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
-        MessageAcknowledgment::PACKET_ORDINAL, // TODO: MessageAcknowledgment
-        Command::PACKET_ORDINAL, ClientPlayerChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL,
-        CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL,
-        PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL, TagQueryRequest::PACKET_ORDINAL, EntityInteract::PACKET_ORDINAL,
-        GenerateStructure::PACKET_ORDINAL, KeepAlive::PACKET_ORDINAL, LockDifficulty::PACKET_ORDINAL, MovePositionOnly::PACKET_ORDINAL,
-        Move::PACKET_ORDINAL, MoveRotationOnly::PACKET_ORDINAL, MoveGroundOnly::PACKET_ORDINAL, MoveVehicle::PACKET_ORDINAL, BoatPaddle::PACKET_ORDINAL,
-        PickItem::PACKET_ORDINAL, CraftRecipeRequest::PACKET_ORDINAL, ClientPlayerAbilities::PACKET_ORDINAL, Digging::PACKET_ORDINAL,
-        EntityAction::PACKET_ORDINAL, PlayerInput::PACKET_ORDINAL, Ping::PACKET_ORDINAL, PlayerChatSession::PACKET_ORDINAL, SeenRecipe::PACKET_ORDINAL,
-        ChangeRecipeBookSettings::PACKET_ORDINAL, RenameItem::PACKET_ORDINAL, ResourcePackResponse::PACKET_ORDINAL, SelectAdvancementsTab::PACKET_ORDINAL,
-        SelectTrade::PACKET_ORDINAL, BeaconEffect::PACKET_ORDINAL, HeldSlot::PACKET_ORDINAL, ProgramCommandBlock::PACKET_ORDINAL,
-        ProgramCommandBlockMinecart::PACKET_ORDINAL, CreativeSlot::PACKET_ORDINAL, ProgramJigsawBlock::PACKET_ORDINAL,
-        ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL, SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL,
-        UseItem::PACKET_ORDINAL}));
+      new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
+        MessageAcknowledgment::PACKET_ORDINAL, Command::PACKET_ORDINAL, ClientPlayerChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
+        ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL,
+        CloseInventory::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL, TagQueryRequest::PACKET_ORDINAL,
+        EntityInteract::PACKET_ORDINAL, GenerateStructure::PACKET_ORDINAL, KeepAlive::PACKET_ORDINAL, LockDifficulty::PACKET_ORDINAL,
+        MovePositionOnly::PACKET_ORDINAL, Move::PACKET_ORDINAL, MoveRotationOnly::PACKET_ORDINAL, MoveGroundOnly::PACKET_ORDINAL,
+        MoveVehicle::PACKET_ORDINAL, BoatPaddle::PACKET_ORDINAL, PickItem::PACKET_ORDINAL, CraftRecipeRequest::PACKET_ORDINAL,
+        ClientPlayerAbilities::PACKET_ORDINAL, Digging::PACKET_ORDINAL, EntityAction::PACKET_ORDINAL, PlayerInput::PACKET_ORDINAL, Ping::PACKET_ORDINAL,
+        PlayerChatSession::PACKET_ORDINAL, SeenRecipe::PACKET_ORDINAL, ChangeRecipeBookSettings::PACKET_ORDINAL, RenameItem::PACKET_ORDINAL,
+        ResourcePackResponse::PACKET_ORDINAL, SelectAdvancementsTab::PACKET_ORDINAL, SelectTrade::PACKET_ORDINAL, BeaconEffect::PACKET_ORDINAL,
+        HeldSlot::PACKET_ORDINAL, ProgramCommandBlock::PACKET_ORDINAL, ProgramCommandBlockMinecart::PACKET_ORDINAL, CreativeSlot::PACKET_ORDINAL,
+        ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL, SwingArm::PACKET_ORDINAL,
+        Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
     return {clientbound, serverbound};
   }
