@@ -9,13 +9,13 @@ namespace Ship {
     virtual void Connect(char* bind_address, int16_t port) = 0;
   };
 
-  class EpollConnector {
+  class UnixConnector : Connector {
    private:
-    EpollEventLoop* eventLoop;
+    UnixEventLoop* eventLoop;
     char* errorBuffer = new char[64];
 
    public:
-    explicit EpollConnector(EpollEventLoop* eventLoop);
-    void Connect(char* bind_address, int16_t port);
+    explicit UnixConnector(UnixEventLoop* eventLoop);
+    void Connect(char* bind_address, int16_t port) override;
   };
 }

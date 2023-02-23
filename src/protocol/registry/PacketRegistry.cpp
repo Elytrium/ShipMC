@@ -18,7 +18,7 @@ namespace Ship {
   }
 
   void DirectionRegistry::RegisterPacketConstructor(uint32_t ordinal, const std::function<Packet*()>& constructor) {
-    ResizeVectorAndSet(ordinalToPacketMap, ordinal, constructor);
+    RegisterConstructor(ordinal, constructor);
   }
 
   Packet* DirectionRegistry::GetPacketByID(const ProtocolVersion* version, uint32_t id) const {

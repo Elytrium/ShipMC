@@ -10,9 +10,6 @@
 namespace Ship {
 
   class DirectionRegistry : public ConstructorRegistry<Packet> {
-   private:
-    std::vector<std::function<Packet*()>> ordinalToPacketMap;
-
    public:
     DirectionRegistry();
 

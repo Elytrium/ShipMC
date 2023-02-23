@@ -16,6 +16,7 @@ namespace Ship {
     virtual void StartListening(std::string bind_address, int16_t port) = 0;
   };
 
+#ifdef __linux__
   class EpollListener : public Listener {
    private:
     EpollEventLoop* eventLoop;
@@ -31,4 +32,27 @@ namespace Ship {
     EpollListener(EpollEventLoop* event_loop, int max_events, int timeout);
     void StartListening(std::string, int16_t port) override;
   };
+
+  typedef EpollListener SystemListener;
+#endif
+
+#if defined(__APPLE__) || defined(__FreeBSD__)
+  class KqueueListener : public Listener {
+   private:
+    KqueueEventLoop* eventLoop;
+    int maxEvents;
+    const timespec* timeout;
+    char* errorBuffer = new char[64];
+    int kqueueFileDescriptor;
+    int socketFileDescriptor;
+
+   public:
+    ~KqueueListener() override;
+
+    KqueueListener(KqueueEventLoop* event_loop, int max_events, const timespec* timeout);
+    void StartListening(std::string, int16_t port) override;
+  };
+
+  typedef KqueueListener SystemListener;
+#endif
 } // namespace Ship

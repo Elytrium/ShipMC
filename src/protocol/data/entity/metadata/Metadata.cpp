@@ -389,26 +389,26 @@ namespace Ship {
     dataRegistry.RegisterConstructor(PaintingVariantMetadataEntry::ORDINAL, CreateConstructor<PaintingVariantMetadataEntry>(PaintingVariant {}));
 
     dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
-      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+      new VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
         ChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL, RotationMetadataEntry::ORDINAL,
         PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL, OptUUIDMetadataEntry::ORDINAL,
         BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL}));
 
     dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_13,
-      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+      new VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
         ChatMetadataEntry::ORDINAL, OptChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL,
         RotationMetadataEntry::ORDINAL, PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL,
         OptUUIDMetadataEntry::ORDINAL, BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL, ParticleMetadataEntry::ORDINAL}));
 
     dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_14,
-      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+      new VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
         ChatMetadataEntry::ORDINAL, OptChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL,
         RotationMetadataEntry::ORDINAL, PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL,
         OptUUIDMetadataEntry::ORDINAL, BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL, ParticleMetadataEntry::ORDINAL,
         VillagerDataMetadataEntry::ORDINAL, OptVarIntMetadataEntry::ORDINAL, PoseMetadataEntry::ORDINAL}));
 
     dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
-      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+      new VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
         ChatMetadataEntry::ORDINAL, OptChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL,
         RotationMetadataEntry::ORDINAL, PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL,
         OptUUIDMetadataEntry::ORDINAL, BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL, ParticleMetadataEntry::ORDINAL,
@@ -416,7 +416,7 @@ namespace Ship {
         FrogVariantMetadataEntry::ORDINAL, PaintingVariantMetadataEntry::ORDINAL}));
 
     dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_1,
-      VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
+      new VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,
         ChatMetadataEntry::ORDINAL, OptChatMetadataEntry::ORDINAL, ItemStackMetadataEntry::ORDINAL, BooleanMetadataEntry::ORDINAL,
         RotationMetadataEntry::ORDINAL, PositionMetadataEntry::ORDINAL, OptPositionMetadataEntry::ORDINAL, DirectionMetadataEntry::ORDINAL,
         OptUUIDMetadataEntry::ORDINAL, BlockIDMetadataEntry::ORDINAL, NBTMetadataEntry::ORDINAL, ParticleMetadataEntry::ORDINAL,
@@ -434,7 +434,7 @@ namespace Ship {
     });
 
     catRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
-      VersionRegistry(std::vector<CatVariant>({CatVariant::TABBY, CatVariant::BLACK, CatVariant::RED, CatVariant::SIAMESE, CatVariant::BRITISH_SHORTHAIR, CatVariant::CALICO,
+      new VersionRegistry(std::vector<CatVariant>({CatVariant::TABBY, CatVariant::BLACK, CatVariant::RED, CatVariant::SIAMESE, CatVariant::BRITISH_SHORTHAIR, CatVariant::CALICO,
         CatVariant::PERSIAN, CatVariant::RAGDOLL, CatVariant::WHITE, CatVariant::JELLIE, CatVariant::ALL_BLACK})));
 
     return catRegistry;
@@ -448,7 +448,7 @@ namespace Ship {
     });
 
     frogRegistry.RegisterVersion(
-      &ProtocolVersion::MINECRAFT_1_19, VersionRegistry(std::vector<FrogVariant>({FrogVariant::TEMPERATE, FrogVariant::WARM, FrogVariant::COLD})));
+      &ProtocolVersion::MINECRAFT_1_19, new VersionRegistry(std::vector<FrogVariant>({FrogVariant::TEMPERATE, FrogVariant::WARM, FrogVariant::COLD})));
 
     return frogRegistry;
   }
@@ -461,7 +461,7 @@ namespace Ship {
     });
 
     paintingRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
-      VersionRegistry(std::vector<PaintingVariant>({PaintingVariant::KEBAB, PaintingVariant::AZTEC, PaintingVariant::ALBAN, PaintingVariant::AZTEC2,
+      new VersionRegistry(std::vector<PaintingVariant>({PaintingVariant::KEBAB, PaintingVariant::AZTEC, PaintingVariant::ALBAN, PaintingVariant::AZTEC2,
         PaintingVariant::BOMB, PaintingVariant::PLANT, PaintingVariant::WASTELAND, PaintingVariant::POOL, PaintingVariant::COURBET, PaintingVariant::SEA,
         PaintingVariant::SUNSET, PaintingVariant::CREEBET, PaintingVariant::WANDERER, PaintingVariant::GRAHAM, PaintingVariant::MATCH,
         PaintingVariant::BUST, PaintingVariant::STAGE, PaintingVariant::VOID, PaintingVariant::SKULL_AND_ROSES, PaintingVariant::WITHER,

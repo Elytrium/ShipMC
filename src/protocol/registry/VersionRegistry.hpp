@@ -2,11 +2,12 @@
 
 #include "../../utils/ordinal/OrdinalRegistry.hpp"
 #include "../Protocol.hpp"
+#include <vector>
 
 namespace Ship {
 
   template<typename T>
-  inline void ResizeVectorAndSet(std::vector<T>& vector, uint32_t at, T value) {
+  void ResizeVectorAndSet(std::vector<T>& vector, uint32_t at, T value) {
     if (at >= vector.size()) {
       vector.resize(at + 8);
     }
@@ -16,7 +17,7 @@ namespace Ship {
 
   class VersionRegistry {
    private:
-    std::vector<uint32_t> ordinalToIDMap = std::vector<uint32_t>(OrdinalRegistry::PacketRegistry.GetLastOrdinal() + 1);
+    std::vector<uint32_t> ordinalToIDMap = std::vector<uint32_t>();
     std::vector<uint32_t> idToOrdinalMap = std::vector<uint32_t>();
     int latestRegisteredID = -1;
 
@@ -24,7 +25,14 @@ namespace Ship {
     VersionRegistry() = default;
 
     template<typename T>
-    explicit VersionRegistry(const std::vector<T>& ordinals);
+    explicit VersionRegistry(const std::vector<T>& ordinals) {
+      uint32_t index = 0;
+      for (const T& ordinal : ordinals) {
+        idToOrdinalMap.push_back((uint32_t) ordinal);
+        ResizeVectorAndSet(ordinalToIDMap, (uint32_t) ordinal, index++);
+      }
+    }
+
     explicit VersionRegistry(const std::vector<uint32_t>& ordinals);
 
     void Register(uint32_t ordinal);

@@ -2,6 +2,7 @@
 
 #include "../../../utils/ordinal/OrdinalRegistry.hpp"
 #include "../Packet.hpp"
+#include <array>
 #include <string>
 #include <utility>
 

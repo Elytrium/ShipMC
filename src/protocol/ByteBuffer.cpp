@@ -6,11 +6,11 @@
 
 namespace Ship {
 
-  const uint32_t ByteBuffer::BYTE_SIZE = INT8_WIDTH / INT_FAST8_WIDTH;
-  const uint32_t ByteBuffer::SHORT_SIZE = INT16_WIDTH / INT_FAST8_WIDTH;
-  const uint32_t ByteBuffer::MEDIUM_SIZE = BYTE_SIZE * 3;
-  const uint32_t ByteBuffer::INT_SIZE = INT32_WIDTH / INT_FAST8_WIDTH;
-  const uint32_t ByteBuffer::LONG_SIZE = INT64_WIDTH / INT_FAST8_WIDTH;
+  const uint32_t ByteBuffer::BYTE_SIZE = 1;
+  const uint32_t ByteBuffer::SHORT_SIZE = 2;
+  const uint32_t ByteBuffer::MEDIUM_SIZE = 3;
+  const uint32_t ByteBuffer::INT_SIZE = 4;
+  const uint32_t ByteBuffer::LONG_SIZE = 8;
   const uint32_t ByteBuffer::FLOAT_SIZE = INT_SIZE;
   const uint32_t ByteBuffer::DOUBLE_SIZE = LONG_SIZE;
   const uint32_t ByteBuffer::BOOLEAN_SIZE = BYTE_SIZE;
@@ -65,7 +65,7 @@ namespace Ship {
   uint32_t ByteBuffer::PropertiesBytes(const std::vector<GameProfileProperty> &properties) {
     uint32_t size = 0;
     for (const GameProfileProperty& property : properties) {
-      size += StringBytes(property.GetName()) + StringBytes(property.GetValue()) + StringBytes(property.GetSignature()) + (INT8_WIDTH / INT8_WIDTH);
+      size += StringBytes(property.GetName()) + StringBytes(property.GetValue()) + StringBytes(property.GetSignature()) + BYTE_SIZE;
     }
 
     return size;

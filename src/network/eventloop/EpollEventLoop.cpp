@@ -1,4 +1,5 @@
-#include "../../utils/exceptions/Exception.hpp"
+#ifdef __linux__
+#include "../../utils/exceptions/ErrnoException.hpp"
 #include "../readwritecloser/ReadWriteCloser.hpp"
 #include "EventLoop.hpp"
 #include <cstring>
@@ -10,7 +11,7 @@
 
 namespace Ship {
   EpollEventLoop::EpollEventLoop(std::function<Connection*(ReadWriteCloser* writer)> initializer, int max_events, int timeout, int buffer_size)
-    : EventLoop(std::move(initializer)), maxEvents(max_events), timeout(timeout), buffer(new uint8_t[buffer_size]), bufferSize(buffer_size) {
+    : UnixEventLoop(std::move(initializer)), maxEvents(max_events), timeout(timeout), buffer(new uint8_t[buffer_size]), bufferSize(buffer_size) {
     epollEvent.events = EPOLLIN | EPOLLRDHUP | EPOLLET;
     epollFileDescriptor = epoll_create1(O_CLOEXEC);
 
@@ -59,7 +60,7 @@ namespace Ship {
 
             if (count == -1) {
               if (errno != EAGAIN) {
-                throw Exception(strerror_r(errno, errorBuffer, 64));
+                throw ErrnoException(errorBuffer, 64);
               }
 
               break;
@@ -79,3 +80,4 @@ namespace Ship {
     }
   }
 }
+#endif

@@ -1,28 +1,27 @@
-#ifdef __linux__
+#if defined(__APPLE__) || defined(__FreeBSD__)
 #include "../../utils/exceptions/ErrnoException.hpp"
 #include "Listener.hpp"
 #include <arpa/inet.h>
-#include <cstring>
-#include <fcntl.h>
-#include <sys/epoll.h>
+#include <sys/event.h>
+#include <sys/fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <thread>
 #include <unistd.h>
 
 namespace Ship {
 
-  EpollListener::EpollListener(EpollEventLoop* event_loop, int max_events, int timeout) : eventLoop(event_loop), maxEvents(max_events), timeout(timeout) {
+  KqueueListener::KqueueListener(KqueueEventLoop* event_loop, int max_events, const timespec* timeout)
+    : eventLoop(event_loop), maxEvents(max_events), timeout(timeout) {
   }
 
-  EpollListener::~EpollListener() {
-    close(epollFileDescriptor);
+  KqueueListener::~KqueueListener() {
+    close(kqueueFileDescriptor);
     close(socketFileDescriptor);
     delete eventLoop;
     delete[] errorBuffer;
   }
 
-  void EpollListener::StartListening(std::string bind_address, int16_t port) {
+  void KqueueListener::StartListening(std::string bind_address, int16_t port) {
     socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFileDescriptor == -1) {
       throw Exception("Error while creating socket. No permissions?");
@@ -46,36 +45,35 @@ namespace Ship {
       throw ErrnoException(errorBuffer, 64);
     }
 
-    epollFileDescriptor = epoll_create1(O_CLOEXEC);
+    kqueueFileDescriptor = kqueue();
 
-    if (epollFileDescriptor == -1) {
+    if (kqueueFileDescriptor == -1) {
       throw ErrnoException(errorBuffer, 64);
     }
 
-    epoll_event ctlEvent {};
-    ctlEvent.data.fd = socketFileDescriptor;
-    ctlEvent.events = EPOLLIN | EPOLLET;
+    struct kevent ctlEvent {};
+    EV_SET(&ctlEvent, socketFileDescriptor, EVFILT_READ | EVFILT_WRITE, EV_ADD, 0, 0, NULL);
 
-    if (epoll_ctl(epollFileDescriptor, EPOLL_CTL_ADD, socketFileDescriptor, &ctlEvent) == -1) {
+    if (::kevent(kqueueFileDescriptor, &ctlEvent, 1, nullptr, 0, nullptr) == -1) {
       throw ErrnoException(errorBuffer, 64);
     }
 
-    epoll_event events[maxEvents];
-    epoll_event event; // NOLINT(cppcoreguidelines-pro-type-member-init)
+    struct kevent events[maxEvents];
+    struct kevent event; // NOLINT(cppcoreguidelines-pro-type-member-init)
     while (true) {
-      int amount = epoll_wait(epollFileDescriptor, events, maxEvents, timeout);
+      int amount = kevent(kqueueFileDescriptor, nullptr, 0, events, maxEvents, timeout);
 
       for (int i = 0; i < amount; ++i) {
         event = events[i];
         try {
           while (true) {
-            if (!(event.events & EPOLLIN) || (event.events & EPOLLERR) || (event.events & EPOLLHUP)) {
+            if (!(event.flags & EVFILT_READ)) {
               throw ErrnoException(errorBuffer, 64);
             } else {
               sockaddr connectionAddress {};
               socklen_t length = sizeof(sockaddr);
 
-              int receivedFileDescriptor = accept4(socketFileDescriptor, &connectionAddress, &length, SOCK_NONBLOCK | SOCK_CLOEXEC);
+              int receivedFileDescriptor = accept(socketFileDescriptor, &connectionAddress, &length);
               if (receivedFileDescriptor == -1) {
                 if (errno != EAGAIN) {
                   throw ErrnoException(errorBuffer, 64);
@@ -84,12 +82,15 @@ namespace Ship {
                 break;
               }
 
+              int flags = fcntl(receivedFileDescriptor, F_GETFL, 0);
+              fcntl(receivedFileDescriptor, F_SETFL, flags | O_NONBLOCK | O_CLOEXEC);
+
               eventLoop->Accept(receivedFileDescriptor);
             }
           }
         } catch (std::exception& e) {
-          close(event.data.fd);
-          close(epollFileDescriptor);
+          close((int) event.ident);
+          close(kqueueFileDescriptor);
           throw;
         }
       }
