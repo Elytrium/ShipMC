@@ -4,7 +4,6 @@ project(Ship)
 
 file(GLOB_RECURSE SHIP_SOURCES src/*.[hc]pp)
 
-# TODO
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
