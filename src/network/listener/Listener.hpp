@@ -36,7 +36,7 @@ namespace Ship {
   typedef EpollListener SystemListener;
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__FreeBSD__)
   class KqueueListener : public Listener {
    private:
     KqueueEventLoop* eventLoop;

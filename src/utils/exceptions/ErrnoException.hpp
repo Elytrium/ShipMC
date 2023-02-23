@@ -8,7 +8,7 @@ namespace Ship {
   class ErrnoException : Exception {
    public:
     ErrnoException(char* errorBuffer, size_t bufferSize) : Exception({}) {
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__FreeBSD__)
       strerror_r(errno, errorBuffer, bufferSize);
       text = errorBuffer;
 #else

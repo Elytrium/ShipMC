@@ -1,4 +1,4 @@
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__FreeBSD__)
 #include "../../utils/exceptions/ErrnoException.hpp"
 #include "EventLoop.hpp"
 #include <sys/fcntl.h>

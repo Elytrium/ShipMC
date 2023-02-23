@@ -8,7 +8,7 @@
 #include <sys/epoll.h>
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__FreeBSD__)
 #include <sys/event.h>
 #endif
 
@@ -68,7 +68,7 @@ namespace Ship {
   typedef EpollEventLoop SystemEventLoop;
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__FreeBSD__)
   class KqueueEventLoop : public UnixEventLoop {
    private:
     int kqueueFileDescriptor;
