@@ -1,4 +1,3 @@
-#include "../../../Ship.hpp"
 #include "../../../protocol/packets/prepared/PreparedPacket.hpp"
 #include "../../../protocol/packets/prepared/SingleVersionPreparedPacket.hpp"
 #include "../../../protocol/registry/PacketRegistry.hpp"
@@ -42,7 +41,7 @@ namespace Ship {
     uint32_t packetSize = packet->Size(version);
     if (packetSize != -1) {
       uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
-      uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetSize);
+      uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetID);
       auto* buffer = new ByteBufferImpl(packetSizeWithID + ByteBuffer::VarIntBytes(packetSizeWithID));
       buffer->WriteVarInt(packetSizeWithID);
       buffer->WriteVarInt(packetID);
@@ -53,7 +52,7 @@ namespace Ship {
       packet->Write(version, buffer);
       packetSize = buffer->GetReadableBytes();
       uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
-      uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetSize);
+      uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetID);
       auto* prefixedBuffer = new ByteBufferImpl(packetSizeWithID + ByteBuffer::VarIntBytes(packetSizeWithID));
       prefixedBuffer->WriteVarInt(packetSizeWithID);
       prefixedBuffer->WriteVarInt(packetID);
