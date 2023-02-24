@@ -2,8 +2,8 @@
 
 namespace Ship {
 
-  class Main {
+  class Proxy {
    public:
-    Main();
+    Proxy();
   };
 }

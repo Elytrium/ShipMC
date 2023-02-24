@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../network/SocketAddress.hpp"
 #include "../../../utils/exceptions/InvalidArgumentException.hpp"
 #include "../../../utils/ordinal/OrdinalRegistry.hpp"
 #include "../Packet.hpp"
@@ -16,8 +17,8 @@ namespace Ship {
    private:
     static const uint32_t MAXIMUM_HOSTNAME_SIZE = 261;
 
-    uint32_t protocolVersion;
-    std::string serverAddress;
+    uint32_t protocolVersionID;
+    std::string hostname;
     uint16_t port;
     HandshakeNextStatus nextStatus;
 
@@ -27,16 +28,16 @@ namespace Ship {
     ~Handshake() override = default;
 
     void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      protocolVersion = buffer->ReadVarInt();
+      protocolVersionID = buffer->ReadVarInt();
 
-      serverAddress = buffer->ReadString(MAXIMUM_HOSTNAME_SIZE);
+      hostname = buffer->ReadString(MAXIMUM_HOSTNAME_SIZE);
       port = buffer->ReadShort();
       nextStatus = (HandshakeNextStatus) buffer->ReadVarInt();
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteVarInt(protocolVersion);
-      buffer->WriteString(serverAddress);
+      buffer->WriteVarInt(protocolVersionID);
+      buffer->WriteString(hostname);
       buffer->WriteShort(port);
       buffer->WriteVarInt((uint32_t) nextStatus);
     }
@@ -45,12 +46,20 @@ namespace Ship {
       return PACKET_ORDINAL;
     }
 
-    [[nodiscard]] uint32_t GetProtocolVersion() const {
-      return protocolVersion;
+    [[nodiscard]] uint32_t GetProtocolVersionID() const {
+      return protocolVersionID;
     }
 
-    [[nodiscard]] const std::string& GetServerAddress() const {
-      return serverAddress;
+    [[nodiscard]] const ProtocolVersion* GetProtocolVersion() const {
+      return ProtocolVersion::FromProtocolID(protocolVersionID);
+    }
+
+    [[nodiscard]] SocketAddress GetSocketAddress() const {
+      return {hostname, port};
+    }
+
+    [[nodiscard]] const std::string& GetHostname() const {
+      return hostname;
     }
 
     [[nodiscard]] uint16_t GetPort() const {

@@ -22,7 +22,7 @@ namespace Ship {
     delete eventLoop;
   }
 
-  void EpollListener::StartListening(std::string bind_address, int16_t port) {
+  void EpollListener::StartListening(SocketAddress address) {
     socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFileDescriptor == -1) {
       throw Exception("Error while creating socket. No permissions?");
@@ -35,8 +35,8 @@ namespace Ship {
 
     sockaddr_in bindAddress {};
     bindAddress.sin_family = AF_INET;
-    bindAddress.sin_port = htons(port);
-    bindAddress.sin_addr.s_addr = inet_addr(bind_address.c_str());
+    bindAddress.sin_port = htons(address.GetPort());
+    bindAddress.sin_addr.s_addr = inet_addr(address.GetHostname().c_str());
 
     if (bind(socketFileDescriptor, (sockaddr*) &bindAddress, sizeof(sockaddr_in)) == -1) {
       throw ErrnoException(listenerErrorBuffer, 64);

@@ -101,8 +101,6 @@ namespace Ship {
       return this->protocolID == other.protocolID;
     };
 
-    static void Init();
-
     static const ProtocolVersion* FromProtocolID(uint32_t protocol_id);
 
     static const ProtocolVersion* FromOrdinal(uint32_t ordinal);

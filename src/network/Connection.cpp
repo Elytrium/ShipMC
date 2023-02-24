@@ -160,8 +160,4 @@ namespace Ship {
   void Connection::Flush() {
     readWriteCloser->Write(writerBuffer);
   }
-
-  const ProtocolVersion* Connection::GetProtocolVersion() {
-    return version;
-  }
 }

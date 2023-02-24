@@ -9,12 +9,18 @@ namespace Ship {
   }
 
   inline bool HandshakePacketHandler::OnHandshake(Connection* connection, Handshake* handshake) {
+    auto minecraftPipe = (MinecraftFramedBytePacketPipe*) connection->GetBytePacketPipe();
+    minecraftPipe->SetProtocolVersion(handshake->GetProtocolVersion());
+
+    Client client(minecraftPipe, handshake->GetSocketAddress());
     switch (handshake->GetNextStatus()) {
       case HandshakeNextStatus::STATUS:
-        ((MinecraftFramedBytePacketPipe*) connection->GetBytePacketPipe())->SetRegistry(&BuiltInPacketRegistry::STATUS);
-        connection->ReplaceMainPacketHandler(new StatusPacketHandler());
+        minecraftPipe->SetRegistry(&BuiltInPacketRegistry::STATUS);
+        connection->ReplaceMainPacketHandler(new StatusPacketHandler(client));
         return true;
       case HandshakeNextStatus::LOGIN:
+        minecraftPipe->SetRegistry(&BuiltInPacketRegistry::LOGIN);
+        connection->ReplaceMainPacketHandler(new PreAuthPacketHandler(client));
         return true;
     }
 

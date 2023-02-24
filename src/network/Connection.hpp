@@ -11,7 +11,6 @@ namespace Ship {
 
   class Connection {
    private:
-    const ProtocolVersion* version {};
     std::list<ByteBytePipe*> pipeline;
     BytePacketPipe* bytePacketPipe;
     PacketHandler* mainPacketHandler;
@@ -51,7 +50,6 @@ namespace Ship {
     void WriteDirect(ByteBuffer* buffer, size_t length);
 
     ReadWriteCloser* GetReadWriteCloser();
-    const ProtocolVersion* GetProtocolVersion();
 
     void Flush();
   };

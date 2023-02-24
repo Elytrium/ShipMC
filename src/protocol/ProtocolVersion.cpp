@@ -44,18 +44,20 @@ namespace Ship {
     ProtocolVersion::MINECRAFT_1_15_2, ProtocolVersion::MINECRAFT_1_16_2, ProtocolVersion::MINECRAFT_1_16_3, ProtocolVersion::MINECRAFT_1_16_4,
     ProtocolVersion::MINECRAFT_1_17, ProtocolVersion::MINECRAFT_1_17_1, ProtocolVersion::MINECRAFT_1_18, ProtocolVersion::MINECRAFT_1_18_2,
     ProtocolVersion::MINECRAFT_1_19, ProtocolVersion::MINECRAFT_1_19_1, ProtocolVersion::MINECRAFT_1_19_3, ProtocolVersion::UNKNOWN};
-  ProtocolVersion* idToVersionMap;
+
+  ProtocolVersion* getIdToVersionMap() {
+    ProtocolVersion* idToVersionMap = new ProtocolVersion[MAXIMUM_PROTOCOL_VERSION + 1];
+    for (uint32_t i = MINIMUM_ORDINAL; i <= MAXIMUM_ORDINAL; ++i) {
+      ProtocolVersion version = ordinalToVersionMap[i];
+      idToVersionMap[version.GetProtocolID()] = version;
+    }
+    return idToVersionMap;
+  }
+
+  ProtocolVersion* idToVersionMap = getIdToVersionMap();
 
   ProtocolVersion::ProtocolVersion(uint32_t ordinal, uint32_t protocol_id, std::string display_version)
     : ordinal(ordinal), protocolID(protocol_id), displayVersion(std::move(display_version)) {
-  }
-
-  void ProtocolVersion::Init() {
-    idToVersionMap = new ProtocolVersion[MAXIMUM_PROTOCOL_VERSION + 1];
-    for (uint32_t i = MINIMUM_ORDINAL; i <= MAXIMUM_ORDINAL; ++i) {
-      ProtocolVersion version = ordinalToVersionMap[i];
-      idToVersionMap[version.protocolID] = version;
-    }
   }
 
   const ProtocolVersion* ProtocolVersion::FromProtocolID(uint32_t protocol_id) {

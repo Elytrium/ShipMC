@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Connection.hpp"
+#include "../SocketAddress.hpp"
 #include "../eventloop/EventLoop.hpp"
 #include "../pipe/Pipe.hpp"
 #include <functional>
@@ -13,7 +14,7 @@ namespace Ship {
    public:
     virtual ~Listener() = default;
 
-    virtual void StartListening(std::string bind_address, int16_t port) = 0;
+    virtual void StartListening(SocketAddress address) = 0;
   };
 
 #ifdef __linux__
@@ -29,7 +30,7 @@ namespace Ship {
     ~EpollListener() override;
 
     EpollListener(EpollEventLoop* event_loop, int max_events, int timeout);
-    void StartListening(std::string, int16_t port) override;
+    void StartListening(SocketAddress address) override;
   };
 
   typedef EpollListener SystemListener;

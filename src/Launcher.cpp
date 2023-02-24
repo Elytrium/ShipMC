@@ -1,6 +1,6 @@
-#include "main/Main.hpp"
+#include "main/proxy/Proxy.hpp"
 
 int main() {
-  new Ship::Main();
+  new Ship::Proxy();
   return 0;
 }
