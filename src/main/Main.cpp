@@ -1,18 +1,22 @@
 #include "Main.hpp"
+#include "../Ship.hpp"
 #include "../network/listener/Listener.hpp"
 #include "../network/pipe/minecraft/MinecraftPipe.hpp"
 #include "../protocol/registry/BuiltInPacketRegistry.hpp"
+#include "proxy/handlers/ProxyPacketHandler.hpp"
 #include <thread>
 
 namespace Ship {
 
   Main::Main() {
     ProtocolVersion::Init();
+    ProxyPacketHandler::Init();
 
     auto* eventLoop = new SystemEventLoop(
       [](ReadWriteCloser* writer) {
-        auto pipe = new MinecraftFramedBytePacketPipe(&BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, 65536, SERVERBOUND, CLIENTBOUND, 1024);
-        Connection* connection = new Connection(pipe, 1024, 1024, writer);
+        auto pipe = new MinecraftFramedBytePacketPipe(
+          &BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, MAX_PACKET_SIZE, SERVERBOUND, CLIENTBOUND, LONG_PACKET_BUFFER_CAPACITY);
+        Connection* connection = new Connection(pipe, new HandshakePacketHandler(), LONG_PACKET_BUFFER_CAPACITY, LONG_PACKET_BUFFER_CAPACITY, writer);
 
         return connection;
       },

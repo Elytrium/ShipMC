@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 namespace Ship {
+  thread_local char* listenerErrorBuffer = new char[64];
 
   EpollListener::EpollListener(EpollEventLoop* event_loop, int max_events, int timeout) : eventLoop(event_loop), maxEvents(max_events), timeout(timeout) {
   }
@@ -19,7 +20,6 @@ namespace Ship {
     close(epollFileDescriptor);
     close(socketFileDescriptor);
     delete eventLoop;
-    delete[] errorBuffer;
   }
 
   void EpollListener::StartListening(std::string bind_address, int16_t port) {
@@ -30,7 +30,7 @@ namespace Ship {
 
     int fionbioValue = true;
     if (ioctl(socketFileDescriptor, FIONBIO, &fionbioValue) == -1) {
-      throw ErrnoException(errorBuffer, 64);
+      throw ErrnoException(listenerErrorBuffer, 64);
     }
 
     sockaddr_in bindAddress {};
@@ -39,17 +39,17 @@ namespace Ship {
     bindAddress.sin_addr.s_addr = inet_addr(bind_address.c_str());
 
     if (bind(socketFileDescriptor, (sockaddr*) &bindAddress, sizeof(sockaddr_in)) == -1) {
-      throw ErrnoException(errorBuffer, 64);
+      throw ErrnoException(listenerErrorBuffer, 64);
     }
 
     if (listen(socketFileDescriptor, SOMAXCONN) == -1) {
-      throw ErrnoException(errorBuffer, 64);
+      throw ErrnoException(listenerErrorBuffer, 64);
     }
 
     epollFileDescriptor = epoll_create1(O_CLOEXEC);
 
     if (epollFileDescriptor == -1) {
-      throw ErrnoException(errorBuffer, 64);
+      throw ErrnoException(listenerErrorBuffer, 64);
     }
 
     epoll_event ctlEvent {};
@@ -57,7 +57,7 @@ namespace Ship {
     ctlEvent.events = EPOLLIN | EPOLLET;
 
     if (epoll_ctl(epollFileDescriptor, EPOLL_CTL_ADD, socketFileDescriptor, &ctlEvent) == -1) {
-      throw ErrnoException(errorBuffer, 64);
+      throw ErrnoException(listenerErrorBuffer, 64);
     }
 
     epoll_event events[maxEvents];
@@ -70,7 +70,7 @@ namespace Ship {
         try {
           while (true) {
             if (!(event.events & EPOLLIN) || (event.events & EPOLLERR) || (event.events & EPOLLHUP)) {
-              throw ErrnoException(errorBuffer, 64);
+              throw ErrnoException(listenerErrorBuffer, 64);
             } else {
               sockaddr connectionAddress {};
               socklen_t length = sizeof(sockaddr);
@@ -78,7 +78,7 @@ namespace Ship {
               int receivedFileDescriptor = accept4(socketFileDescriptor, &connectionAddress, &length, SOCK_NONBLOCK | SOCK_CLOEXEC);
               if (receivedFileDescriptor == -1) {
                 if (errno != EAGAIN) {
-                  throw ErrnoException(errorBuffer, 64);
+                  throw ErrnoException(listenerErrorBuffer, 64);
                 }
 
                 break;

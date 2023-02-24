@@ -14,13 +14,15 @@ namespace Ship {
     const ProtocolVersion* version {};
     std::list<ByteBytePipe*> pipeline;
     BytePacketPipe* bytePacketPipe;
+    PacketHandler* mainPacketHandler;
     std::list<PacketHandler*> packetHandlers;
     ByteBuffer* readerBuffer;
     ByteBuffer* writerBuffer;
     ReadWriteCloser* readWriteCloser;
 
    public:
-    Connection(BytePacketPipe* bytePacketPipe, size_t reader_buffer_length, size_t writer_buffer_length, ReadWriteCloser* read_write_closer);
+    Connection(BytePacketPipe* byte_packet_pipe, PacketHandler* main_packet_handler, size_t reader_buffer_length, size_t writer_buffer_length,
+      ReadWriteCloser* read_write_closer);
 
     ~Connection();
 
@@ -33,6 +35,7 @@ namespace Ship {
     void PrependByteBytePipe(ByteBytePipe* byte_byte_pipe, uint32_t before_ordinal);
     void RemoveByteBytePipe(uint32_t byte_byte_pipe_ordinal);
 
+    void ReplaceMainPacketHandler(PacketHandler* packet_handler);
     void AppendPacketHandler(PacketHandler* packet_handler);
     void PrependPacketHandler(PacketHandler* packet_handler);
     void AppendPacketHandler(PacketHandler* packet_handler, uint32_t after_ordinal);
@@ -48,6 +51,7 @@ namespace Ship {
     void WriteDirect(ByteBuffer* buffer, size_t length);
 
     ReadWriteCloser* GetReadWriteCloser();
+    const ProtocolVersion* GetProtocolVersion();
 
     void Flush();
   };

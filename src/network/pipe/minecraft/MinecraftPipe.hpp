@@ -43,7 +43,7 @@ namespace Ship {
       PacketDirection reader_direction, PacketDirection writer_direction, int long_packet_buffer_capacity);
 
     const PacketRegistry* GetRegistry();
-    void SetRegistry(PacketRegistry* new_registry);
+    void SetRegistry(const PacketRegistry* new_registry);
 
     const ProtocolVersion* GetProtocolVersion();
     void SetProtocolVersion(const ProtocolVersion* new_protocol_version);

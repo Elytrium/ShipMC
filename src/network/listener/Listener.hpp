@@ -22,7 +22,6 @@ namespace Ship {
     EpollEventLoop* eventLoop;
     int maxEvents;
     int timeout;
-    char* errorBuffer = new char[64];
     int epollFileDescriptor {};
     int socketFileDescriptor {};
 

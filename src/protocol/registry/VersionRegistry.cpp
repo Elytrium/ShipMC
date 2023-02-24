@@ -1,4 +1,5 @@
 #include "VersionRegistry.hpp"
+#include "../../utils/ordinal/OrdinalVector.hpp"
 
 namespace Ship {
 
@@ -7,7 +8,7 @@ namespace Ship {
 
     uint32_t index = 0;
     for (uint32_t ordinal : ordinals) {
-      ResizeVectorAndSet(ordinalToIDMap, (uint32_t) ordinal, index++);
+      OrdinalVector::ResizeVectorAndSet(ordinalToIDMap, (uint32_t) ordinal, index++);
     }
   }
 
@@ -32,7 +33,7 @@ namespace Ship {
   }
 
   void VersionRegistry::Register(uint32_t ordinal, uint32_t id) {
-    ResizeVectorAndSet(ordinalToIDMap, ordinal, id);
-    ResizeVectorAndSet(idToOrdinalMap, id, ordinal);
+    OrdinalVector::ResizeVectorAndSet(ordinalToIDMap, ordinal, id);
+    OrdinalVector::ResizeVectorAndSet(idToOrdinalMap, id, ordinal);
   }
 }

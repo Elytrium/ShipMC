@@ -6,7 +6,7 @@ namespace Ship {
   }
 
   void ByteCounter::WriteBoolean(bool input) {
-    writerIndex += BYTE_SIZE;
+    writerIndex += BOOLEAN_SIZE;
   }
   
   void ByteCounter::WriteShort(uint16_t input) {

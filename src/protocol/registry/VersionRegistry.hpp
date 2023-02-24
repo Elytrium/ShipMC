@@ -1,20 +1,11 @@
 #pragma once
 
 #include "../../utils/ordinal/OrdinalRegistry.hpp"
+#include "../../utils/ordinal/OrdinalVector.hpp"
 #include "../Protocol.hpp"
 #include <vector>
 
 namespace Ship {
-
-  template<typename T>
-  void ResizeVectorAndSet(std::vector<T>& vector, uint32_t at, T value) {
-    if (at >= vector.size()) {
-      vector.resize(at + 8);
-    }
-
-    vector.at(at) = value;
-  }
-
   class VersionRegistry {
    private:
     std::vector<uint32_t> ordinalToIDMap = std::vector<uint32_t>();
@@ -29,7 +20,7 @@ namespace Ship {
       uint32_t index = 0;
       for (const T& ordinal : ordinals) {
         idToOrdinalMap.push_back((uint32_t) ordinal);
-        ResizeVectorAndSet(ordinalToIDMap, (uint32_t) ordinal, index++);
+        OrdinalVector::ResizeVectorAndSet(ordinalToIDMap, (uint32_t) ordinal, index++);
       }
     }
 

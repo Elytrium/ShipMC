@@ -12,7 +12,6 @@ namespace Ship {
   class UnixConnector : Connector {
    private:
     UnixEventLoop* eventLoop;
-    char* errorBuffer = new char[64];
 
    public:
     explicit UnixConnector(UnixEventLoop* eventLoop);

@@ -16,7 +16,7 @@ namespace Ship {
     return directionRegistry;
   }
 
-  void MinecraftFramedBytePacketPipe::SetRegistry(PacketRegistry* new_registry) {
+  void MinecraftFramedBytePacketPipe::SetRegistry(const PacketRegistry* new_registry) {
     directionRegistry = new_registry;
     readerRegistry = new_registry->GetRegistry(readerDirection);
     writerRegistry = new_registry->GetRegistry(writerDirection);

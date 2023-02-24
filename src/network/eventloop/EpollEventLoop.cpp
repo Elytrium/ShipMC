@@ -10,6 +10,8 @@
   #include <utility>
 
 namespace Ship {
+  thread_local char* eventLoopErrorBuffer = new char[64];
+
   EpollEventLoop::EpollEventLoop(std::function<Connection*(ReadWriteCloser* writer)> initializer, int max_events, int timeout, int buffer_size)
     : UnixEventLoop(std::move(initializer)), maxEvents(max_events), timeout(timeout), buffer(new uint8_t[buffer_size]), bufferSize(buffer_size) {
     epollEvent.events = EPOLLIN | EPOLLRDHUP | EPOLLET;
@@ -23,7 +25,6 @@ namespace Ship {
   EpollEventLoop::~EpollEventLoop() {
     close(epollFileDescriptor);
     delete[] buffer;
-    delete[] errorBuffer;
   }
 
   void EpollEventLoop::Accept(int fileDescriptor) {
@@ -58,7 +59,7 @@ namespace Ship {
 
               if (count == -1) {
                 if (errno != EAGAIN) {
-                  throw ErrnoException(errorBuffer, 64);
+                  throw ErrnoException(eventLoopErrorBuffer, 64);
                 }
 
                 break;

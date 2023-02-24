@@ -5,6 +5,8 @@
 #include <sys/socket.h>
 
 namespace Ship {
+  thread_local char* errorBuffer = new char[64];
+
   UnixConnector::UnixConnector(UnixEventLoop* eventLoop) : eventLoop(eventLoop) {
   }
 

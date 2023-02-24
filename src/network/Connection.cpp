@@ -1,15 +1,17 @@
 #include "Connection.hpp"
 
 namespace Ship {
-  Connection::Connection(BytePacketPipe* bytePacketPipe, size_t reader_buffer_length, size_t writer_buffer_length, ReadWriteCloser* read_write_closer)
-    : bytePacketPipe(bytePacketPipe), readerBuffer(new ByteBufferImpl(reader_buffer_length)), writerBuffer(new ByteBufferImpl(writer_buffer_length)),
-      readWriteCloser(read_write_closer) {
+  Connection::Connection(BytePacketPipe* byte_packet_pipe, PacketHandler* main_packet_handler, size_t reader_buffer_length, size_t writer_buffer_length,
+    ReadWriteCloser* read_write_closer)
+    : bytePacketPipe(byte_packet_pipe), mainPacketHandler(main_packet_handler), readerBuffer(new ByteBufferImpl(reader_buffer_length)),
+      writerBuffer(new ByteBufferImpl(writer_buffer_length)), readWriteCloser(read_write_closer) {
   }
 
   Connection::~Connection() {
     delete bytePacketPipe;
     delete readerBuffer;
     delete writerBuffer;
+    delete mainPacketHandler;
     delete readWriteCloser;
   }
 
@@ -54,6 +56,11 @@ namespace Ship {
     pipeline.remove_if([byte_byte_pipe_ordinal](ByteBytePipe*& pipe) {
       return byte_byte_pipe_ordinal == pipe->GetOrdinal();
     });
+  }
+
+  void Connection::ReplaceMainPacketHandler(PacketHandler* packet_handler) {
+    delete mainPacketHandler;
+    mainPacketHandler = packet_handler;
   }
 
   void Connection::AppendPacketHandler(PacketHandler* byteBytePipe) {
@@ -101,9 +108,11 @@ namespace Ship {
 
     Packet* packet = bytePacketPipe->Read(currentBuffer);
     if (packet != nullptr) {
-      for (const auto& item : packetHandlers) {
-        if (item->Handle(version, packet)) {
-          break;
+      if (!mainPacketHandler->Handle(mainPacketHandler, this, packet)) {
+        for (const auto& item : packetHandlers) {
+          if (item->Handle(item, this, packet)) {
+            break;
+          }
         }
       }
     }
@@ -150,5 +159,9 @@ namespace Ship {
 
   void Connection::Flush() {
     readWriteCloser->Write(writerBuffer);
+  }
+
+  const ProtocolVersion* Connection::GetProtocolVersion() {
+    return version;
   }
 }

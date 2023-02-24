@@ -54,7 +54,6 @@ namespace Ship {
     int epollFileDescriptor;
     int maxEvents;
     int timeout;
-    char* errorBuffer = new char[64];
     uint8_t* buffer;
     int bufferSize;
     epoll_event epollEvent {};

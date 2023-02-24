@@ -1,3 +1,4 @@
+#include "../Ship.hpp"
 #include "../utils/exceptions/Exception.hpp"
 #include "../utils/exceptions/InvalidArgumentException.hpp"
 #include "Protocol.hpp"
@@ -17,6 +18,8 @@ namespace Ship {
   const uint32_t ByteBuffer::POSITION_SIZE = LONG_SIZE;
   const uint32_t ByteBuffer::ANGLE_SIZE = BYTE_SIZE;
   const uint32_t ByteBuffer::UUID_SIZE = LONG_SIZE * 2;
+
+  thread_local uint8_t* writeBuffer = new uint8_t[MAX_PACKET_SIZE];
 
   ByteBuffer::~ByteBuffer() = default;
 
@@ -444,7 +447,7 @@ namespace Ship {
     size_t bytesIndex = 0;
     TryRefreshWriterBuffer();
 
-    if (localWriterIndex + size >= singleCapacity) {
+    if (localWriterIndex + size > singleCapacity) {
       std::copy(input, input + singleCapacity - localWriterIndex, currentWriteBuffer + localWriterIndex);
       size_t copiedBytes = singleCapacity - localWriterIndex;
       size -= copiedBytes;
@@ -453,7 +456,7 @@ namespace Ship {
       localWriterIndex = 0;
       AppendBuffer();
 
-      while (size >= singleCapacity) {
+      while (size > singleCapacity) {
         std::copy(input + bytesIndex, input + bytesIndex + singleCapacity, currentWriteBuffer + localWriterIndex);
         size -= singleCapacity;
         readableBytes += singleCapacity;
@@ -479,7 +482,8 @@ namespace Ship {
   }
 
   void ByteBufferImpl::WriteBytes(ByteBuffer* input, size_t size) {
-    WriteBytesAndDelete(input->ReadBytes(size), size);
+    input->ReadBytes(writeBuffer, size);
+    WriteBytesAndDelete(writeBuffer, size);
   }
 
   void ByteBufferImpl::ReadBytes(uint8_t* output, size_t size) {
@@ -490,16 +494,16 @@ namespace Ship {
     uint32_t bytesIndex = 0;
     TryRefreshReaderBuffer();
 
-    if (localWriterIndex + size >= singleCapacity) {
+    if (localReaderIndex + size > singleCapacity) {
       std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + singleCapacity, output);
-      uint32_t copiedBytes = singleCapacity - localReaderIndex;
+      size_t copiedBytes = singleCapacity - localReaderIndex;
       size -= copiedBytes;
       readableBytes -= copiedBytes;
       bytesIndex += copiedBytes;
       localReaderIndex = 0;
       PopBuffer();
 
-      while (size >= singleCapacity) {
+      while (size > singleCapacity) {
         std::copy(currentReadBuffer, currentReadBuffer + singleCapacity, output + bytesIndex);
         size -= singleCapacity;
         readableBytes -= singleCapacity;

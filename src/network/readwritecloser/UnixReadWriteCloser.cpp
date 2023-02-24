@@ -1,9 +1,12 @@
+#include "../../utils/exceptions/ErrnoException.hpp"
 #include "../../utils/exceptions/Exception.hpp"
 #include "../eventloop/EventLoop.hpp"
 #include "ReadWriteCloser.hpp"
 #include <unistd.h>
 
 namespace Ship {
+  thread_local char* readWriteCloserErrorBuffer = new char[64];
+
   UnixReadWriteCloser::UnixReadWriteCloser(int socket_file_descriptor) : socketFileDescriptor(socket_file_descriptor) {
   }
 
@@ -15,24 +18,41 @@ namespace Ship {
     size_t singleCapacity = buffer->GetSingleCapacity();
     size_t readableBytesInSingleBuffer = singleCapacity - buffer->GetReaderIndex();
     if (readableBytesInSingleBuffer != 0) {
-      if (write(socketFileDescriptor, buffer->GetDirectReadAddress(), readableBytesInSingleBuffer) != 0) {
-        throw Exception("Error while flushing writer");
+      if (write(socketFileDescriptor, buffer->GetDirectReadAddress(), readableBytesInSingleBuffer) == -1) {
+        if (errno == ECONNRESET) {
+          Close();
+          return;
+        }
+
+        throw ErrnoException(readWriteCloserErrorBuffer, 64);
       }
       buffer->TryRefreshReaderBuffer();
     }
 
     while (buffer->GetReadableBytes() >= singleCapacity) {
-      if (write(socketFileDescriptor, buffer->GetDirectReadAddress(), singleCapacity)) {
-        throw Exception("Error while flushing writer");
+      if (write(socketFileDescriptor, buffer->GetDirectReadAddress(), singleCapacity) == -1) {
+        if (errno == ECONNRESET) {
+          Close();
+          return;
+        }
+
+        throw ErrnoException(readWriteCloserErrorBuffer, 64);
       }
       buffer->TryRefreshReaderBuffer();
     }
 
     size_t readableBytesLeft = buffer->GetReadableBytes();
     if (readableBytesLeft != 0) {
-      if (write(socketFileDescriptor, buffer->GetDirectReadAddress(), readableBytesLeft)) {
-        throw Exception("Error while flushing writer");
+      if (write(socketFileDescriptor, buffer->GetDirectReadAddress(), readableBytesLeft) == -1) {
+        if (errno == ECONNRESET) {
+          Close();
+          return;
+        }
+
+        throw ErrnoException(readWriteCloserErrorBuffer, 64);
       }
+
+      buffer->TryRefreshReaderBuffer();
     }
   }
 

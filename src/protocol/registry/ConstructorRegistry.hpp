@@ -22,7 +22,7 @@ namespace Ship {
     explicit ConstructorRegistry(const std::set<ProtocolVersion>& versionMap) : VersionedRegistry(versionMap) {}
 
     void RegisterConstructor(uint32_t ordinal, const std::function<T*()>& constructor) {
-      ResizeVectorAndSet(ordinalToObjectMap, ordinal, constructor);
+      OrdinalVector::ResizeVectorAndSet(ordinalToObjectMap, ordinal, constructor);
     }
 
     T* GetObjectByID(const ProtocolVersion* version, uint32_t id) const {
@@ -37,6 +37,10 @@ namespace Ship {
       } else {
         return nullptr;
       }
+    }
+
+    [[nodiscard]] size_t GetConstructorCount() const {
+      return ordinalToObjectMap.size();
     }
   };
 }

@@ -7,6 +7,11 @@
 
 namespace Ship {
 
+  enum class HandshakeNextStatus : uint32_t {
+    STATUS = 1,
+    LOGIN = 2
+  };
+
   class Handshake : public Packet {
    private:
     static const uint32_t MAXIMUM_HOSTNAME_SIZE = 261;
@@ -14,7 +19,7 @@ namespace Ship {
     uint32_t protocolVersion;
     std::string serverAddress;
     uint16_t port;
-    uint32_t nextStatus;
+    HandshakeNextStatus nextStatus;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
@@ -26,14 +31,14 @@ namespace Ship {
 
       serverAddress = buffer->ReadString(MAXIMUM_HOSTNAME_SIZE);
       port = buffer->ReadShort();
-      nextStatus = buffer->ReadVarInt();
+      nextStatus = (HandshakeNextStatus) buffer->ReadVarInt();
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
       buffer->WriteVarInt(protocolVersion);
       buffer->WriteString(serverAddress);
       buffer->WriteShort(port);
-      buffer->WriteVarInt(nextStatus);
+      buffer->WriteVarInt((uint32_t) nextStatus);
     }
 
     uint32_t GetOrdinal() override {
@@ -52,7 +57,7 @@ namespace Ship {
       return port;
     }
 
-    [[nodiscard]] uint32_t GetNextStatus() const {
+    [[nodiscard]] HandshakeNextStatus GetNextStatus() const {
       return nextStatus;
     }
   };
