@@ -9,7 +9,7 @@ namespace Ship {
   }
 
   inline bool StatusPacketHandler::OnStatusRequest(Connection* connection, StatusRequest* statusRequest) {
-    connection->WriteAndFlush(new StatusResponse("{}"), true); // TODO: It doesn't work well =( It duplicates packets many times. Not sure why. Possibly the packet registry is broken.
+    connection->WriteAndFlush(new StatusResponse("{}"), true); // TODO: doesn't work with long strings. Something is broken in ReadWriteCloser or ByteBuffer.
     return true;
   }
 

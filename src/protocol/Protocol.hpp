@@ -181,6 +181,8 @@ namespace Ship {
     virtual void TryRefreshWriterBuffer() = 0;
     virtual void AppendBuffer() = 0;
     virtual void PopBuffer() = 0;
+    virtual void SkipReadBytes(size_t count) = 0;
+    virtual void SkipWriteBytes(size_t count) = 0;
 
     [[nodiscard]] virtual bool CanReadDirect(size_t read_size) const = 0;
     virtual uint8_t* GetDirectReadAddress() = 0;
@@ -249,6 +251,8 @@ namespace Ship {
     void TryRefreshWriterBuffer() override;
     void AppendBuffer() override;
     void PopBuffer() override;
+    void SkipReadBytes(size_t count) override;
+    void SkipWriteBytes(size_t count) override;
 
     [[nodiscard]] bool CanReadDirect(size_t read_size) const override;
     uint8_t* GetDirectReadAddress() override;
@@ -299,6 +303,8 @@ namespace Ship {
     void TryRefreshWriterBuffer() override;
     void AppendBuffer() override;
     void PopBuffer() override;
+    void SkipReadBytes(size_t count) override;
+    void SkipWriteBytes(size_t count) override;
 
     [[nodiscard]] bool CanReadDirect(size_t read_size) const override;
     uint8_t* GetDirectReadAddress() override;

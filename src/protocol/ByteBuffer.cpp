@@ -406,6 +406,33 @@ namespace Ship {
     return bytes;
   }
 
+  void ByteBufferImpl::SkipReadBytes(size_t count) {
+    if (count > readableBytes) {
+      throw Exception("Not enough readable bytes to skip them");
+    }
+
+    readableBytes -= count;
+
+    while (count > singleCapacity - localReaderIndex) {
+      count -= singleCapacity - localReaderIndex;
+      PopBuffer();
+    }
+
+    localReaderIndex = count;
+    TryRefreshReaderBuffer();
+  }
+
+  void ByteBufferImpl::SkipWriteBytes(size_t count) {
+    readableBytes += count;
+    while (count > singleCapacity - localWriterIndex) {
+      count -= singleCapacity;
+      AppendBuffer();
+    }
+
+    localWriterIndex = count;
+    TryRefreshWriterBuffer();
+  }
+
   ByteBufferImpl::ByteBufferImpl(size_t cap) {
     singleCapacity = cap;
     auto* buffer = new uint8_t[singleCapacity];
@@ -483,7 +510,7 @@ namespace Ship {
 
   void ByteBufferImpl::WriteBytes(ByteBuffer* input, size_t size) {
     input->ReadBytes(writeBuffer, size);
-    WriteBytesAndDelete(writeBuffer, size);
+    WriteBytes(writeBuffer, size);
   }
 
   void ByteBufferImpl::ReadBytes(uint8_t* output, size_t size) {
@@ -545,25 +572,24 @@ namespace Ship {
 
   void ByteBufferImpl::TryRefreshReaderBuffer() {
     if (localReaderIndex >= singleCapacity) {
-      delete[] currentReadBuffer;
-      localReaderIndex = 0;
       PopBuffer();
     }
   }
 
   void ByteBufferImpl::TryRefreshWriterBuffer() {
     if (localWriterIndex >= singleCapacity) {
-      localWriterIndex = 0;
       AppendBuffer();
     }
   }
 
   void ByteBufferImpl::AppendBuffer() {
+    localWriterIndex = 0;
     currentWriteBuffer = new uint8_t[singleCapacity];
     buffers.push_back(currentWriteBuffer);
   }
 
   void ByteBufferImpl::PopBuffer() {
+    localReaderIndex = 0;
     delete buffers.front();
     buffers.pop_front();
     currentReadBuffer = buffers.front();

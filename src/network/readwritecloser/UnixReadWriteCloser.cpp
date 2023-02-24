@@ -16,9 +16,9 @@ namespace Ship {
     }
 
     size_t singleCapacity = buffer->GetSingleCapacity();
-    size_t readableBytesInSingleBuffer = singleCapacity - buffer->GetReaderIndex();
-    if (readableBytesInSingleBuffer != 0) {
-      if (write(socketFileDescriptor, buffer->GetDirectReadAddress(), readableBytesInSingleBuffer) == -1) {
+    while (buffer->GetReadableBytes() >= singleCapacity - buffer->GetReaderIndex()) {
+      ssize_t bytesWritten = write(socketFileDescriptor, buffer->GetDirectReadAddress(), singleCapacity - buffer->GetReaderIndex());
+      if (bytesWritten == -1) {
         if (errno == ECONNRESET) {
           Close();
           return;
@@ -26,24 +26,13 @@ namespace Ship {
 
         throw ErrnoException(readWriteCloserErrorBuffer, 64);
       }
-      buffer->TryRefreshReaderBuffer();
+
+      buffer->SkipReadBytes(bytesWritten);
     }
 
-    while (buffer->GetReadableBytes() >= singleCapacity) {
-      if (write(socketFileDescriptor, buffer->GetDirectReadAddress(), singleCapacity) == -1) {
-        if (errno == ECONNRESET) {
-          Close();
-          return;
-        }
-
-        throw ErrnoException(readWriteCloserErrorBuffer, 64);
-      }
-      buffer->TryRefreshReaderBuffer();
-    }
-
-    size_t readableBytesLeft = buffer->GetReadableBytes();
-    if (readableBytesLeft != 0) {
-      if (write(socketFileDescriptor, buffer->GetDirectReadAddress(), readableBytesLeft) == -1) {
+    while (buffer->GetReadableBytes() != 0) {
+      ssize_t bytesWritten = write(socketFileDescriptor, buffer->GetDirectReadAddress(), buffer->GetReadableBytes());
+      if (bytesWritten == -1) {
         if (errno == ECONNRESET) {
           Close();
           return;
@@ -52,7 +41,7 @@ namespace Ship {
         throw ErrnoException(readWriteCloserErrorBuffer, 64);
       }
 
-      buffer->TryRefreshReaderBuffer();
+      buffer->SkipReadBytes(bytesWritten);
     }
   }
 

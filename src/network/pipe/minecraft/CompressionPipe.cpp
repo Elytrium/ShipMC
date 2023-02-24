@@ -3,8 +3,8 @@
 #include "MinecraftPipe.hpp"
 
 namespace Ship {
-  thread_local uint8_t* localCompressionOutputBuffer = new uint8_t[MAX_PACKET_SIZE];
-  thread_local uint8_t* localDecompressionOutputBuffer = new uint8_t[MAX_PACKET_SIZE];
+  thread_local uint8_t* localCompressionBuffer = new uint8_t[MAX_PACKET_SIZE];
+  thread_local uint8_t* localDecompressionBuffer = new uint8_t[MAX_PACKET_SIZE];
 
   void CompressionPipe::EncodeFrame(ByteBuffer* in, uint32_t frame_size) {
     ByteBuffer* buffer = GetWriterBuffer();
@@ -19,20 +19,21 @@ namespace Ship {
     uint8_t* compressionInputAddress;
     bool directRead = in->CanReadDirect(frame_size);
     if (directRead) {
-      compressionInputAddress = in->GetDirectWriteAddress();
+      compressionInputAddress = in->GetDirectReadAddress();
     } else {
-      compressionInputAddress = in->ReadBytes(frame_size);
+      in->ReadBytes(localDecompressionBuffer, frame_size);
+      compressionInputAddress = localDecompressionBuffer;
     }
 
     size_t compressionSizeAvailable = frame_size + 2 + 4 + 4; // uncompressed (frame_size), zlib header (2), dict id (4), checksum (4)
-    size_t compressedSize = libdeflate_zlib_compress(compressor, compressionInputAddress, frame_size, localCompressionOutputBuffer, compressionSizeAvailable);
+    size_t compressedSize = libdeflate_zlib_compress(compressor, compressionInputAddress, frame_size, localCompressionBuffer, compressionSizeAvailable);
 
     buffer->WriteVarInt(compressedSize + ByteBuffer::VarIntBytes(frame_size));
     buffer->WriteVarInt(frame_size);
-    buffer->WriteBytes(localCompressionOutputBuffer, compressedSize);
+    buffer->WriteBytes(localCompressionBuffer, compressedSize);
 
-    if (!directRead) {
-      delete[] compressionInputAddress;
+    if (directRead) {
+      in->SkipReadBytes(frame_size);
     }
   }
 
@@ -56,9 +57,10 @@ namespace Ship {
     uint8_t* compressionInputAddress;
     bool directRead = in->CanReadDirect(compressedSize);
     if (directRead) {
-      compressionInputAddress = in->GetDirectWriteAddress();
+      compressionInputAddress = in->GetDirectReadAddress();
     } else {
-      compressionInputAddress = in->ReadBytes(compressedSize);
+      in->ReadBytes(localCompressionBuffer, compressedSize);
+      compressionInputAddress = localCompressionBuffer;
     }
 
     uint8_t* compressionOutputAddress;
@@ -66,16 +68,18 @@ namespace Ship {
     if (directWrite) {
       compressionOutputAddress = buffer->GetDirectWriteAddress();
     } else {
-      compressionOutputAddress = localDecompressionOutputBuffer;
+      compressionOutputAddress = localDecompressionBuffer;
     }
 
     libdeflate_zlib_decompress(decompressor, compressionInputAddress, compressedSize, compressionOutputAddress, decompressedSize, nullptr);
 
-    if (!directRead) {
-      delete[] compressionInputAddress;
+    if (directRead) {
+      in->SkipReadBytes(compressedSize);
     }
 
-    if (!directWrite) {
+    if (directWrite) {
+      buffer->SkipWriteBytes(decompressedSize);
+    } else {
       buffer->WriteBytes(compressionOutputAddress, decompressedSize);
     }
   }

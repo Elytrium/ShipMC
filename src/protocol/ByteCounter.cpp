@@ -138,4 +138,10 @@ namespace Ship {
 
   void ByteCounter::PopBuffer() {
   }
+
+  void ByteCounter::SkipReadBytes(size_t count) {
+  }
+
+  void ByteCounter::SkipWriteBytes(size_t count) {
+  }
 }
