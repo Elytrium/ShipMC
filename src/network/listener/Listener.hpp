@@ -50,7 +50,7 @@ namespace Ship {
     ~KqueueListener() override;
 
     KqueueListener(KqueueEventLoop* event_loop, int max_events, const timespec* timeout);
-    void StartListening(std::string, int16_t port) override;
+    void StartListening(SocketAddress address) override;
   };
 
   typedef KqueueListener SystemListener;
