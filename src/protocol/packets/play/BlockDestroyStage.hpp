@@ -21,21 +21,21 @@ namespace Ship {
       : entityId(entityId), locationX(locationX), locationY(locationY), locationZ(locationZ), destroyStage(destroyStage) {
     }
 
-    ~BlockDestroyStage() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    BlockDestroyStage(const ProtocolVersion* version, ByteBuffer* buffer) {
       entityId = buffer->ReadVarInt();
       buffer->ReadPosition(locationX, locationY, locationZ);
       destroyStage = buffer->ReadByte();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~BlockDestroyStage() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
       buffer->WritePosition(locationX, locationY, locationZ);
       buffer->WriteByte(destroyStage);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

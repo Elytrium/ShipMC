@@ -6,21 +6,20 @@ namespace Ship {
   NBTMetadataEntry::NBTMetadataEntry(NBT* value) : value(value) {
   }
 
+  NBTMetadataEntry::NBTMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
+    value = ProtocolUtils::ReadNBT(buffer);
+  }
+
   NBTMetadataEntry::~NBTMetadataEntry() {
     delete value;
   }
 
-  void NBTMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void NBTMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     if (value) {
       ProtocolUtils::WriteNBT(buffer, value);
     } else {
       buffer->WriteByte(0);
     }
-  }
-
-  void NBTMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
-    delete value;
-    value = ProtocolUtils::ReadNBT(buffer);
   }
 
   MetadataEntryType NBTMetadataEntry::GetType() const {

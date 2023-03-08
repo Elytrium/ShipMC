@@ -18,15 +18,15 @@ namespace Ship {
 
     ~Disconnect() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    Disconnect(const ProtocolVersion* version, ByteBuffer* buffer) {
       reason = buffer->ReadString();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(reason);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

@@ -20,19 +20,19 @@ namespace Ship {
 
     ~OpenHorseInventory() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    OpenHorseInventory(const ProtocolVersion* version, ByteBuffer* buffer) {
       windowId = buffer->ReadByte();
       slotCount = buffer->ReadVarInt();
       entityId = buffer->ReadInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(windowId);
       buffer->WriteVarInt(slotCount);
       buffer->WriteInt(entityId);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

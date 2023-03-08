@@ -5,11 +5,11 @@ namespace Ship {
   FrogVariantMetadataEntry::FrogVariantMetadataEntry(const FrogVariant& value) : value(value) {
   }
 
-  void FrogVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void FrogVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(FROG_VARIANT_REGISTRY.GetID(version, value));
   }
 
-  void FrogVariantMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  FrogVariantMetadataEntry::FrogVariantMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = FROG_VARIANT_REGISTRY.GetValue(version, buffer->ReadVarInt());
   }
 

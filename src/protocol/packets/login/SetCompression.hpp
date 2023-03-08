@@ -15,17 +15,17 @@ namespace Ship {
 
     explicit SetCompression(uint32_t threshold) : threshold(threshold) {}
 
-    ~SetCompression() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    SetCompression(const ProtocolVersion* version, ByteBuffer* buffer) {
       threshold = buffer->ReadVarInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~SetCompression() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(threshold);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

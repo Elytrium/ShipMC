@@ -19,17 +19,17 @@ namespace Ship {
 
     ~UnloadChunk() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    UnloadChunk(const ProtocolVersion* version, ByteBuffer* buffer) {
       chunkX = buffer->ReadInt();
       chunkZ = buffer->ReadInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteInt(chunkX);
       buffer->WriteInt(chunkZ);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

@@ -6,13 +6,13 @@ namespace Ship {
     : type(type), profession(profession), level(level) {
   }
 
-  void VillagerDataMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void VillagerDataMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(VILLAGER_TYPE_REGISTRY.GetID(version, type));
     buffer->WriteVarInt(VILLAGER_PROFESSION_REGISTRY.GetID(version, profession));
     buffer->WriteVarInt(level);
   }
 
-  void VillagerDataMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  VillagerDataMetadataEntry::VillagerDataMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     type = VILLAGER_TYPE_REGISTRY.GetValue(version, buffer->ReadVarInt());
     profession = VILLAGER_PROFESSION_REGISTRY.GetValue(version, buffer->ReadVarInt());
     level = buffer->ReadVarInt();

@@ -5,11 +5,11 @@ namespace Ship {
   BlockMarkerParticle::BlockMarkerParticle(uint32_t blockState) : blockState(blockState) {
   }
 
-  void BlockMarkerParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void BlockMarkerParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(blockState);
   }
 
-  void BlockMarkerParticle::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  BlockMarkerParticle::BlockMarkerParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
     blockState = buffer->ReadVarInt();
   }
 

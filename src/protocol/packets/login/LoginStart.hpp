@@ -15,7 +15,7 @@ namespace Ship {
 
     std::string username;
     bool hasSigData = false;
-    uint64_t timestamp;
+    uint64_t expiry;
     uint32_t publicKeyLength;
     uint8_t* publicKey;
     uint32_t signatureLength;
@@ -24,25 +24,18 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    LoginStart(std::string username, bool hasSigData, uint64_t timestamp, uint32_t publicKeyLength, uint8_t* publicKey, uint32_t signatureLength,
+    LoginStart(std::string username, bool hasSigData, uint64_t expiry, uint32_t publicKeyLength, uint8_t* publicKey, uint32_t signatureLength,
       uint8_t* signature)
-      : username(std::move(username)), hasSigData(hasSigData), timestamp(timestamp), publicKeyLength(publicKeyLength), publicKey(publicKey),
+      : username(std::move(username)), hasSigData(hasSigData), expiry(expiry), publicKeyLength(publicKeyLength), publicKey(publicKey),
         signatureLength(signatureLength), signature(signature) {
     }
 
-    ~LoginStart() override {
-      if (hasSigData) {
-        delete[] publicKey;
-        delete[] signature;
-      }
-    };
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    LoginStart(const ProtocolVersion* version, ByteBuffer* buffer) {
       username = buffer->ReadString(MAXIMUM_USERNAME_SIZE);
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         hasSigData = buffer->ReadBoolean();
         if (hasSigData) {
-          timestamp = buffer->ReadLong();
+          expiry = buffer->ReadLong();
 
           publicKeyLength = buffer->ReadVarInt();
           if (publicKeyLength > MAXIMUM_PUBLIC_KEY_SIZE) {
@@ -59,12 +52,19 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~LoginStart() override {
+      if (hasSigData) {
+        delete[] publicKey;
+        delete[] signature;
+      }
+    };
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(username);
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteBoolean(hasSigData);
         if (hasSigData) {
-          buffer->WriteLong(timestamp);
+          buffer->WriteLong(expiry);
           buffer->WriteVarInt(publicKeyLength);
           buffer->WriteBytes(publicKey, publicKeyLength);
           buffer->WriteVarInt(signatureLength);
@@ -73,7 +73,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 
@@ -85,8 +85,8 @@ namespace Ship {
       return hasSigData;
     }
 
-    [[nodiscard]] uint64_t GetTimestamp() const {
-      return timestamp;
+    [[nodiscard]] uint64_t GetExpiry() const {
+      return expiry;
     }
 
     [[nodiscard]] uint32_t GetPublicKeyLength() const {

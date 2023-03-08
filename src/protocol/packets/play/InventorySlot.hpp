@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../utils/ordinal/OrdinalRegistry.hpp"
+#include "../../data/ItemStack.hpp"
 #include "../Packet.hpp"
 #include <string>
 
@@ -22,16 +23,16 @@ namespace Ship {
 
     ~InventorySlot() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    InventorySlot(const ProtocolVersion* version, ByteBuffer* buffer) {
       windowId = buffer->ReadByte();
       if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
         stateId = buffer->ReadVarInt();
       }
       slot = buffer->ReadShort();
-      item.Read(version, buffer);
+      item = ItemStack(version, buffer);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(windowId);
       if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
         buffer->WriteVarInt(stateId);
@@ -40,7 +41,7 @@ namespace Ship {
       item.Write(version, buffer);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

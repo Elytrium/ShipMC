@@ -1,4 +1,5 @@
 #include "Connection.hpp"
+#include "pipe/FramedPipe.hpp"
 
 namespace Ship {
   Connection::Connection(BytePacketPipe* byte_packet_pipe, PacketHandler* main_packet_handler, size_t reader_buffer_length, size_t writer_buffer_length,
@@ -106,8 +107,8 @@ namespace Ship {
       currentBuffer = byteBytePipe->GetReaderBuffer();
     }
 
-    Packet* packet = bytePacketPipe->Read(currentBuffer);
-    if (packet != nullptr) {
+    try {
+      PacketHolder packet = bytePacketPipe->Read(currentBuffer);
       if (!mainPacketHandler->Handle(mainPacketHandler, this, packet)) {
         for (const auto& item : packetHandlers) {
           if (item->Handle(item, this, packet)) {
@@ -115,16 +116,14 @@ namespace Ship {
           }
         }
       }
+    } catch (IncompleteFrameException& exception) {
+      // Wait until more data is available
     }
   }
 
-  void Connection::Write(Packet* packet, bool delete_on_send) {
-    ByteBuffer* initBuffer = bytePacketPipe->WriteWithoutDeletion(packet);
+  void Connection::Write(const Packet& packet) {
+    ByteBuffer* initBuffer = bytePacketPipe->Write(packet);
     ByteBuffer* buffer = initBuffer;
-
-    if (delete_on_send) {
-      delete packet;
-    }
 
     for (auto byteBytePipeIterator = pipeline.rbegin(); byteBytePipeIterator != pipeline.rend(); ++byteBytePipeIterator) {
       ByteBytePipe* pipe = *byteBytePipeIterator;
@@ -136,8 +135,8 @@ namespace Ship {
     delete initBuffer;
   }
 
-  void Connection::WriteAndFlush(Packet* packet, bool delete_on_send) {
-    Write(packet, delete_on_send);
+  void Connection::WriteAndFlush(const Packet& packet) {
+    Write(packet);
     Flush();
   }
 

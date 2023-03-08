@@ -13,23 +13,23 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    SingleVersionPreparedPacket(const ProtocolVersion* version, ByteBuffer* buffer) {
+      unknownBytes = buffer;
+    }
+
     ~SingleVersionPreparedPacket() override {
       delete unknownBytes;
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      unknownBytes = buffer;
-    }
-
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteBytes(new ByteBufferImpl(unknownBytes), unknownBytes->GetReadableBytes());
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
+    uint32_t Size(const ProtocolVersion* version) const override {
       return unknownBytes->GetReadableBytes();
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

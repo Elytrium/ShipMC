@@ -9,13 +9,11 @@
 
 namespace Ship {
 
-  class DirectionRegistry : public ConstructorRegistry<Packet> {
+  class DirectionRegistry : public VersionedRegistry {
    public:
     DirectionRegistry();
 
-    void RegisterPacketConstructor(uint32_t ordinal, const std::function<Packet*()>& constructor);
-    Packet* GetPacketByID(const ProtocolVersion* version, uint32_t ordinal) const;
-    uint32_t GetIDByPacket(const ProtocolVersion* version, Packet* packet) const;
+    uint32_t GetIDByPacket(const ProtocolVersion* version, const Packet& packet) const;
   };
 
   enum PacketDirection {

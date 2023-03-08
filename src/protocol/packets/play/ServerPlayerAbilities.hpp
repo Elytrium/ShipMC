@@ -31,19 +31,19 @@ namespace Ship {
 
     ~ServerPlayerAbilities() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ServerPlayerAbilities(const ProtocolVersion* version, ByteBuffer* buffer) {
       flags.value = buffer->ReadByte();
       flyingSpeed = buffer->ReadFloat();
       fovModifier = buffer->ReadFloat();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(flags.value);
       buffer->WriteFloat(flyingSpeed);
       buffer->WriteFloat(fovModifier);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

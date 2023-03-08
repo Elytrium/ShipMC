@@ -5,11 +5,11 @@ namespace Ship {
   ByteMetadataEntry::ByteMetadataEntry(uint8_t value) : value(value) {
   }
 
-  void ByteMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void ByteMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteByte(value);
   }
 
-  void ByteMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  ByteMetadataEntry::ByteMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = buffer->ReadByte();
   }
 

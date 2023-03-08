@@ -20,15 +20,15 @@ namespace Ship {
 
     ~ChatSuggestions() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ChatSuggestions(const ProtocolVersion* version, ByteBuffer* buffer) {
       action = buffer->ReadVarInt();
-      entries.resize(buffer->ReadVarInt());
-      for (std::string& entry : entries) {
-        entry = buffer->ReadString();
+      uint32_t vectorSize = buffer->ReadVarInt();
+      for (int i = 0; i < vectorSize; ++i) {
+         entries.push_back(buffer->ReadString());
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(action);
       buffer->WriteVarInt(entries.size());
       for (const std::string& entry : entries) {
@@ -36,7 +36,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

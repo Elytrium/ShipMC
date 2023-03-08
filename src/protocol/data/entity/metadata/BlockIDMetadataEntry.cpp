@@ -8,12 +8,12 @@ namespace Ship {
   BlockIDMetadataEntry::BlockIDMetadataEntry(uint32_t value) : value(value) {
   }
 
-  void BlockIDMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
-    buffer->WriteVarInt(value);
+  BlockIDMetadataEntry::BlockIDMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
+    value = buffer->ReadVarInt();
   }
 
-  void BlockIDMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadVarInt();
+  void BlockIDMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+    buffer->WriteVarInt(value);
   }
 
   MetadataEntryType BlockIDMetadataEntry::GetType() const {

@@ -5,11 +5,11 @@ namespace Ship {
   PositionMetadataEntry::PositionMetadataEntry(int x, int y, int z) : x(x), y(y), z(z) {
   }
 
-  void PositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void PositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WritePosition(x, y, z);
   }
 
-  void PositionMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  PositionMetadataEntry::PositionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     buffer->ReadPosition(x, y, z);
   }
 

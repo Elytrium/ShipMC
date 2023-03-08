@@ -5,11 +5,11 @@ namespace Ship {
   LongMetadataEntry::LongMetadataEntry(uint64_t value) : value(value) {
   }
 
-  void LongMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void LongMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteLong(value);
   }
 
-  void LongMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  LongMetadataEntry::LongMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = buffer->ReadLong();
   }
 

@@ -6,34 +6,34 @@
 
 namespace Ship {
 
-  template<typename T, typename... A>
-  inline std::function<T*()> CreateConstructor(const A&... args) {
-    return [=]() {
-      return new T(args...);
+  template<typename T>
+  inline std::function<T*(const ProtocolVersion* version, ByteBuffer* buffer)> CreateConstructor() {
+    return [=](const ProtocolVersion* version, ByteBuffer* buffer) {
+      return new T(version, buffer);
     };
   }
 
   template<typename T>
   class ConstructorRegistry : public VersionedRegistry {
    private:
-    std::vector<std::function<T*()>> ordinalToObjectMap;
+    std::vector<std::function<T*(const ProtocolVersion* version, ByteBuffer* buffer)>> ordinalToObjectMap;
 
    public:
     explicit ConstructorRegistry(const std::set<ProtocolVersion>& versionMap) : VersionedRegistry(versionMap) {}
 
-    void RegisterConstructor(uint32_t ordinal, const std::function<T*()>& constructor) {
+    void RegisterConstructor(uint32_t ordinal, const std::function<T*(const ProtocolVersion* version, ByteBuffer* buffer)>& constructor) {
       OrdinalVector::ResizeVectorAndSet(ordinalToObjectMap, ordinal, constructor);
     }
 
-    T* GetObjectByID(const ProtocolVersion* version, uint32_t id) const {
+    T* GetObjectByID(const ProtocolVersion* version, uint32_t id, ByteBuffer* buffer) const {
       uint32_t ordinal = GetOrdinalByID(version, id);
       if (ordinal >= ordinalToObjectMap.size()) {
         return nullptr;
       }
 
-      std::function<T*()> constructor = ordinalToObjectMap[ordinal];
+      std::function<T*(const ProtocolVersion* version, ByteBuffer* buffer)> constructor = ordinalToObjectMap[ordinal];
       if (constructor) {
-        return constructor();
+        return constructor(version, buffer);
       } else {
         return nullptr;
       }

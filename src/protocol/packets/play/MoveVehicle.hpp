@@ -22,7 +22,7 @@ namespace Ship {
 
     ~MoveVehicle() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    MoveVehicle(const ProtocolVersion* version, ByteBuffer* buffer) {
       x = buffer->ReadDouble();
       y = buffer->ReadDouble();
       z = buffer->ReadDouble();
@@ -30,7 +30,7 @@ namespace Ship {
       pitch = buffer->ReadFloat();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteDouble(x);
       buffer->WriteDouble(y);
       buffer->WriteDouble(z);
@@ -38,7 +38,7 @@ namespace Ship {
       buffer->WriteFloat(pitch);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

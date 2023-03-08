@@ -43,8 +43,8 @@ namespace Ship {
 
     void HandleNewBytes(uint8_t* page, size_t page_size);
 
-    void Write(Packet* packet, bool delete_on_send);
-    void WriteAndFlush(Packet* packet, bool delete_on_send);
+    void Write(const Packet& packet);
+    void WriteAndFlush(const Packet& packet);
 
     void WriteDirect(ByteBuffer* buffer);
     void WriteDirect(ByteBuffer* buffer, size_t length);

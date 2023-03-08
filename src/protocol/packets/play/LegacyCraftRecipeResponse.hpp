@@ -20,17 +20,17 @@ namespace Ship {
 
     ~LegacyCraftRecipeResponse() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    LegacyCraftRecipeResponse(const ProtocolVersion* version, ByteBuffer* buffer) {
       windowId = buffer->ReadByte();
       recipe = buffer->ReadVarInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(windowId);
       buffer->WriteVarInt(recipe);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

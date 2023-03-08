@@ -22,19 +22,19 @@ namespace Ship {
 
     ~OpenInventory() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    OpenInventory(const ProtocolVersion* version, ByteBuffer* buffer) {
       windowId = buffer->ReadVarInt();
       windowType = buffer->ReadVarInt();
       windowTitle = buffer->ReadString();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(windowId);
       buffer->WriteVarInt(windowType);
       buffer->WriteString(windowTitle);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

@@ -22,23 +22,23 @@ namespace Ship {
       : locationX(locationX), locationY(locationY), locationZ(locationZ), actionId(actionId), actionParameter(actionParameter), blockType(blockType) {
     }
 
-    ~BlockAction() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    BlockAction(const ProtocolVersion* version, ByteBuffer* buffer) {
       buffer->ReadPosition(locationX, locationY, locationZ);
       actionId = buffer->ReadByte();
       actionParameter = buffer->ReadByte();
       blockType = buffer->ReadVarInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~BlockAction() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WritePosition(locationX, locationY, locationZ);
       buffer->WriteByte(actionId);
       buffer->WriteByte(actionParameter);
       buffer->WriteVarInt(blockType);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

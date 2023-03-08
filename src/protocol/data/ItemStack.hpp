@@ -21,8 +21,7 @@ namespace Ship {
 
     ~ItemStack() override;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
 
     [[nodiscard]] bool IsPresent() const;
     void SetPresent(bool value);
@@ -34,5 +33,14 @@ namespace Ship {
     void SetData(uint16_t value);
     [[nodiscard]] NBT* GetNBT() const;
     void SetNBT(NBT* value);
+  };
+
+  class OptionalItemStack : public Serializable {
+   private:
+    std::optional<ItemStack> itemStack;
+   public:
+    OptionalItemStack() = default;
+    OptionalItemStack(const ProtocolVersion* version, ByteBuffer* buffer);
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
   };
 }

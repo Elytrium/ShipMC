@@ -17,15 +17,15 @@ namespace Ship {
 
     ~StatusPing() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    StatusPing(const ProtocolVersion* version, ByteBuffer* buffer) {
       id = buffer->ReadLong();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteLong(id);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

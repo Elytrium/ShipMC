@@ -32,7 +32,7 @@ namespace Ship {
       delete particle;
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    Particle(const ProtocolVersion* version, ByteBuffer* buffer) {
       uint32_t particleId;
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         particleId = buffer->ReadVarInt();
@@ -40,7 +40,6 @@ namespace Ship {
         particleId = buffer->ReadInt();
       }
       delete particle;
-      particle = PARTICLE_REGISTRY.GetObjectByID(version, particleId);
       longDistance = buffer->ReadBoolean();
       if (version >= &ProtocolVersion::MINECRAFT_1_15) {
         x = buffer->ReadDouble();
@@ -56,10 +55,10 @@ namespace Ship {
       offsetZ = buffer->ReadFloat();
       maxSpeed = buffer->ReadFloat();
       particleCount = buffer->ReadInt();
-      particle->Read(version, buffer);
+      particle = PARTICLE_REGISTRY.GetObjectByID(version, particleId, buffer);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       uint32_t particleId = PARTICLE_REGISTRY.GetIDByOrdinal(version, particle->GetOrdinal());
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteVarInt(particleId);
@@ -84,7 +83,7 @@ namespace Ship {
       particle->Write(version, buffer);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

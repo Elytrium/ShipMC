@@ -5,11 +5,11 @@ namespace Ship {
   FloatMetadataEntry::FloatMetadataEntry(float value) : value(value) {
   }
 
-  void FloatMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void FloatMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteFloat(value);
   }
 
-  void FloatMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  FloatMetadataEntry::FloatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = buffer->ReadFloat();
   }
 

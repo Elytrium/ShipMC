@@ -24,21 +24,21 @@ namespace Ship {
 
     ~WorldEvent() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    WorldEvent(const ProtocolVersion* version, ByteBuffer* buffer) {
       event = buffer->ReadInt();
       buffer->ReadPosition(locationX, locationY, locationZ);
       data = buffer->ReadInt();
       disableRelativeVolume = buffer->ReadBoolean();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteInt(event);
       buffer->WritePosition(locationX, locationY, locationZ);
       buffer->WriteInt(data);
       buffer->WriteBoolean(disableRelativeVolume);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

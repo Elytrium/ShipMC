@@ -22,23 +22,23 @@ namespace Ship {
       : locationX(locationX), locationY(locationY), locationZ(locationZ), block(block), status(status), successful(successful) {
     }
 
-    ~AcknowledgePlayerDigging() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    AcknowledgePlayerDigging(const ProtocolVersion* version, ByteBuffer* buffer) {
       buffer->ReadPosition(locationX, locationY, locationZ);
       block = buffer->ReadVarInt();
       status = buffer->ReadVarInt();
       successful = buffer->ReadBoolean();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~AcknowledgePlayerDigging() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WritePosition(locationX, locationY, locationZ);
       buffer->WriteVarInt(block);
       buffer->WriteVarInt(status);
       buffer->WriteBoolean(successful);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

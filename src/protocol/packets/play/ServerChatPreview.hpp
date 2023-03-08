@@ -21,7 +21,7 @@ namespace Ship {
 
     ~ServerChatPreview() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ServerChatPreview(const ProtocolVersion* version, ByteBuffer* buffer) {
       queryId = buffer->ReadInt();
       if (buffer->ReadBoolean()) {
         message = buffer->ReadString();
@@ -30,7 +30,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteInt(queryId);
       buffer->WriteBoolean(message.has_value());
       if (message) {
@@ -38,7 +38,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

@@ -95,7 +95,7 @@ namespace Ship {
     libdeflate_free_decompressor(decompressor);
   }
 
-  uint32_t CompressionPipe::GetOrdinal() {
+  uint32_t CompressionPipe::GetOrdinal() const {
     return PIPE_ORDINAL;
   }
 } // namespace Ship

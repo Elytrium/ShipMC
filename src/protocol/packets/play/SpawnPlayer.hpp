@@ -30,7 +30,7 @@ namespace Ship {
       delete metadata;
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    SpawnPlayer(const ProtocolVersion* version, ByteBuffer* buffer) {
       entityId = buffer->ReadVarInt();
       playerUuid = buffer->ReadUUID();
       x = buffer->ReadDouble();
@@ -44,7 +44,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
       buffer->WriteUUID(playerUuid);
       buffer->WriteDouble(x);
@@ -57,7 +57,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

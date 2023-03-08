@@ -22,19 +22,19 @@ namespace Ship {
       delete data;
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    PluginMessage(const ProtocolVersion* version, ByteBuffer* buffer) {
       channel = buffer->ReadString();
       delete data;
       uint32_t size = buffer->GetReadableBytes();
       data = new ByteBufferImpl(buffer->ReadBytes(size), size);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(channel);
       buffer->WriteBytes(buffer, buffer->GetReadableBytes());
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

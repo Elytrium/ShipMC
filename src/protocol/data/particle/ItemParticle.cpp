@@ -5,12 +5,12 @@ namespace Ship {
   ItemParticle::ItemParticle(const ItemStack& item) : item(item) {
   }
 
-  void ItemParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void ItemParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     item.Write(version, buffer);
   }
 
-  void ItemParticle::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
-    item.Read(version, buffer);
+  ItemParticle::ItemParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
+    item = ItemStack(version, buffer);
   }
 
   std::string ItemParticle::GetIdentifier() const {

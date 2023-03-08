@@ -23,9 +23,7 @@ namespace Ship {
       : uuid(uuid), username(std::move(username)), properties(std::move(properties)) {
     }
 
-    ~LoginSuccess() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    LoginSuccess(const ProtocolVersion* version, ByteBuffer* buffer) {
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         uuid = buffer->ReadUUID();
       } else if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
@@ -40,7 +38,9 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~LoginSuccess() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteUUID(uuid);
       } else if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
@@ -55,7 +55,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

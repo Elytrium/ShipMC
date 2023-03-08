@@ -25,7 +25,7 @@ namespace Ship {
 
     ~EntityPositionAndRotation() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    EntityPositionAndRotation(const ProtocolVersion* version, ByteBuffer* buffer) {
       entityId = buffer->ReadVarInt();
       deltaX = buffer->ReadShort();
       deltaY = buffer->ReadShort();
@@ -35,7 +35,7 @@ namespace Ship {
       onGround = buffer->ReadBoolean();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
       buffer->WriteShort(deltaX);
       buffer->WriteShort(deltaY);
@@ -45,7 +45,7 @@ namespace Ship {
       buffer->WriteBoolean(onGround);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

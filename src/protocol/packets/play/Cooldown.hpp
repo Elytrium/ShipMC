@@ -19,17 +19,17 @@ namespace Ship {
 
     ~Cooldown() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    Cooldown(const ProtocolVersion* version, ByteBuffer* buffer) {
       itemId = buffer->ReadVarInt();
       cooldownTicks = buffer->ReadVarInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(itemId);
       buffer->WriteVarInt(cooldownTicks);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

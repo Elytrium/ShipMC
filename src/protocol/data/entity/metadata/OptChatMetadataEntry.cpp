@@ -8,14 +8,14 @@ namespace Ship {
   OptChatMetadataEntry::OptChatMetadataEntry(std::optional<std::string> optValue) : optValue(std::move(optValue)) {
   }
 
-  void OptChatMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void OptChatMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteBoolean(optValue.has_value());
     if (optValue) {
       buffer->WriteString(optValue.value());
     }
   }
 
-  void OptChatMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  OptChatMetadataEntry::OptChatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     if (buffer->ReadBoolean()) {
       optValue = buffer->ReadString();
     } else {

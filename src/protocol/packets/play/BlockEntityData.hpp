@@ -23,11 +23,7 @@ namespace Ship {
       : locationX(locationX), locationY(locationY), locationZ(locationZ), type(type), data(data) {
     }
 
-    ~BlockEntityData() override {
-      delete data;
-    }
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    BlockEntityData(const ProtocolVersion* version, ByteBuffer* buffer) {
       buffer->ReadPosition(locationX, locationY, locationZ);
       if (version >= &ProtocolVersion::MINECRAFT_1_18) {
         type = buffer->ReadVarInt();
@@ -39,7 +35,11 @@ namespace Ship {
       data = ProtocolUtils::ReadNBT(buffer);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~BlockEntityData() override {
+      delete data;
+    }
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WritePosition(locationX, locationY, locationZ);
       if (version >= &ProtocolVersion::MINECRAFT_1_18) {
         buffer->WriteVarInt(type);
@@ -54,7 +54,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

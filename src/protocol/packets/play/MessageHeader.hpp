@@ -17,11 +17,7 @@ namespace Ship {
     MessageHeader(ByteBuffer* precedingSignature, const UUID& sender) : precedingSignature(precedingSignature), sender(sender) {
     }
 
-    ~MessageHeader() override {
-      delete precedingSignature;
-    }
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    MessageHeader(const ProtocolVersion* version, ByteBuffer* buffer) {
       delete precedingSignature;
       if (buffer->ReadBoolean()) {
         uint32_t size = buffer->GetReadableBytes() - ByteBuffer::UUID_SIZE;
@@ -32,7 +28,11 @@ namespace Ship {
       sender = buffer->ReadUUID();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~MessageHeader() override {
+      delete precedingSignature;
+    }
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteBoolean(precedingSignature);
       if (precedingSignature) {
         buffer->WriteBytes(precedingSignature, precedingSignature->GetReadableBytes());
@@ -40,7 +40,7 @@ namespace Ship {
       buffer->WriteUUID(sender);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

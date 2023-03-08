@@ -16,21 +16,21 @@ namespace Ship {
     explicit HideMessage(ByteBuffer* signature) : signature(signature) {
     }
 
-    ~HideMessage() override {
-      delete signature;
-    }
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    HideMessage(const ProtocolVersion* version, ByteBuffer* buffer) {
       uint32_t size = buffer->GetReadableBytes();
       delete signature;
       signature = new ByteBufferImpl(buffer->ReadBytes(size), size);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~HideMessage() override {
+      delete signature;
+    }
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteBytes(signature, signature->GetReadableBytes());
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

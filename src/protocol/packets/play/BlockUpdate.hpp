@@ -20,19 +20,19 @@ namespace Ship {
       : locationX(locationX), locationY(locationY), locationZ(locationZ), blockId(blockId) {
     }
 
-    ~BlockUpdate() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    BlockUpdate(const ProtocolVersion* version, ByteBuffer* buffer) {
       buffer->ReadPosition(locationX, locationX, locationZ);
       buffer->WriteVarInt(blockId);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~BlockUpdate() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WritePosition(locationX, locationY, locationZ);
       buffer->WriteVarInt(blockId);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

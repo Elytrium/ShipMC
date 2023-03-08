@@ -5,13 +5,13 @@ namespace Ship {
   RotationMetadataEntry::RotationMetadataEntry(float x, float y, float z) : x(x), y(y), z(z) {
   }
 
-  void RotationMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void RotationMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteFloat(x);
     buffer->WriteFloat(y);
     buffer->WriteFloat(z);
   }
 
-  void RotationMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  RotationMetadataEntry::RotationMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     x = buffer->ReadFloat();
     y = buffer->ReadFloat();
     z = buffer->ReadFloat();

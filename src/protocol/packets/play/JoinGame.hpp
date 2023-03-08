@@ -24,12 +24,12 @@ namespace Ship {
     bool reducedDebugInfo;
     bool showRespawnScreen;
     std::set<std::string> levelNames;
-    std::map<std::string, Dimension> dimensionRegistry;
+    std::map<std::string, Dimension*> dimensionRegistry;
     std::string registryIdentifier;
     std::string levelName;
     bool isFlat;
     bool isDebugType;
-    Dimension dimension;
+    Dimension* dimension;
     Gamemode previousGamemode;
     CompoundTag* biomeRegistry;
     uint32_t simulationDistance;
@@ -43,13 +43,13 @@ namespace Ship {
 
     JoinGame(uint32_t entityId, Gamemode gamemode, uint64_t partialHashedSeed, Difficulty difficulty, bool isHardcore, uint32_t maxPlayers,
       uint32_t viewDistance, bool reducedDebugInfo, bool showRespawnScreen, std::set<std::string> levelNames,
-      std::map<std::string, Dimension> dimensionRegistry, std::string registryIdentifier, std::string levelName, bool isFlat, bool isDebugType,
-      Dimension dimension, Gamemode previousGamemode, CompoundTag* biomeRegistry, uint32_t simulationDistance, bool hasLastDeathPosition,
+      std::map<std::string, Dimension*> dimensionRegistry, std::string registryIdentifier, std::string levelName, bool isFlat, bool isDebugType,
+      Dimension* dimension, Gamemode previousGamemode, CompoundTag* biomeRegistry, uint32_t simulationDistance, bool hasLastDeathPosition,
       std::pair<std::string, uint64_t> lastDeathPosition, CompoundTag* chatTypeRegistry, CompoundTag* registryContainer)
       : entityId(entityId), gamemode(gamemode), partialHashedSeed(partialHashedSeed), difficulty(difficulty), isHardcore(isHardcore),
         maxPlayers(maxPlayers), viewDistance(viewDistance), reducedDebugInfo(reducedDebugInfo), showRespawnScreen(showRespawnScreen),
         levelNames(std::move(levelNames)), dimensionRegistry(std::move(dimensionRegistry)), registryIdentifier(std::move(registryIdentifier)),
-        levelName(std::move(levelName)), isFlat(isFlat), isDebugType(isDebugType), dimension(std::move(dimension)), previousGamemode(previousGamemode),
+        levelName(std::move(levelName)), isFlat(isFlat), isDebugType(isDebugType), dimension(dimension), previousGamemode(previousGamemode),
         biomeRegistry(biomeRegistry), simulationDistance(simulationDistance), hasLastDeathPosition(hasLastDeathPosition),
         lastDeathPosition(std::move(lastDeathPosition)), chatTypeRegistry(chatTypeRegistry), registryContainer(registryContainer) {
     }
@@ -58,7 +58,7 @@ namespace Ship {
       delete registryContainer;
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    JoinGame(const ProtocolVersion* version, ByteBuffer* buffer) {
       entityId = buffer->ReadInt();
       if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
         isHardcore = buffer->ReadBoolean();
@@ -85,8 +85,8 @@ namespace Ship {
         }
 
         for (const auto& item : dimensionRegistryContainer->GetList()) {
-          Dimension dimensionInRegistry = Dimension::FromNBT((CompoundTag*) item);
-          dimensionRegistry.emplace(dimensionInRegistry.GetKey(), dimensionInRegistry);
+          Dimension* dimensionInRegistry = Dimension::FromNBT((CompoundTag*) item);
+          dimensionRegistry.emplace(dimensionInRegistry->GetKey(), dimensionInRegistry);
         }
 
         delete dimensionRegistryContainer;
@@ -132,7 +132,7 @@ namespace Ship {
         previousGamemode = gamemode == Gamemode::SPECTATOR ? Gamemode::SURVIVAL : Gamemode::SPECTATOR;
         uint32_t dimensionIndex = buffer->ReadInt();
         dimension = Dimension::FromLegacyID(dimensionIndex);
-        registryIdentifier = dimension.GetKey();
+        registryIdentifier = dimension->GetKey();
 
         if (version <= &ProtocolVersion::MINECRAFT_1_13_2) {
           difficulty = (Difficulty) buffer->ReadByte();
@@ -171,7 +171,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteInt(entityId);
       if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
         buffer->WriteBoolean(isHardcore);
@@ -193,7 +193,7 @@ namespace Ship {
           auto* tag = new CompoundTag("");
           auto* dimensionRegistryContainer = new ListTag("value");
           for (const auto& item : dimensionRegistry) {
-            dimensionRegistryContainer->GetList().emplace_back(item.second.Serialize());
+            dimensionRegistryContainer->GetList().emplace_back(item.second->Serialize());
           }
 
           auto* dimensionRegistryEntry = new CompoundTag("minecraft:dimension_type");
@@ -210,7 +210,7 @@ namespace Ship {
         }
 
         if (version >= &ProtocolVersion::MINECRAFT_1_16_2 && version < &ProtocolVersion::MINECRAFT_1_19) {
-          NBT* currentDimDataTag = dimension.Serialize();
+          NBT* currentDimDataTag = dimension->Serialize();
           ProtocolUtils::WriteNBT(buffer, currentDimDataTag);
           delete currentDimDataTag;
 
@@ -244,7 +244,7 @@ namespace Ship {
           }
         }
       } else {
-        buffer->WriteInt(dimension.GetLegacyId());
+        buffer->WriteInt(dimension->GetLegacyId());
 
         if (version <= &ProtocolVersion::MINECRAFT_1_13_2) {
           buffer->WriteByte(difficulty);
@@ -268,102 +268,98 @@ namespace Ship {
       }
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
-      return -1;
-    }
-
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 
     [[nodiscard]] uint32_t GetEntityId() const {
       return entityId;
     }
-    
+
     [[nodiscard]] Gamemode GetGamemode() const {
       return gamemode;
     }
-    
+
     [[nodiscard]] uint64_t GetPartialHashedSeed() const {
       return partialHashedSeed;
     }
-    
+
     [[nodiscard]] Difficulty GetDifficulty() const {
       return difficulty;
     }
-    
+
     [[nodiscard]] bool IsHardcore() const {
       return isHardcore;
     }
-    
+
     [[nodiscard]] uint32_t GetMaxPlayers() const {
       return maxPlayers;
     }
-    
+
     [[nodiscard]] uint32_t GetViewDistance() const {
       return viewDistance;
     }
-    
+
     [[nodiscard]] bool IsReducedDebugInfo() const {
       return reducedDebugInfo;
     }
-    
+
     [[nodiscard]] bool IsShowRespawnScreen() const {
       return showRespawnScreen;
     }
-    
+
     [[nodiscard]] const std::set<std::string>& GetLevelNames() const {
       return levelNames;
     }
-    
-    [[nodiscard]] const std::map<std::string, Dimension>& GetDimensionRegistry() const {
+
+    [[nodiscard]] const std::map<std::string, Dimension*>& GetDimensionRegistry() const {
       return dimensionRegistry;
     }
-    
+
     [[nodiscard]] const std::string& GetRegistryIdentifier() const {
       return registryIdentifier;
     }
-    
+
     [[nodiscard]] const std::string& GetLevelName() const {
       return levelName;
     }
-    
+
     [[nodiscard]] bool IsFlat() const {
       return isFlat;
     }
-    
+
     [[nodiscard]] bool IsDebugType() const {
       return isDebugType;
     }
-    
-    [[nodiscard]] const Dimension& GetDimension() const {
+
+    [[nodiscard]] Dimension* GetDimension() const {
       return dimension;
     }
-    
+
     [[nodiscard]] Gamemode GetPreviousGamemode() const {
       return previousGamemode;
     }
-    
+
     [[nodiscard]] CompoundTag* GetBiomeRegistry() const {
       return biomeRegistry;
     }
-    
+
     [[nodiscard]] uint32_t GetSimulationDistance() const {
       return simulationDistance;
     }
-    
+
     [[nodiscard]] bool IsHasLastDeathPosition() const {
       return hasLastDeathPosition;
     }
-    
+
     [[nodiscard]] const std::pair<std::string, uint64_t>& GetLastDeathPosition() const {
       return lastDeathPosition;
     }
-    
+
     [[nodiscard]] CompoundTag* GetChatTypeRegistry() const {
       return chatTypeRegistry;
     }
-    
+
     [[nodiscard]] CompoundTag* GetRegistryContainer() const {
       return registryContainer;
     }

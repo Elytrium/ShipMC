@@ -20,19 +20,19 @@ namespace Ship {
 
     ~InventoryProperty() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    InventoryProperty(const ProtocolVersion* version, ByteBuffer* buffer) {
       windowId = buffer->ReadByte();
       property = buffer->ReadShort();
       value = buffer->ReadShort();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(windowId);
       buffer->WriteShort(property);
       buffer->WriteShort(value);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

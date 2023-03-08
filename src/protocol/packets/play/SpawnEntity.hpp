@@ -33,7 +33,7 @@ namespace Ship {
 
     ~SpawnEntity() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    SpawnEntity(const ProtocolVersion* version, ByteBuffer* buffer) {
       entityId = buffer->ReadVarInt();
       entityUuid = buffer->ReadUUID();
       if (version >= &ProtocolVersion::MINECRAFT_1_14) {
@@ -57,7 +57,7 @@ namespace Ship {
       velocityZ = (float) buffer->ReadShort() / 8000.0F;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
       buffer->WriteUUID(entityUuid);
       if (version >= &ProtocolVersion::MINECRAFT_1_14) {
@@ -81,7 +81,7 @@ namespace Ship {
       buffer->WriteShort((uint16_t) (velocityZ * 8000.0F));
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

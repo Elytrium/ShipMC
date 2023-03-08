@@ -25,9 +25,7 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    ~Handshake() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    Handshake(const ProtocolVersion* version, ByteBuffer* buffer) {
       protocolVersionID = buffer->ReadVarInt();
 
       hostname = buffer->ReadString(MAXIMUM_HOSTNAME_SIZE);
@@ -35,14 +33,16 @@ namespace Ship {
       nextStatus = (HandshakeNextStatus) buffer->ReadVarInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~Handshake() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(protocolVersionID);
       buffer->WriteString(hostname);
       buffer->WriteShort(port);
       buffer->WriteVarInt((uint32_t) nextStatus);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

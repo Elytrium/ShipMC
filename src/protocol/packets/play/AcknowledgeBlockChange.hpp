@@ -16,17 +16,17 @@ namespace Ship {
     explicit AcknowledgeBlockChange(uint32_t sequence) : sequence(sequence) {
     }
 
-    ~AcknowledgeBlockChange() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    AcknowledgeBlockChange(const ProtocolVersion* version, ByteBuffer* buffer) {
       sequence = buffer->ReadVarInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~AcknowledgeBlockChange() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(sequence);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

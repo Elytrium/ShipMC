@@ -11,13 +11,10 @@ namespace Ship {
     ~SkulkVibration() override {
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-    }
-
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
   };

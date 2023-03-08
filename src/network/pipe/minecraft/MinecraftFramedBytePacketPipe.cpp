@@ -29,27 +29,27 @@ namespace Ship {
     version = new_protocol_version;
   }
 
-  ByteBuffer* MinecraftFramedBytePacketPipe::WriteWithoutDeletion(Packet* packet) {
-    if (packet->GetOrdinal() == PreparedPacket::PACKET_ORDINAL) {
-      return ((PreparedPacket*) packet)->GetBytes(version);
+  ByteBuffer* MinecraftFramedBytePacketPipe::Write(const Packet& packet) {
+    if (packet.GetOrdinal() == PreparedPacket::PACKET_ORDINAL) {
+      return ((PreparedPacket&) packet).GetBytes(version);
     }
 
-    if (packet->GetOrdinal() == SingleVersionPreparedPacket::PACKET_ORDINAL) {
-      return ((SingleVersionPreparedPacket*) packet)->GetBytes();
+    if (packet.GetOrdinal() == SingleVersionPreparedPacket::PACKET_ORDINAL) {
+      return ((SingleVersionPreparedPacket&) packet).GetBytes();
     }
 
-    uint32_t packetSize = packet->Size(version);
+    uint32_t packetSize = packet.Size(version);
     if (packetSize != -1) {
       uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
       uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetID);
       auto* buffer = new ByteBufferImpl(packetSizeWithID + ByteBuffer::VarIntBytes(packetSizeWithID));
       buffer->WriteVarInt(packetSizeWithID);
       buffer->WriteVarInt(packetID);
-      packet->Write(version, buffer);
+      packet.Write(version, buffer);
       return buffer;
     } else {
       auto* buffer = new ByteBufferImpl(longPacketBufferCapacity);
-      packet->Write(version, buffer);
+      packet.Write(version, buffer);
       packetSize = buffer->GetReadableBytes();
       uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
       uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetID);
@@ -62,27 +62,11 @@ namespace Ship {
     }
   }
 
-  Packet* MinecraftFramedBytePacketPipe::ReadPacket(ByteBuffer* in, uint32_t frame_size) {
+  PacketHolder MinecraftFramedBytePacketPipe::ReadPacket(ByteBuffer* in, uint32_t frame_size) {
     uint32_t oldReadableBytes = in->GetReadableBytes();
     uint32_t packetID = in->ReadVarInt();
-    Packet* packet = readerRegistry->GetPacketByID(version, packetID);
+    uint32_t expectedSize = frame_size - (oldReadableBytes - in->GetReadableBytes());
 
-    if (packet == nullptr) {
-      packet = new SingleVersionPreparedPacket();
-      auto* buffer = new ByteBufferImpl(in->GetSingleCapacity());
-      buffer->WriteVarInt(frame_size);
-      buffer->WriteVarInt(packetID);
-      buffer->WriteBytes(in, frame_size - ByteBuffer::VarIntBytes(packetID));
-      packet->Read(version, buffer);
-      return packet;
-    }
-
-    packet->Read(version, in);
-
-    if (oldReadableBytes - in->GetReadableBytes() != frame_size) {
-      throw InvalidArgumentException("Invalid packet size: ", frame_size);
-    }
-
-    return packet;
+    return {readerRegistry->GetOrdinalByID(version, packetID), version, in, expectedSize};
   }
 } // namespace Ship

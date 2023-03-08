@@ -175,9 +175,9 @@ namespace Ship {
       const std::optional<bool>& createDragonFight, const std::optional<double>& coordinateScale, std::optional<std::string> effects, int32_t minY,
       int32_t height, uint32_t monsterSpawnBlockLightLimit, uint32_t monsterSpawnLightLevel, Biome* defaultBiome);
 
-    static Dimension FromLegacyID(uint32_t id);
+    static Dimension* FromLegacyID(uint32_t id);
 
-    static Dimension FromNBT(CompoundTag* nbt);
+    static Dimension* FromNBT(CompoundTag* nbt);
 
     [[nodiscard]] CompoundTag* Serialize() const;
 

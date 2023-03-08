@@ -18,15 +18,15 @@ namespace Ship {
 
     ~CloseInventory() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    CloseInventory(const ProtocolVersion* version, ByteBuffer* buffer) {
       windowId = buffer->ReadByte();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(windowId);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

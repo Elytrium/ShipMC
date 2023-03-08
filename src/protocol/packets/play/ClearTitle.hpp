@@ -18,15 +18,15 @@ namespace Ship {
 
     ~ClearTitle() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ClearTitle(const ProtocolVersion* version, ByteBuffer* buffer) {
       reset = buffer->ReadBoolean();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteBoolean(reset);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

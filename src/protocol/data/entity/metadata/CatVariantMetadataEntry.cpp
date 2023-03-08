@@ -5,11 +5,11 @@ namespace Ship {
   CatVariantMetadataEntry::CatVariantMetadataEntry(const CatVariant& value) : value(value) {
   }
 
-  void CatVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void CatVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(CAT_VARIANT_REGISTRY.GetID(version, value));
   }
 
-  void CatVariantMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  CatVariantMetadataEntry::CatVariantMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = CAT_VARIANT_REGISTRY.GetValue(version, buffer->ReadVarInt());
   }
 

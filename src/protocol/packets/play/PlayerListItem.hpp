@@ -35,7 +35,7 @@ namespace Ship {
       delete signature;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteUUID(gameProfile.GetUuid());
       buffer->WriteString(gameProfile.GetName());
       buffer->WriteProperties(gameProfile.GetProperties());
@@ -62,17 +62,16 @@ namespace Ship {
       }
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      gameProfile = GameProfile(buffer->ReadUUID(), buffer->ReadString(), buffer->ReadProperties());
-      gamemode = (Gamemode) buffer->ReadVarInt();
-      ping = buffer->ReadVarInt();
+    PlayerListAddPlayer(const ProtocolVersion* version, ByteBuffer* buffer)
+      : gameProfile(GameProfile(buffer->ReadUUID(), buffer->ReadString(), buffer->ReadProperties())), gamemode((Gamemode) buffer->ReadVarInt()),
+        ping(buffer->ReadVarInt()) {
       if (buffer->ReadBoolean()) {
         displayName = buffer->ReadString();
       } else {
         displayName.reset();
       }
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
-
+        // TODO: 1.19+
       }
     }
 
@@ -118,14 +117,14 @@ namespace Ship {
     PlayerListUpdateGamemode(const UUID& uuid, Gamemode gamemode) : uuid(uuid), gamemode(gamemode) {
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteUUID(uuid);
-      buffer->WriteVarInt(gamemode);
-    }
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    PlayerListUpdateGamemode(const ProtocolVersion* version, ByteBuffer* buffer) {
       uuid = buffer->ReadUUID();
       gamemode = (Gamemode) buffer->ReadVarInt();
+    }
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteUUID(uuid);
+      buffer->WriteVarInt(gamemode);
     }
 
     [[nodiscard]] const UUID& GetUuid() const {
@@ -146,14 +145,14 @@ namespace Ship {
     PlayerListUpdateLatency(const UUID& uuid, uint32_t ping) : uuid(uuid), ping(ping) {
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteUUID(uuid);
-      buffer->WriteVarInt(ping);
-    }
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    PlayerListUpdateLatency(const ProtocolVersion* version, ByteBuffer* buffer) {
       uuid = buffer->ReadUUID();
       ping = buffer->ReadVarInt();
+    }
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteUUID(uuid);
+      buffer->WriteVarInt(ping);
     }
 
     [[nodiscard]] const UUID& GetUuid() const {
@@ -174,20 +173,20 @@ namespace Ship {
     PlayerListUpdateDisplayName(const UUID& uuid, std::optional<std::string> displayName) : uuid(uuid), displayName(std::move(displayName)) {
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteUUID(uuid);
-      buffer->WriteBoolean(displayName.has_value());
-      if (displayName) {
-        buffer->WriteString(*displayName);
-      }
-    }
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    PlayerListUpdateDisplayName(const ProtocolVersion* version, ByteBuffer* buffer) {
       uuid = buffer->ReadUUID();
       if (buffer->ReadBoolean()) {
         displayName = buffer->ReadString();
       } else {
         displayName.reset();
+      }
+    }
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteUUID(uuid);
+      buffer->WriteBoolean(displayName.has_value());
+      if (displayName) {
+        buffer->WriteString(*displayName);
       }
     }
 
@@ -208,12 +207,12 @@ namespace Ship {
     explicit PlayerListRemovePlayer(const UUID& uuid) : uuid(uuid) {
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteUUID(uuid);
+    PlayerListRemovePlayer(const ProtocolVersion* version, ByteBuffer* buffer) {
+      uuid = buffer->ReadUUID();
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      uuid = buffer->ReadUUID();
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteUUID(uuid);
     }
 
     [[nodiscard]] const UUID& GetUuid() const {
@@ -232,52 +231,44 @@ namespace Ship {
     PlayerListItem(uint32_t action, std::vector<PlayerListAction*> players) : action(action), players(std::move(players)) {
     }
 
-    ~PlayerListItem() override {
-      for (PlayerListAction* player : players) {
-        delete player;
-      }
-    }
+    ~PlayerListItem() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      for (PlayerListAction* player : players) {
-        delete player;
-      }
-
-      uint32_t actionId = buffer->ReadVarInt();
+    PlayerListItem(const ProtocolVersion* version, ByteBuffer* buffer) {
+      action = buffer->ReadVarInt();
       players.resize(buffer->ReadVarInt());
       for (PlayerListAction*& player : players) {
-        switch (actionId) {
+        switch (action) {
           case 0:
-            player = new PlayerListAddPlayer(GameProfile({}, {}, {}), {}, 0, {}, false, 0, nullptr, nullptr);
+            player = new PlayerListAddPlayer(version, buffer);
             break;
 
           case 1:
-            player = new PlayerListUpdateGamemode({}, {});
+            player = new PlayerListUpdateGamemode(version, buffer);
             break;
 
           case 2:
-            player = new PlayerListUpdateLatency({}, 0);
+            player = new PlayerListUpdateLatency(version, buffer);
             break;
 
           case 3:
-            player = new PlayerListUpdateDisplayName({}, {});
+            player = new PlayerListUpdateDisplayName(version, buffer);
             break;
 
           case 4:
-            player = new PlayerListRemovePlayer({});
+            player = new PlayerListRemovePlayer(version, buffer);
             break;
 
           default:
             throw Exception("Unexpected value");
         }
-        player->Read(version, buffer);
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      // TODO: Write PlayerListItem
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

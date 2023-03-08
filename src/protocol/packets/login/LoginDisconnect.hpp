@@ -17,17 +17,17 @@ namespace Ship {
     explicit LoginDisconnect(std::string reason) : reason(std::move(reason)) {
     }
 
-    ~LoginDisconnect() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    LoginDisconnect(const ProtocolVersion* version, ByteBuffer* buffer) {
       reason = buffer->ReadString();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~LoginDisconnect() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(reason);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

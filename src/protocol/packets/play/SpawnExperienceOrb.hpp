@@ -22,7 +22,7 @@ namespace Ship {
 
     ~SpawnExperienceOrb() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    SpawnExperienceOrb(const ProtocolVersion* version, ByteBuffer* buffer) {
       entityId = buffer->ReadVarInt();
       x = buffer->ReadDouble();
       y = buffer->ReadDouble();
@@ -30,7 +30,7 @@ namespace Ship {
       count = buffer->ReadShort();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
       buffer->WriteDouble(x);
       buffer->WriteDouble(y);
@@ -38,7 +38,7 @@ namespace Ship {
       buffer->WriteShort(count);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

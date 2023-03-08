@@ -17,14 +17,38 @@ namespace Ship {
   }
 
   ItemStack::ItemStack(const ProtocolVersion* version, ByteBuffer* buffer) : ItemStack() {
-    ItemStack::Read(version, buffer);
+    if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
+      present = buffer->ReadBoolean();
+    } else {
+      present = buffer->ReadShort() != (uint16_t) -1;
+    }
+
+    delete nbt;
+    if (present) {
+      if (version < &ProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
+        itemID = buffer->ReadShort();
+      } else {
+        itemID = buffer->ReadVarInt();
+      }
+
+      itemCount = buffer->ReadByte();
+
+      if (version < &ProtocolVersion::MINECRAFT_1_13) {
+        data = buffer->ReadShort();
+      }
+
+      nbt = ProtocolUtils::ReadNBT(buffer);
+    } else {
+      itemID = itemCount = data = 0;
+      nbt = nullptr;
+    }
   }
 
   ItemStack::~ItemStack() {
     delete nbt;
   }
 
-  void ItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void ItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
       buffer->WriteBoolean(present);
     }
@@ -51,34 +75,6 @@ namespace Ship {
       } else {
         buffer->WriteByte(0);
       }
-    }
-  }
-
-  void ItemStack::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
-    if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
-      present = buffer->ReadBoolean();
-    } else {
-      present = buffer->ReadShort() != (uint16_t) -1;
-    }
-
-    delete nbt;
-    if (present) {
-      if (version < &ProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
-        itemID = buffer->ReadShort();
-      } else {
-        itemID = buffer->ReadVarInt();
-      }
-
-      itemCount = buffer->ReadByte();
-
-      if (version < &ProtocolVersion::MINECRAFT_1_13) {
-        data = buffer->ReadShort();
-      }
-
-      nbt = ProtocolUtils::ReadNBT(buffer);
-    } else {
-      itemID = itemCount = data = 0;
-      nbt = nullptr;
     }
   }
 
@@ -121,5 +117,20 @@ namespace Ship {
   void ItemStack::SetNBT(NBT* value) {
     delete nbt;
     nbt = value;
+  }
+
+  OptionalItemStack::OptionalItemStack(const ProtocolVersion* version, ByteBuffer* buffer) {
+    if (buffer->ReadBoolean()) {
+      itemStack = ItemStack(version, buffer);
+    } else {
+      itemStack = std::nullopt;
+    }
+  }
+
+  void OptionalItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+    buffer->WriteBoolean(itemStack.has_value());
+    if (itemStack.has_value()) {
+      itemStack->Write(version, buffer);
+    }
   }
 }

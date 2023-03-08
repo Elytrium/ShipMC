@@ -21,19 +21,19 @@ namespace Ship {
 
     ~DeathCombatEvent() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    DeathCombatEvent(const ProtocolVersion* version, ByteBuffer* buffer) {
       playerId = buffer->ReadVarInt();
       entityId = buffer->ReadInt();
       message = buffer->ReadString();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(playerId);
       buffer->WriteInt(entityId);
       buffer->WriteString(message);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

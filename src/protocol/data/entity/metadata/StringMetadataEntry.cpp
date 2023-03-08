@@ -6,11 +6,11 @@ namespace Ship {
   StringMetadataEntry::StringMetadataEntry(std::string value) : value(std::move(value)) {
   }
 
-  void StringMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void StringMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteString(value);
   }
 
-  void StringMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  StringMetadataEntry::StringMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = buffer->ReadString();
   }
 

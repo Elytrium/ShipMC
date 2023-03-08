@@ -8,14 +8,14 @@ namespace Ship {
   OptPositionMetadataEntry::OptPositionMetadataEntry(int x, int y, int z) : present(true), x(x), y(y), z(z) {
   }
 
-  void OptPositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void OptPositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteBoolean(present);
     if (present) {
       buffer->WritePosition(x, y, z);
     }
   }
 
-  void OptPositionMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  OptPositionMetadataEntry::OptPositionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     present = buffer->ReadBoolean();
     if (present) {
       buffer->ReadPosition(x, y, z);

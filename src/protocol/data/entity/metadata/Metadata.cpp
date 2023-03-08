@@ -3,7 +3,7 @@
 
 namespace Ship {
 
-  void Metadata::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  Metadata::Metadata(const ProtocolVersion* version, ByteBuffer* buffer) {
     while (true) {
       uint8_t index = buffer->ReadByte();
       if (index == 0xFF) {
@@ -11,13 +11,12 @@ namespace Ship {
       }
 
       uint32_t type = buffer->ReadVarInt();
-      MetadataEntry* entry = METADATA_ENTRY_REGISTRY.GetObjectByID(version, type);
-      entry->Read(version, buffer);
+      MetadataEntry* entry = METADATA_ENTRY_REGISTRY.GetObjectByID(version, type, buffer);
       Set(index, entry);
     }
   }
 
-  void Metadata::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void Metadata::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     for (auto& pair : entries) {
       uint8_t index = pair.first;
       MetadataEntry* entry = pair.second;
@@ -372,31 +371,31 @@ namespace Ship {
     ConstructorRegistry<MetadataEntry> dataRegistry({ProtocolVersion::MINECRAFT_1_12_2, ProtocolVersion::MINECRAFT_1_13, ProtocolVersion::MINECRAFT_1_14,
       ProtocolVersion::MINECRAFT_1_19, ProtocolVersion::MINECRAFT_1_19_1, ProtocolVersion::MINECRAFT_1_19_3});
 
-    dataRegistry.RegisterConstructor(ByteMetadataEntry::ORDINAL, CreateConstructor<ByteMetadataEntry>(0));
-    dataRegistry.RegisterConstructor(VarIntMetadataEntry::ORDINAL, CreateConstructor<VarIntMetadataEntry>(0));
-    dataRegistry.RegisterConstructor(LongMetadataEntry::ORDINAL, CreateConstructor<LongMetadataEntry>(0));
-    dataRegistry.RegisterConstructor(FloatMetadataEntry::ORDINAL, CreateConstructor<FloatMetadataEntry>(0));
-    dataRegistry.RegisterConstructor(StringMetadataEntry::ORDINAL, CreateConstructor<StringMetadataEntry>(std::string {}));
-    dataRegistry.RegisterConstructor(ChatMetadataEntry::ORDINAL, CreateConstructor<ChatMetadataEntry>(std::string {}));
+    dataRegistry.RegisterConstructor(ByteMetadataEntry::ORDINAL, CreateConstructor<ByteMetadataEntry>());
+    dataRegistry.RegisterConstructor(VarIntMetadataEntry::ORDINAL, CreateConstructor<VarIntMetadataEntry>());
+    dataRegistry.RegisterConstructor(LongMetadataEntry::ORDINAL, CreateConstructor<LongMetadataEntry>());
+    dataRegistry.RegisterConstructor(FloatMetadataEntry::ORDINAL, CreateConstructor<FloatMetadataEntry>());
+    dataRegistry.RegisterConstructor(StringMetadataEntry::ORDINAL, CreateConstructor<StringMetadataEntry>());
+    dataRegistry.RegisterConstructor(ChatMetadataEntry::ORDINAL, CreateConstructor<ChatMetadataEntry>());
     dataRegistry.RegisterConstructor(OptChatMetadataEntry::ORDINAL, CreateConstructor<OptChatMetadataEntry>());
-    dataRegistry.RegisterConstructor(ItemStackMetadataEntry::ORDINAL, CreateConstructor<ItemStackMetadataEntry>(ItemStack {}));
-    dataRegistry.RegisterConstructor(BooleanMetadataEntry::ORDINAL, CreateConstructor<BooleanMetadataEntry>(false));
-    dataRegistry.RegisterConstructor(RotationMetadataEntry::ORDINAL, CreateConstructor<RotationMetadataEntry>(0, 0, 0));
-    dataRegistry.RegisterConstructor(PositionMetadataEntry::ORDINAL, CreateConstructor<PositionMetadataEntry>(0, 0, 0));
+    dataRegistry.RegisterConstructor(ItemStackMetadataEntry::ORDINAL, CreateConstructor<ItemStackMetadataEntry>());
+    dataRegistry.RegisterConstructor(BooleanMetadataEntry::ORDINAL, CreateConstructor<BooleanMetadataEntry>());
+    dataRegistry.RegisterConstructor(RotationMetadataEntry::ORDINAL, CreateConstructor<RotationMetadataEntry>());
+    dataRegistry.RegisterConstructor(PositionMetadataEntry::ORDINAL, CreateConstructor<PositionMetadataEntry>());
     dataRegistry.RegisterConstructor(OptPositionMetadataEntry::ORDINAL, CreateConstructor<OptPositionMetadataEntry>());
-    dataRegistry.RegisterConstructor(DirectionMetadataEntry::ORDINAL, CreateConstructor<DirectionMetadataEntry>(Direction {}));
+    dataRegistry.RegisterConstructor(DirectionMetadataEntry::ORDINAL, CreateConstructor<DirectionMetadataEntry>());
     dataRegistry.RegisterConstructor(OptUUIDMetadataEntry::ORDINAL, CreateConstructor<OptUUIDMetadataEntry>());
     dataRegistry.RegisterConstructor(BlockIDMetadataEntry::ORDINAL, CreateConstructor<BlockIDMetadataEntry>());
-    dataRegistry.RegisterConstructor(NBTMetadataEntry::ORDINAL, CreateConstructor<NBTMetadataEntry>(nullptr));
-    dataRegistry.RegisterConstructor(ParticleMetadataEntry::ORDINAL, CreateConstructor<ParticleMetadataEntry>(nullptr));
+    dataRegistry.RegisterConstructor(NBTMetadataEntry::ORDINAL, CreateConstructor<NBTMetadataEntry>());
+    dataRegistry.RegisterConstructor(ParticleMetadataEntry::ORDINAL, CreateConstructor<ParticleMetadataEntry>());
     dataRegistry.RegisterConstructor(
-      VillagerDataMetadataEntry::ORDINAL, CreateConstructor<VillagerDataMetadataEntry>(VillagerType {}, VillagerProfession {}, 0));
+      VillagerDataMetadataEntry::ORDINAL, CreateConstructor<VillagerDataMetadataEntry>());
     dataRegistry.RegisterConstructor(OptVarIntMetadataEntry::ORDINAL, CreateConstructor<OptVarIntMetadataEntry>());
-    dataRegistry.RegisterConstructor(PoseMetadataEntry::ORDINAL, CreateConstructor<PoseMetadataEntry>(Pose {}));
-    dataRegistry.RegisterConstructor(CatVariantMetadataEntry::ORDINAL, CreateConstructor<CatVariantMetadataEntry>(CatVariant {}));
-    dataRegistry.RegisterConstructor(FrogVariantMetadataEntry::ORDINAL, CreateConstructor<FrogVariantMetadataEntry>(FrogVariant {}));
-    dataRegistry.RegisterConstructor(GlobalPosMetadataEntry::ORDINAL, CreateConstructor<GlobalPosMetadataEntry>(std::string {}, 0, 0, 0));
-    dataRegistry.RegisterConstructor(PaintingVariantMetadataEntry::ORDINAL, CreateConstructor<PaintingVariantMetadataEntry>(PaintingVariant {}));
+    dataRegistry.RegisterConstructor(PoseMetadataEntry::ORDINAL, CreateConstructor<PoseMetadataEntry>());
+    dataRegistry.RegisterConstructor(CatVariantMetadataEntry::ORDINAL, CreateConstructor<CatVariantMetadataEntry>());
+    dataRegistry.RegisterConstructor(FrogVariantMetadataEntry::ORDINAL, CreateConstructor<FrogVariantMetadataEntry>());
+    dataRegistry.RegisterConstructor(GlobalPosMetadataEntry::ORDINAL, CreateConstructor<GlobalPosMetadataEntry>());
+    dataRegistry.RegisterConstructor(PaintingVariantMetadataEntry::ORDINAL, CreateConstructor<PaintingVariantMetadataEntry>());
 
     dataRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
       new VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,

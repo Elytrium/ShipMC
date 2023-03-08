@@ -5,11 +5,11 @@ namespace Ship {
   FallingDustParticle::FallingDustParticle(uint32_t blockState) : blockState(blockState) {
   }
 
-  void FallingDustParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void FallingDustParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(blockState);
   }
 
-  void FallingDustParticle::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  FallingDustParticle::FallingDustParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
     blockState = buffer->ReadVarInt();
   }
 

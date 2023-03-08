@@ -20,8 +20,9 @@ namespace Ship {
    public:                                                                                      \
     static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal(); \
                                                                                                 \
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {}                  \
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {}                   \
+    ParticleName(const ProtocolVersion* version, ByteBuffer* buffer) {}                         \
+                                                                                                \
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {}            \
     [[nodiscard]] std::string GetIdentifier() const override { return Identifier; }             \
     [[nodiscard]] uint32_t GetOrdinal() const override { return ORDINAL; }                      \
   }
@@ -127,9 +128,9 @@ namespace Ship {
     static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit BlockParticle(uint32_t blockState);
+    BlockParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -145,9 +146,9 @@ namespace Ship {
     static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit BlockMarkerParticle(uint32_t blockState);
+    BlockMarkerParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -166,9 +167,9 @@ namespace Ship {
     static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit DustParticle(float red, float green, float blue, float scale);
+    DustParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -196,9 +197,9 @@ namespace Ship {
     static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit DustColorTransitionParticle(float fromRed, float fromGreen, float fromBlue, float scale, float toRed, float toGreen, float toBlue);
+    DustColorTransitionParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -226,9 +227,9 @@ namespace Ship {
     static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit FallingDustParticle(uint32_t blockState);
+    FallingDustParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -244,9 +245,9 @@ namespace Ship {
     static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit ItemParticle(const ItemStack& item);
+    ItemParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -271,9 +272,9 @@ namespace Ship {
     VibrationParticle(int blockX, int blockY, int blockZ, uint32_t ticks);
     VibrationParticle(uint32_t entityId, float entityEyeHeight, uint32_t ticks);
     VibrationParticle(std::string sourceType, uint32_t ticks);
+    VibrationParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override;
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override;
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 

@@ -2,11 +2,11 @@
 #include "FramedPipe.hpp"
 
 namespace Ship {
-  Packet* FramedBytePacketPipe::Read(ByteBuffer* in) {
+  PacketHolder FramedBytePacketPipe::Read(ByteBuffer* in) {
     size_t readableBytes = in->GetReadableBytes();
     if (nextReadFrameLength == 0) {
       if (readableBytes == 0) {
-        return nullptr;
+        throw IncompleteFrameException();
       }
 
       try {
@@ -15,16 +15,16 @@ namespace Ship {
           throw InvalidArgumentException("Invalid packet size: ", nextReadFrameLength);
         }
       } catch (const IncompleteVarIntException& exception) {
-        return nullptr;
+        throw IncompleteFrameException();
       }
     }
 
     if (nextReadFrameLength != 0 && readableBytes >= nextReadFrameLength) {
-      Packet* packet = ReadPacket(in, nextReadFrameLength);
+      PacketHolder packet = ReadPacket(in, nextReadFrameLength);
       nextReadFrameLength = 0;
       return packet;
     }
 
-    return nullptr;
+    throw IncompleteFrameException();
   }
 } // namespace Ship

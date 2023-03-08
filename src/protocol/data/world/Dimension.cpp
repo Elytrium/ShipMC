@@ -16,7 +16,7 @@ namespace Ship {
       monsterSpawnLightLevel(monsterSpawnLightLevel), defaultBiome(defaultBiome) {
   }
 
-  Dimension Dimension::FromNBT(CompoundTag *nbt) {
+  Dimension *Dimension::FromNBT(CompoundTag *nbt) {
     std::string key = nbt->GetString("name").value();
     uint32_t modernId = nbt->GetInt("id").value();
     uint32_t legacyId = 1; // TODO:
@@ -49,9 +49,9 @@ namespace Ship {
 
     Biome *defaultBiome = nullptr;
 
-    return {key, legacyId, modernId, sections, isNatural, ambientLight, isShrunk, isUltrawarm, hasCeiling, hasLegacySkyLight, hasModernSkyLight,
-      isPiglinSafe, doBedsWork, doRespawnAnchorsWork, hasRaids, logicalHeight, burningBehaviourIdentifier, fixedTime, hasEnderdragonFight, coordinateScale,
-      effects, minY, height, monsterSpawnBlockLightLimit, monsterSpawnLightLevel, defaultBiome};
+    return new Dimension(key, legacyId, modernId, sections, isNatural, ambientLight, isShrunk, isUltrawarm, hasCeiling, hasLegacySkyLight,
+      hasModernSkyLight, isPiglinSafe, doBedsWork, doRespawnAnchorsWork, hasRaids, logicalHeight, burningBehaviourIdentifier, fixedTime,
+      hasEnderdragonFight, coordinateScale, effects, minY, height, monsterSpawnBlockLightLimit, monsterSpawnLightLevel, defaultBiome);
   }
 
   CompoundTag *Dimension::Serialize() const {
@@ -115,7 +115,7 @@ namespace Ship {
     return defaultBiome;
   }
 
-  Dimension Dimension::FromLegacyID(uint32_t id) {
+  Dimension *Dimension::FromLegacyID(uint32_t id) {
     throw Exception("Not implemented"); // TODO:
   }
 }

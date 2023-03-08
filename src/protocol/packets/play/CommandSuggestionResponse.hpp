@@ -7,7 +7,7 @@
 
 namespace Ship {
 
-  class CommandSuggestion {
+  class CommandSuggestion : Serializable {
    private:
     std::string match;
     std::optional<std::string> tooltip;
@@ -20,6 +20,30 @@ namespace Ship {
     }
 
     CommandSuggestion() : CommandSuggestion("") {
+    }
+
+    CommandSuggestion(const ProtocolVersion* version, ByteBuffer* buffer) {
+      match = buffer->ReadString();
+
+      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
+        if (buffer->ReadBoolean()) {
+          tooltip = buffer->ReadString();
+        } else {
+          tooltip = std::nullopt;
+        }
+      } else {
+        tooltip = std::nullopt;
+      }
+    }
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteString(match);
+      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
+        buffer->WriteBoolean(tooltip.has_value());
+        if (tooltip) {
+          buffer->WriteString(tooltip.value());
+        }
+      }
     }
 
     [[nodiscard]] const std::string& GetMatch() const {
@@ -55,55 +79,35 @@ namespace Ship {
 
     ~CommandSuggestionResponse() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    CommandSuggestionResponse(const ProtocolVersion* version, ByteBuffer* buffer) {
       if (version >= &ProtocolVersion::MINECRAFT_1_13) {
         id = buffer->ReadVarInt();
         start = buffer->ReadVarInt();
         length = buffer->ReadVarInt();
-        matches.resize(buffer->ReadVarInt());
+      }
 
-        for (CommandSuggestion& match : matches) {
-          match.SetMatch(buffer->ReadString());
-          if (buffer->ReadBoolean()) {
-            match.SetTooltip(buffer->ReadString());
-          } else {
-            match.SetTooltip(std::nullopt);
-          }
-        }
-      } else {
-        matches.resize(buffer->ReadVarInt());
-
-        for (CommandSuggestion& match : matches) {
-          match.SetMatch(buffer->ReadString());
-          match.SetTooltip(std::nullopt);
-        }
+      uint32_t vectorSize = buffer->ReadVarInt();
+      for (int i = 0; i < vectorSize; ++i) {
+        matches.emplace_back(version, buffer);
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       if (version >= &ProtocolVersion::MINECRAFT_1_13) {
         buffer->WriteVarInt(id);
         buffer->WriteVarInt(start);
         buffer->WriteVarInt(length);
         buffer->WriteVarInt(matches.size());
-
-        for (const CommandSuggestion& match : matches) {
-          buffer->WriteString(match.GetMatch());
-          buffer->WriteBoolean(match.GetTooltip().has_value());
-          if (match.GetTooltip()) {
-            buffer->WriteString(match.GetTooltip().value());
-          }
-        }
       } else {
         buffer->WriteVarInt(matches.size());
+      }
 
-        for (const CommandSuggestion& match : matches) {
-          buffer->WriteString(match.GetMatch());
-        }
+      for (const CommandSuggestion& match : matches) {
+        match.Write(version, buffer);
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

@@ -20,7 +20,7 @@ namespace Ship {
   VibrationParticle::VibrationParticle(std::string sourceType, uint32_t ticks) : VibrationParticle(std::move(sourceType), 0, 0, 0, 0, 0, ticks) {
   }
 
-  void VibrationParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void VibrationParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteString(sourceType);
     if (sourceType == "minecraft:block") {
       buffer->WritePosition(blockX, blockY, blockZ);
@@ -31,7 +31,7 @@ namespace Ship {
     buffer->WriteVarInt(ticks);
   }
 
-  void VibrationParticle::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  VibrationParticle::VibrationParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
     sourceType = buffer->ReadString();
     if (sourceType == "minecraft:block") {
       buffer->ReadPosition(blockX, blockY, blockZ);

@@ -19,17 +19,17 @@ namespace Ship {
 
     ~EntityAnimation() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteVarInt(entityId);
-      buffer->WriteByte(animationId);
-    }
-
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    EntityAnimation(const ProtocolVersion* version, ByteBuffer* buffer) {
       entityId = buffer->ReadVarInt();
       animationId = buffer->ReadByte();
     }
 
-    uint32_t GetOrdinal() override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteVarInt(entityId);
+      buffer->WriteByte(animationId);
+    }
+
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

@@ -6,12 +6,12 @@ namespace Ship {
   GlobalPosMetadataEntry::GlobalPosMetadataEntry(std::string dimension, int x, int y, int z) : dimension(std::move(dimension)), x(x), y(y), z(z) {
   }
 
-  void GlobalPosMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void GlobalPosMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteString(dimension);
     buffer->WritePosition(x, y, z);
   }
 
-  void GlobalPosMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  GlobalPosMetadataEntry::GlobalPosMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     dimension = buffer->ReadString();
     buffer->ReadPosition(x, y, z);
   }

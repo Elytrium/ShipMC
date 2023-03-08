@@ -29,7 +29,7 @@ namespace Ship {
 
     ~CustomSoundEffect() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    CustomSoundEffect(const ProtocolVersion* version, ByteBuffer* buffer) {
       soundName = buffer->ReadString();
       soundCategory = buffer->ReadVarInt();
       effectPositionX = buffer->ReadInt();
@@ -42,7 +42,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(soundName);
       buffer->WriteVarInt(soundCategory);
       buffer->WriteInt(effectPositionX);
@@ -55,7 +55,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

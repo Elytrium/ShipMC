@@ -24,6 +24,16 @@ namespace Ship {
     Statistic() : Statistic(0, 0, 0) {
     }
 
+    Statistic(const ProtocolVersion* version, ByteBuffer* buffer) {
+      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
+        categoryId = buffer->ReadVarInt();
+        statisticId = buffer->ReadVarInt();
+      } else {
+        name = buffer->ReadString();
+      }
+      value = buffer->ReadVarInt();
+    }
+
     [[nodiscard]] uint32_t GetCategoryId() const {
       return categoryId;
     }
@@ -67,22 +77,16 @@ namespace Ship {
     explicit AwardStatistics(std::vector<Statistic> statistics) : statistics(std::move(statistics)) {
     }
 
-    ~AwardStatistics() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      statistics.resize(buffer->ReadVarInt());
-      for (Statistic& statistic : statistics) {
-        if (version >= &ProtocolVersion::MINECRAFT_1_13) {
-          statistic.SetCategoryId(buffer->ReadVarInt());
-          statistic.SetStatisticId(buffer->ReadVarInt());
-        } else {
-          statistic.SetName(buffer->ReadString());
-        }
-        statistic.SetValue(buffer->ReadVarInt());
+    AwardStatistics(const ProtocolVersion* version, ByteBuffer* buffer) {
+      uint32_t vectorSize = buffer->ReadVarInt();
+      for (int i = 0; i < vectorSize; ++i) {
+        statistics.emplace_back(version, buffer);
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~AwardStatistics() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(statistics.size());
       for (const Statistic& statistic : statistics) {
         if (version >= &ProtocolVersion::MINECRAFT_1_13) {
@@ -95,7 +99,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

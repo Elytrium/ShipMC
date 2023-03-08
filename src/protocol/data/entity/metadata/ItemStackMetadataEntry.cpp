@@ -5,12 +5,12 @@ namespace Ship {
   ItemStackMetadataEntry::ItemStackMetadataEntry(const ItemStack& value) : value(value) {
   }
 
-  void ItemStackMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void ItemStackMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     value.Write(version, buffer);
   }
 
-  void ItemStackMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value.Read(version, buffer);
+  ItemStackMetadataEntry::ItemStackMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
+    value = ItemStack(version, buffer);
   }
 
   MetadataEntryType ItemStackMetadataEntry::GetType() const {

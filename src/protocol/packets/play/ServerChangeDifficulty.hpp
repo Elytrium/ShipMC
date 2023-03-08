@@ -19,21 +19,21 @@ namespace Ship {
 
     ~ServerChangeDifficulty() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ServerChangeDifficulty(const ProtocolVersion* version, ByteBuffer* buffer) {
       difficulty = (Difficulty) buffer->ReadByte();
       if (version >= &ProtocolVersion::MINECRAFT_1_14) {
         locked = buffer->ReadBoolean();
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(difficulty);
       if (version >= &ProtocolVersion::MINECRAFT_1_14) {
         buffer->WriteBoolean(locked);
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

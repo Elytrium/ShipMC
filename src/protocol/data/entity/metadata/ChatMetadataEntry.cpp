@@ -5,11 +5,11 @@ namespace Ship {
   ChatMetadataEntry::ChatMetadataEntry(std::string value) : value(std::move(value)) {
   }
 
-  void ChatMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void ChatMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteString(value);
   }
 
-  void ChatMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  ChatMetadataEntry::ChatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = buffer->ReadString();
   }
 

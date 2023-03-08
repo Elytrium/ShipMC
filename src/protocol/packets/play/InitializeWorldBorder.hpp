@@ -28,7 +28,7 @@ namespace Ship {
 
     ~InitializeWorldBorder() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    InitializeWorldBorder(const ProtocolVersion* version, ByteBuffer* buffer) {
       x = buffer->ReadDouble();
       z = buffer->ReadDouble();
       oldDiameter = buffer->ReadDouble();
@@ -39,7 +39,7 @@ namespace Ship {
       warningTime = buffer->ReadVarInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteDouble(x);
       buffer->WriteDouble(z);
       buffer->WriteDouble(oldDiameter);
@@ -50,7 +50,7 @@ namespace Ship {
       buffer->WriteVarInt(warningTime);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

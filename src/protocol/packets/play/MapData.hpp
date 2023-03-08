@@ -23,6 +23,27 @@ namespace Ship {
     MapIcon() : MapIcon(0, 0, 0, 0, {}) {
     }
 
+    MapIcon(const ProtocolVersion* version, ByteBuffer* buffer) {
+      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
+        type = buffer->ReadVarInt();
+        x = buffer->ReadByte();
+        z = buffer->ReadByte();
+        direction = buffer->ReadByte();
+        if (buffer->ReadBoolean()) {
+          displayName = buffer->ReadString();
+        } else {
+          displayName = std::nullopt;
+        }
+      } else {
+        uint8_t directionAndType = buffer->ReadByte();
+        direction = directionAndType & 0xF;
+        type = (directionAndType & 0xF) >> 4;
+        x = buffer->ReadByte();
+        z = buffer->ReadByte();
+        displayName = std::nullopt;
+      }
+    }
+
     [[nodiscard]] uint32_t GetType() const {
       return type;
     }
@@ -91,7 +112,7 @@ namespace Ship {
       delete[] data;
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    MapData(const ProtocolVersion* version, ByteBuffer* buffer) {
       mapId = buffer->ReadVarInt();
       scale = buffer->ReadByte();
       if (version >= &ProtocolVersion::MINECRAFT_1_17) {
@@ -103,26 +124,9 @@ namespace Ship {
           locked = buffer->ReadBoolean();
         }
       }
-      icons.resize(buffer->ReadVarInt());
-      for (MapIcon& icon : icons) {
-        if (version >= &ProtocolVersion::MINECRAFT_1_13) {
-          icon.SetType(buffer->ReadVarInt());
-          icon.SetX(buffer->ReadByte());
-          icon.SetZ(buffer->ReadByte());
-          icon.SetDirection(buffer->ReadByte());
-          if (buffer->ReadBoolean()) {
-            icon.SetDisplayName(buffer->ReadString());
-          } else {
-            icon.SetDisplayName(std::nullopt);
-          }
-        } else {
-          uint8_t directionAndType = buffer->ReadByte();
-          icon.SetDirection(directionAndType & 0xF);
-          icon.SetType((directionAndType & 0xF) >> 4);
-          icon.SetX(buffer->ReadByte());
-          icon.SetZ(buffer->ReadByte());
-          icon.SetDisplayName(std::nullopt);
-        }
+      uint32_t vectorSize = buffer->ReadVarInt();
+      for (int i = 0; i < vectorSize; ++i) {
+        icons.emplace_back(version, buffer);
       }
       columns = buffer->ReadByte();
       if (columns) {
@@ -135,7 +139,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(mapId);
       buffer->WriteByte(scale);
       if (version >= &ProtocolVersion::MINECRAFT_1_17) {
@@ -174,7 +178,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

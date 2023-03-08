@@ -30,20 +30,20 @@ namespace Ship {
 
     ~BossBarAdd() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteString(title);
-      buffer->WriteFloat(health);
-      buffer->WriteVarInt(color);
-      buffer->WriteVarInt(division);
-      buffer->WriteByte(flags);
-    }
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    BossBarAdd(const ProtocolVersion* version, ByteBuffer* buffer) {
       title = buffer->ReadString();
       health = buffer->ReadFloat();
       color = buffer->ReadVarInt();
       division = buffer->ReadVarInt();
       flags = buffer->ReadByte();
+    }
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteString(title);
+      buffer->WriteFloat(health);
+      buffer->WriteVarInt(color);
+      buffer->WriteVarInt(division);
+      buffer->WriteByte(flags);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -73,12 +73,12 @@ namespace Ship {
 
   class BossBarRemove : public BossBarAction {
    public:
-    ~BossBarRemove() override = default;
-
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    BossBarRemove(const ProtocolVersion* version, ByteBuffer* buffer) {
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~BossBarRemove() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -94,14 +94,14 @@ namespace Ship {
     explicit BossBarUpdateHealth(float health) : health(health) {
     }
 
-    ~BossBarUpdateHealth() override = default;
-
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteFloat(health);
+    BossBarUpdateHealth(const ProtocolVersion* version, ByteBuffer* buffer) {
+      health = buffer->ReadFloat();
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      health = buffer->ReadFloat();
+    ~BossBarUpdateHealth() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteFloat(health);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -121,14 +121,14 @@ namespace Ship {
     explicit BossBarUpdateTitle(std::string title) : title(std::move(title)) {
     }
 
-    ~BossBarUpdateTitle() override = default;
-
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteString(title);
+    BossBarUpdateTitle(const ProtocolVersion* version, ByteBuffer* buffer) {
+      title = buffer->ReadString();
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      title = buffer->ReadString();
+    ~BossBarUpdateTitle() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteString(title);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -149,16 +149,16 @@ namespace Ship {
     BossBarUpdateStyle(uint32_t color, uint32_t dividers) : color(color), dividers(dividers) {
     }
 
-    ~BossBarUpdateStyle() override = default;
-
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteVarInt(color);
-      buffer->WriteVarInt(dividers);
-    }
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    BossBarUpdateStyle(const ProtocolVersion* version, ByteBuffer* buffer) {
       color = buffer->ReadVarInt();
       dividers = buffer->ReadVarInt();
+    }
+
+    ~BossBarUpdateStyle() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteVarInt(color);
+      buffer->WriteVarInt(dividers);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -182,12 +182,12 @@ namespace Ship {
     explicit BossBarUpdateFlags(uint8_t flags) : flags(flags) {
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      buffer->WriteByte(flags);
+    BossBarUpdateFlags(const ProtocolVersion* version, ByteBuffer* buffer) {
+      flags = buffer->ReadByte();
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
-      flags = buffer->ReadByte();
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteByte(flags);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -210,54 +210,50 @@ namespace Ship {
     BossBar(const UUID& uuid, BossBarAction* action) : uuid(uuid), action(action) {
     }
 
-    ~BossBar() override {
-      delete action;
-    }
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    BossBar(const ProtocolVersion* version, ByteBuffer* buffer) {
       uuid = buffer->ReadUUID();
       uint32_t actionId = buffer->ReadVarInt();
 
       delete action;
       switch (actionId) {
         case 0:
-          action = new BossBarAdd({}, 0, 0, 0, 0);
+          action = new BossBarAdd(version, buffer);
           break;
 
         case 1:
-          action = new BossBarRemove();
+          action = new BossBarRemove(version, buffer);
           break;
 
         case 2:
-          action = new BossBarUpdateHealth(0);
+          action = new BossBarUpdateHealth(version, buffer);
           break;
 
         case 3:
-          action = new BossBarUpdateTitle({});
+          action = new BossBarUpdateTitle(version, buffer);
           break;
 
         case 4:
-          action = new BossBarUpdateStyle(0, 0);
+          action = new BossBarUpdateStyle(version, buffer);
           break;
 
         case 5:
-          action = new BossBarUpdateFlags(0);
+          action = new BossBarUpdateFlags(version, buffer);
           break;
 
         default:
           throw Exception("Unknown boss bar action");
       }
-
-      action->Read(version, buffer);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~BossBar() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteUUID(uuid);
       buffer->WriteVarInt(action->GetAction());
       action->Write(version, buffer);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

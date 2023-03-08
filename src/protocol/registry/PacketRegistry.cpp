@@ -2,7 +2,7 @@
 
 namespace Ship {
   DirectionRegistry::DirectionRegistry()
-    : ConstructorRegistry<Packet>({
+    : VersionedRegistry({
       ProtocolVersion::MINECRAFT_1_12_2,
       ProtocolVersion::MINECRAFT_1_13,
       ProtocolVersion::MINECRAFT_1_14,
@@ -17,16 +17,8 @@ namespace Ship {
     }) {
   }
 
-  void DirectionRegistry::RegisterPacketConstructor(uint32_t ordinal, const std::function<Packet*()>& constructor) {
-    RegisterConstructor(ordinal, constructor);
-  }
-
-  Packet* DirectionRegistry::GetPacketByID(const ProtocolVersion* version, uint32_t id) const {
-    return (Packet*) GetObjectByID(version, id);
-  }
-
-  uint32_t DirectionRegistry::GetIDByPacket(const ProtocolVersion* version, Packet* packet) const {
-    return GetIDByOrdinal(version, packet->GetOrdinal());
+  uint32_t DirectionRegistry::GetIDByPacket(const ProtocolVersion* version, const Packet& packet) const {
+    return GetIDByOrdinal(version, packet.GetOrdinal());
   }
 
   PacketRegistry::PacketRegistry(const DirectionRegistry* clientbound_registry, const DirectionRegistry* serverbound_registry)

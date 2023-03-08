@@ -5,11 +5,11 @@ namespace Ship {
   VarIntMetadataEntry::VarIntMetadataEntry(uint32_t value) : value(value) {
   }
 
-  void VarIntMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void VarIntMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(value);
   }
 
-  void VarIntMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  VarIntMetadataEntry::VarIntMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = buffer->ReadVarInt();
   }
 

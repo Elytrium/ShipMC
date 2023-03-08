@@ -5,11 +5,11 @@ namespace Ship {
   PaintingVariantMetadataEntry::PaintingVariantMetadataEntry(const PaintingVariant& value) : value(value) {
   }
 
-  void PaintingVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void PaintingVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(PAINTING_VARIANT_REGISTRY.GetID(version, value));
   }
 
-  void PaintingVariantMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  PaintingVariantMetadataEntry::PaintingVariantMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = PAINTING_VARIANT_REGISTRY.GetValue(version, buffer->ReadVarInt());
   }
 

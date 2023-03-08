@@ -17,17 +17,17 @@ namespace Ship {
     explicit StatusResponse(std::string status) : status(std::move(status)) {
     }
 
-    ~StatusResponse() override = default;
-
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    StatusResponse(const ProtocolVersion* version, ByteBuffer* buffer) {
       status = buffer->ReadString();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    ~StatusResponse() override = default;
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(status);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

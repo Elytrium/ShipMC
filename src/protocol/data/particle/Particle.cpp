@@ -156,8 +156,8 @@ namespace Ship {
     particleRegistry.RegisterConstructor(AngryVillagerParticle::ORDINAL, CreateConstructor<AngryVillagerParticle>());
     particleRegistry.RegisterConstructor(BarrierParticle::ORDINAL, CreateConstructor<BarrierParticle>());
     particleRegistry.RegisterConstructor(LightParticle::ORDINAL, CreateConstructor<LightParticle>());
-    particleRegistry.RegisterConstructor(BlockParticle::ORDINAL, CreateConstructor<BlockParticle>(0));
-    particleRegistry.RegisterConstructor(BlockMarkerParticle::ORDINAL, CreateConstructor<BlockMarkerParticle>(0));
+    particleRegistry.RegisterConstructor(BlockParticle::ORDINAL, CreateConstructor<BlockParticle>());
+    particleRegistry.RegisterConstructor(BlockMarkerParticle::ORDINAL, CreateConstructor<BlockMarkerParticle>());
     particleRegistry.RegisterConstructor(BubbleParticle::ORDINAL, CreateConstructor<BubbleParticle>());
     particleRegistry.RegisterConstructor(CloudParticle::ORDINAL, CreateConstructor<CloudParticle>());
     particleRegistry.RegisterConstructor(CritParticle::ORDINAL, CreateConstructor<CritParticle>());
@@ -168,8 +168,8 @@ namespace Ship {
     particleRegistry.RegisterConstructor(LandingLavaParticle::ORDINAL, CreateConstructor<LandingLavaParticle>());
     particleRegistry.RegisterConstructor(DrippingWaterParticle::ORDINAL, CreateConstructor<DrippingWaterParticle>());
     particleRegistry.RegisterConstructor(FallingWaterParticle::ORDINAL, CreateConstructor<FallingWaterParticle>());
-    particleRegistry.RegisterConstructor(DustParticle::ORDINAL, CreateConstructor<DustParticle>(0, 0, 0, 0));
-    particleRegistry.RegisterConstructor(DustColorTransitionParticle::ORDINAL, CreateConstructor<DustColorTransitionParticle>(0, 0, 0, 0, 0, 0, 0));
+    particleRegistry.RegisterConstructor(DustParticle::ORDINAL, CreateConstructor<DustParticle>());
+    particleRegistry.RegisterConstructor(DustColorTransitionParticle::ORDINAL, CreateConstructor<DustColorTransitionParticle>());
     particleRegistry.RegisterConstructor(EffectParticle::ORDINAL, CreateConstructor<EffectParticle>());
     particleRegistry.RegisterConstructor(ElderGuardianParticle::ORDINAL, CreateConstructor<ElderGuardianParticle>());
     particleRegistry.RegisterConstructor(EnchantedHitParticle::ORDINAL, CreateConstructor<EnchantedHitParticle>());
@@ -179,7 +179,7 @@ namespace Ship {
     particleRegistry.RegisterConstructor(ExplosionEmitterParticle::ORDINAL, CreateConstructor<ExplosionEmitterParticle>());
     particleRegistry.RegisterConstructor(ExplosionParticle::ORDINAL, CreateConstructor<ExplosionParticle>());
     particleRegistry.RegisterConstructor(SonicBoomParticle::ORDINAL, CreateConstructor<SonicBoomParticle>());
-    particleRegistry.RegisterConstructor(FallingDustParticle::ORDINAL, CreateConstructor<FallingDustParticle>(0));
+    particleRegistry.RegisterConstructor(FallingDustParticle::ORDINAL, CreateConstructor<FallingDustParticle>());
     particleRegistry.RegisterConstructor(FireworkParticle::ORDINAL, CreateConstructor<FireworkParticle>());
     particleRegistry.RegisterConstructor(FishingParticle::ORDINAL, CreateConstructor<FishingParticle>());
     particleRegistry.RegisterConstructor(FlameParticle::ORDINAL, CreateConstructor<FlameParticle>());
@@ -193,8 +193,8 @@ namespace Ship {
     particleRegistry.RegisterConstructor(ComposterParticle::ORDINAL, CreateConstructor<ComposterParticle>());
     particleRegistry.RegisterConstructor(HeartParticle::ORDINAL, CreateConstructor<HeartParticle>());
     particleRegistry.RegisterConstructor(InstantEffectParticle::ORDINAL, CreateConstructor<InstantEffectParticle>());
-    particleRegistry.RegisterConstructor(ItemParticle::ORDINAL, CreateConstructor<ItemParticle>(ItemStack {}));
-    particleRegistry.RegisterConstructor(VibrationParticle::ORDINAL, CreateConstructor<VibrationParticle>(std::string {}, 0));
+    particleRegistry.RegisterConstructor(ItemParticle::ORDINAL, CreateConstructor<ItemParticle>());
+    particleRegistry.RegisterConstructor(VibrationParticle::ORDINAL, CreateConstructor<VibrationParticle>());
     particleRegistry.RegisterConstructor(ItemSlimeParticle::ORDINAL, CreateConstructor<ItemSlimeParticle>());
     particleRegistry.RegisterConstructor(ItemSnowballParticle::ORDINAL, CreateConstructor<ItemSnowballParticle>());
     particleRegistry.RegisterConstructor(LargeSmokeParticle::ORDINAL, CreateConstructor<LargeSmokeParticle>());

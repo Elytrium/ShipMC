@@ -21,20 +21,20 @@ namespace Ship {
       delete[] unknownBytes;
     }
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    PreparedPacket(const ProtocolVersion* version, ByteBuffer* buffer) {
       unknownBytes[version->GetOrdinal()] = buffer;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       auto* temp = new ByteBufferImpl(unknownBytes[version->GetOrdinal()]);
       buffer->WriteBytes(temp, temp->GetReadableBytes());
     }
 
-    uint32_t Size(const ProtocolVersion* version) override {
+    uint32_t Size(const ProtocolVersion* version) const override {
       return unknownBytes[version->GetOrdinal()]->GetReadableBytes();
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

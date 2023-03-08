@@ -5,12 +5,12 @@ namespace Ship {
   BooleanMetadataEntry::BooleanMetadataEntry(bool value) : value(value) {
   }
 
-  void BooleanMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
-    buffer->WriteBoolean(value);
+  BooleanMetadataEntry::BooleanMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
+    value = buffer->ReadBoolean();
   }
 
-  void BooleanMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadBoolean();
+  void BooleanMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+    buffer->WriteBoolean(value);
   }
 
   MetadataEntryType BooleanMetadataEntry::GetType() const {

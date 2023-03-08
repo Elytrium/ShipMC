@@ -7,14 +7,14 @@ namespace Ship {
   OptUUIDMetadataEntry::OptUUIDMetadataEntry(const std::optional<UUID>& optValue) : optValue(optValue) {
   }
 
-  void OptUUIDMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) {
+  void OptUUIDMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteBoolean(optValue.has_value());
     if (optValue) {
       buffer->WriteUUID(optValue.value());
     }
   }
 
-  void OptUUIDMetadataEntry::Read(const ProtocolVersion* version, ByteBuffer* buffer) {
+  OptUUIDMetadataEntry::OptUUIDMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     if (buffer->ReadBoolean()) {
       optValue = buffer->ReadUUID();
     } else {

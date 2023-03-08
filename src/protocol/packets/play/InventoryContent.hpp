@@ -24,25 +24,26 @@ namespace Ship {
 
     ~InventoryContent() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    InventoryContent(const ProtocolVersion* version, ByteBuffer* buffer) {
       windowId = buffer->ReadByte();
+      uint32_t vectorSize;
       if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
         stateId = buffer->ReadVarInt();
-        slots.resize(buffer->ReadVarInt());
+        vectorSize = buffer->ReadVarInt();
       } else {
-        slots.resize(buffer->ReadShort());
+        vectorSize = buffer->ReadShort();
       }
 
-      for (ItemStack& slot : slots) {
-        slot.Read(version, buffer);
+      for (int i = 0; i < vectorSize; ++i) {
+        slots.emplace_back(version, buffer);
       }
 
       if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
-        carriedItem.Read(version, buffer);
+        carriedItem = ItemStack(version, buffer);
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(windowId);
       if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
         buffer->WriteVarInt(stateId);
@@ -51,7 +52,7 @@ namespace Ship {
         buffer->WriteShort(slots.size());
       }
 
-      for (ItemStack& slot : slots) {
+      for (const ItemStack& slot : slots) {
         slot.Write(version, buffer);
       }
 
@@ -60,7 +61,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

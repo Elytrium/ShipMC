@@ -23,7 +23,7 @@ namespace Ship {
 
     void EncodeFrame(ByteBuffer* in, uint32_t frame_size) override;
     void DecodeFrame(ByteBuffer* in, uint32_t frame_size) override;
-    uint32_t GetOrdinal() override;
+    uint32_t GetOrdinal() const override;
   };
 
   class MinecraftFramedBytePacketPipe : public FramedBytePacketPipe {
@@ -48,7 +48,7 @@ namespace Ship {
     const ProtocolVersion* GetProtocolVersion();
     void SetProtocolVersion(const ProtocolVersion* new_protocol_version);
 
-    ByteBuffer* WriteWithoutDeletion(Packet* in) override;
-    Packet* ReadPacket(ByteBuffer* in, uint32_t frame_size) override;
+    ByteBuffer* Write(const Packet& in) override;
+    PacketHolder ReadPacket(ByteBuffer* in, uint32_t frame_size) override;
   };
 } // namespace Ship

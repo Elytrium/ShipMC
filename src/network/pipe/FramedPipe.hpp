@@ -3,6 +3,11 @@
 #include "Pipe.hpp"
 
 namespace Ship {
+  class IncompleteFrameException : public Exception {
+   public:
+    IncompleteFrameException() : Exception("ByteBuffer doesn't contain enough data to read frame correctly") {}
+  };
+
   class FramedByteBytePipe : public ByteBytePipe {
    private:
     uint32_t nextReadFrameLength = 0;
@@ -30,8 +35,8 @@ namespace Ship {
     explicit FramedBytePacketPipe(uint32_t max_read_size) : BytePacketPipe(), maxReadSize(max_read_size) {
     }
 
-    Packet* Read(ByteBuffer* in) override;
+    PacketHolder Read(ByteBuffer* in) override;
 
-    virtual Packet* ReadPacket(ByteBuffer* in, uint32_t frame_size) = 0;
+    virtual PacketHolder ReadPacket(ByteBuffer* in, uint32_t frame_size) = 0;
   };
 } // namespace Ship

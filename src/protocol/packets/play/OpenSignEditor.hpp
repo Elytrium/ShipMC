@@ -20,15 +20,15 @@ namespace Ship {
 
     ~OpenSignEditor() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    OpenSignEditor(const ProtocolVersion* version, ByteBuffer* buffer) {
       buffer->ReadPosition(locationX, locationY, locationZ);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WritePosition(locationX, locationY, locationZ);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

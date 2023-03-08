@@ -30,7 +30,7 @@ namespace Ship {
 
     ~Explosion() override = default;
 
-    void Read(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    Explosion(const ProtocolVersion* version, ByteBuffer* buffer) {
       if (version == &ProtocolVersion::MINECRAFT_1_19) {
         x = buffer->ReadFloat();
         y = buffer->ReadFloat();
@@ -56,7 +56,7 @@ namespace Ship {
       playerMotionZ = buffer->ReadFloat();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) override {
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       if (version == &ProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteFloat((float) x);
         buffer->WriteFloat((float) y);
@@ -82,7 +82,7 @@ namespace Ship {
       buffer->WriteFloat(playerMotionZ);
     }
 
-    uint32_t GetOrdinal() override {
+    uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

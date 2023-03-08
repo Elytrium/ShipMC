@@ -33,15 +33,11 @@ namespace Ship {
   }
 
   AbstractParticle* ProtocolUtils::ReadParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    AbstractParticle* particle = PARTICLE_REGISTRY.GetObjectByID(version, buffer->ReadVarInt());
-    particle->Read(version, buffer);
-    return particle;
+    return PARTICLE_REGISTRY.GetObjectByID(version, buffer->ReadVarInt(), buffer);
   }
 
   Metadata* ProtocolUtils::ReadMetadata(const ProtocolVersion* version, ByteBuffer* buffer) {
-    auto* metadata = new Metadata();
-    metadata->Read(version, buffer);
-    return metadata;
+    return new Metadata(version, buffer);
   }
 
   uint32_t ProtocolUtils::NBTSize(NBT* nbt) {

@@ -8,12 +8,12 @@ namespace Ship {
     SetPacketCallback(HandshakePacketHandler, Handshake, OnHandshake);
   }
 
-  inline bool HandshakePacketHandler::OnHandshake(Connection* connection, Handshake* handshake) {
+  inline bool HandshakePacketHandler::OnHandshake(Connection* connection, const Handshake& handshake) {
     auto minecraftPipe = (MinecraftFramedBytePacketPipe*) connection->GetBytePacketPipe();
-    minecraftPipe->SetProtocolVersion(handshake->GetProtocolVersion());
+    minecraftPipe->SetProtocolVersion(handshake.GetProtocolVersion());
 
-    Client client(minecraftPipe, handshake->GetSocketAddress());
-    switch (handshake->GetNextStatus()) {
+    Client client(connection, minecraftPipe, handshake.GetSocketAddress());
+    switch (handshake.GetNextStatus()) {
       case HandshakeNextStatus::STATUS:
         minecraftPipe->SetRegistry(&BuiltInPacketRegistry::STATUS);
         connection->ReplaceMainPacketHandler(new StatusPacketHandler(client));
