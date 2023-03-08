@@ -19,7 +19,8 @@ namespace Ship {
 
     ~Cooldown() override = default;
 
-    Cooldown(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit Cooldown(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       itemId = buffer->ReadVarInt();
       cooldownTicks = buffer->ReadVarInt();
     }

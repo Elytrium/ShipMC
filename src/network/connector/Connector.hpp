@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../eventloop/NetworkEventLoop.hpp"
 #include "../Connection.hpp"
-#include "../eventloop/EventLoop.hpp"
 
 namespace Ship {
   class Connector {

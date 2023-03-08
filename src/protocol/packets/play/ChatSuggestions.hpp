@@ -20,7 +20,8 @@ namespace Ship {
 
     ~ChatSuggestions() override = default;
 
-    ChatSuggestions(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit ChatSuggestions(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       action = buffer->ReadVarInt();
       uint32_t vectorSize = buffer->ReadVarInt();
       for (int i = 0; i < vectorSize; ++i) {

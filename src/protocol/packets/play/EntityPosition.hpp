@@ -23,7 +23,8 @@ namespace Ship {
 
     ~EntityPosition() override = default;
 
-    EntityPosition(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit EntityPosition(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       entityId = buffer->ReadVarInt();
       deltaX = buffer->ReadShort();
       deltaY = buffer->ReadShort();

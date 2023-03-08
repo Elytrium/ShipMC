@@ -25,7 +25,8 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    Handshake(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit Handshake(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       protocolVersionID = buffer->ReadVarInt();
 
       hostname = buffer->ReadString(MAXIMUM_HOSTNAME_SIZE);

@@ -10,7 +10,7 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    StatusRequest(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit StatusRequest(const PacketHolder& holder) {
     }
 
     ~StatusRequest() override = default;

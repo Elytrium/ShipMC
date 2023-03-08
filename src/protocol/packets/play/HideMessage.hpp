@@ -16,7 +16,8 @@ namespace Ship {
     explicit HideMessage(ByteBuffer* signature) : signature(signature) {
     }
 
-    HideMessage(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit HideMessage(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       uint32_t size = buffer->GetReadableBytes();
       delete signature;
       signature = new ByteBufferImpl(buffer->ReadBytes(size), size);

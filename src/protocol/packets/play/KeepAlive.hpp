@@ -18,7 +18,8 @@ namespace Ship {
 
     ~KeepAlive() override = default;
 
-    KeepAlive(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit KeepAlive(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       id = buffer->ReadLong();
     }
 

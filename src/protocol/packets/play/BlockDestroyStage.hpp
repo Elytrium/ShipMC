@@ -21,7 +21,8 @@ namespace Ship {
       : entityId(entityId), locationX(locationX), locationY(locationY), locationZ(locationZ), destroyStage(destroyStage) {
     }
 
-    BlockDestroyStage(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BlockDestroyStage(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       entityId = buffer->ReadVarInt();
       buffer->ReadPosition(locationX, locationY, locationZ);
       destroyStage = buffer->ReadByte();

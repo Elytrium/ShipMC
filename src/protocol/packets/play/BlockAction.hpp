@@ -22,7 +22,8 @@ namespace Ship {
       : locationX(locationX), locationY(locationY), locationZ(locationZ), actionId(actionId), actionParameter(actionParameter), blockType(blockType) {
     }
 
-    BlockAction(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BlockAction(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       buffer->ReadPosition(locationX, locationY, locationZ);
       actionId = buffer->ReadByte();
       actionParameter = buffer->ReadByte();

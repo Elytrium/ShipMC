@@ -30,7 +30,8 @@ namespace Ship {
 
     ~BossBarAdd() override = default;
 
-    BossBarAdd(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BossBarAdd(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       title = buffer->ReadString();
       health = buffer->ReadFloat();
       color = buffer->ReadVarInt();
@@ -73,7 +74,7 @@ namespace Ship {
 
   class BossBarRemove : public BossBarAction {
    public:
-    BossBarRemove(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BossBarRemove(const PacketHolder& holder) {
     }
 
     ~BossBarRemove() override = default;
@@ -94,7 +95,8 @@ namespace Ship {
     explicit BossBarUpdateHealth(float health) : health(health) {
     }
 
-    BossBarUpdateHealth(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BossBarUpdateHealth(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       health = buffer->ReadFloat();
     }
 
@@ -121,7 +123,8 @@ namespace Ship {
     explicit BossBarUpdateTitle(std::string title) : title(std::move(title)) {
     }
 
-    BossBarUpdateTitle(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BossBarUpdateTitle(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       title = buffer->ReadString();
     }
 
@@ -149,7 +152,8 @@ namespace Ship {
     BossBarUpdateStyle(uint32_t color, uint32_t dividers) : color(color), dividers(dividers) {
     }
 
-    BossBarUpdateStyle(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BossBarUpdateStyle(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       color = buffer->ReadVarInt();
       dividers = buffer->ReadVarInt();
     }
@@ -182,7 +186,8 @@ namespace Ship {
     explicit BossBarUpdateFlags(uint8_t flags) : flags(flags) {
     }
 
-    BossBarUpdateFlags(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BossBarUpdateFlags(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       flags = buffer->ReadByte();
     }
 
@@ -210,34 +215,35 @@ namespace Ship {
     BossBar(const UUID& uuid, BossBarAction* action) : uuid(uuid), action(action) {
     }
 
-    BossBar(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BossBar(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       uuid = buffer->ReadUUID();
       uint32_t actionId = buffer->ReadVarInt();
 
       delete action;
       switch (actionId) {
         case 0:
-          action = new BossBarAdd(version, buffer);
+          action = new BossBarAdd(holder);
           break;
 
         case 1:
-          action = new BossBarRemove(version, buffer);
+          action = new BossBarRemove(holder);
           break;
 
         case 2:
-          action = new BossBarUpdateHealth(version, buffer);
+          action = new BossBarUpdateHealth(holder);
           break;
 
         case 3:
-          action = new BossBarUpdateTitle(version, buffer);
+          action = new BossBarUpdateTitle(holder);
           break;
 
         case 4:
-          action = new BossBarUpdateStyle(version, buffer);
+          action = new BossBarUpdateStyle(holder);
           break;
 
         case 5:
-          action = new BossBarUpdateFlags(version, buffer);
+          action = new BossBarUpdateFlags(holder);
           break;
 
         default:

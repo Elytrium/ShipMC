@@ -27,6 +27,7 @@ namespace Ship {
 
    public:
     explicit GameProfile(const UUID& uuid, std::string name, std::vector<GameProfileProperty> properties);
+    static GameProfile* ForOfflinePlayer(const std::string& basicString);
 
     [[nodiscard]] const UUID& GetUuid() const;
     [[nodiscard]] const std::string& GetName() const;

@@ -25,7 +25,8 @@ namespace Ship {
 
     ~EntityPositionAndRotation() override = default;
 
-    EntityPositionAndRotation(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit EntityPositionAndRotation(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       entityId = buffer->ReadVarInt();
       deltaX = buffer->ReadShort();
       deltaY = buffer->ReadShort();

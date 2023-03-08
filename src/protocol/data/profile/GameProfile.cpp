@@ -33,4 +33,9 @@ namespace Ship {
   const std::vector<GameProfileProperty>& GameProfile::GetProperties() const {
     return properties;
   }
+
+  GameProfile* GameProfile::ForOfflinePlayer(const std::string& name) {
+    // TODO: game profile for offline player
+    return nullptr;
+  }
 }

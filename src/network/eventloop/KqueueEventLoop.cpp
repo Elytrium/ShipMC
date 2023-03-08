@@ -1,11 +1,11 @@
 #if defined(__APPLE__) || defined(__FreeBSD__)
 #include "../../utils/exceptions/ErrnoException.hpp"
-#include "EventLoop.hpp"
+#include "NetworkEventLoop.hpp"
 #include <sys/fcntl.h>
 #include <unistd.h>
 
 namespace Ship {
-  KqueueEventLoop::KqueueEventLoop(std::function<Connection*(ReadWriteCloser* writer)> initializer, int max_events, const timespec* timeout, int buffer_size)
+  KqueueEventLoop::KqueueEventLoop(std::function<Connection*(EventLoop*, ReadWriteCloser* writer)> initializer, int max_events, const timespec* timeout, int buffer_size)
     : UnixEventLoop(std::move(initializer)), maxEvents(max_events), timeout(timeout), buffer(new uint8_t[buffer_size]), bufferSize(buffer_size) {
     kqueueFileDescriptor = ::kqueue();
     if (kqueueFileDescriptor == -1) {

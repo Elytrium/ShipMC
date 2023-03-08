@@ -20,7 +20,8 @@ namespace Ship {
 
     ~LegacyCraftRecipeResponse() override = default;
 
-    LegacyCraftRecipeResponse(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit LegacyCraftRecipeResponse(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       windowId = buffer->ReadByte();
       recipe = buffer->ReadVarInt();
     }

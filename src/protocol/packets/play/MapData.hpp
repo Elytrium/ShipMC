@@ -23,7 +23,9 @@ namespace Ship {
     MapIcon() : MapIcon(0, 0, 0, 0, {}) {
     }
 
-    MapIcon(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit MapIcon(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       if (version >= &ProtocolVersion::MINECRAFT_1_13) {
         type = buffer->ReadVarInt();
         x = buffer->ReadByte();
@@ -112,7 +114,9 @@ namespace Ship {
       delete[] data;
     }
 
-    MapData(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit MapData(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       mapId = buffer->ReadVarInt();
       scale = buffer->ReadByte();
       if (version >= &ProtocolVersion::MINECRAFT_1_17) {
@@ -126,7 +130,7 @@ namespace Ship {
       }
       uint32_t vectorSize = buffer->ReadVarInt();
       for (int i = 0; i < vectorSize; ++i) {
-        icons.emplace_back(version, buffer);
+        icons.emplace_back(holder);
       }
       columns = buffer->ReadByte();
       if (columns) {

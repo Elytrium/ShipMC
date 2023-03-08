@@ -2,6 +2,8 @@
 #include "../../../network/Connection.hpp"
 #include "../../../protocol/handlers/PacketHandler.hpp"
 #include "../../../protocol/packets/handshake/Handshake.hpp"
+#include "../../../protocol/packets/login/EncryptionResponse.hpp"
+#include "../../../protocol/packets/login/LoginPluginResponse.hpp"
 #include "../../../protocol/packets/login/LoginStart.hpp"
 #include "../../../protocol/packets/status/StatusPing.hpp"
 #include "../../../protocol/packets/status/StatusRequest.hpp"
@@ -29,10 +31,10 @@ namespace Ship {
 
   class StatusPacketHandler : public PacketHandler {
    private:
-    Client client;
+    LoginClient client;
 
    public:
-    explicit StatusPacketHandler(Client client) : client(std::move(client)) {
+    explicit StatusPacketHandler(LoginClient client) : client(std::move(client)) {
     }
 
     static void Init();
@@ -48,17 +50,20 @@ namespace Ship {
 
   class PreAuthPacketHandler : public PacketHandler {
    private:
-    Client client;
+    LoginClient client;
     LoginState currentState = LoginState::LOGIN_PACKET_EXPECTED;
+    uint32_t verifyToken;
 
    public:
-    explicit PreAuthPacketHandler(Client client) : client(std::move(client)) {
+    explicit PreAuthPacketHandler(LoginClient client) : client(std::move(client)) {
     }
 
     static void Init();
     static inline const uint32_t HANDLER_ORDINAL = OrdinalRegistry::PacketHandlerRegistry.RegisterOrdinal();
 
     inline bool OnLoginStart(Connection* connection, const LoginStart& serverLogin);
+    inline bool OnEncryptionResponse(Connection* connection, const EncryptionResponse& serverLogin);
+    inline bool OnLoginPluginResponse(Connection* connection, const LoginPluginResponse& serverLogin);
     inline void AssertState(LoginState expected);
 
     uint32_t GetOrdinal() const override {
@@ -68,10 +73,11 @@ namespace Ship {
 
   class PostAuthPacketHandler : public PacketHandler {
    private:
-    Client client;
+    LoginClient client;
+    GameProfile* profile;
 
    public:
-    explicit PostAuthPacketHandler(Client client) : client(std::move(client)) {
+    PostAuthPacketHandler(LoginClient client, GameProfile* profile) : client(std::move(client)), profile(profile) {
     }
 
     static void Init();
@@ -80,6 +86,8 @@ namespace Ship {
     uint32_t GetOrdinal() const override {
       return HANDLER_ORDINAL;
     }
+
+    GameProfile* GetProfile() const;
   };
 
   class ConnectPacketHandler : public PacketHandler {

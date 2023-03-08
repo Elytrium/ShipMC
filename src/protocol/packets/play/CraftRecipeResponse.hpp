@@ -20,7 +20,8 @@ namespace Ship {
 
     ~CraftRecipeResponse() override = default;
 
-    CraftRecipeResponse(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit CraftRecipeResponse(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       windowId = buffer->ReadByte();
       recipe = buffer->ReadString();
     }

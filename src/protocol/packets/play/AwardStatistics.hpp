@@ -24,7 +24,9 @@ namespace Ship {
     Statistic() : Statistic(0, 0, 0) {
     }
 
-    Statistic(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit Statistic(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       if (version >= &ProtocolVersion::MINECRAFT_1_13) {
         categoryId = buffer->ReadVarInt();
         statisticId = buffer->ReadVarInt();
@@ -77,10 +79,11 @@ namespace Ship {
     explicit AwardStatistics(std::vector<Statistic> statistics) : statistics(std::move(statistics)) {
     }
 
-    AwardStatistics(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit AwardStatistics(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       uint32_t vectorSize = buffer->ReadVarInt();
       for (int i = 0; i < vectorSize; ++i) {
-        statistics.emplace_back(version, buffer);
+        statistics.emplace_back(holder);
       }
     }
 

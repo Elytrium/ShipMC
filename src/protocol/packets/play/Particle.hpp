@@ -32,7 +32,9 @@ namespace Ship {
       delete particle;
     }
 
-    Particle(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit Particle(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       uint32_t particleId;
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         particleId = buffer->ReadVarInt();

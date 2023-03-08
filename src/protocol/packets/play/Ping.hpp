@@ -18,7 +18,8 @@ namespace Ship {
 
     ~Ping() override = default;
 
-    Ping(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit Ping(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       id = buffer->ReadInt();
     }
 

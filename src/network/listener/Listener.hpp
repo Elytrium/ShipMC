@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../eventloop/NetworkEventLoop.hpp"
 #include "../Connection.hpp"
 #include "../SocketAddress.hpp"
-#include "../eventloop/EventLoop.hpp"
 #include "../pipe/Pipe.hpp"
 #include <functional>
 #include <list>

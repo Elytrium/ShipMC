@@ -22,7 +22,8 @@ namespace Ship {
 
     ~OpenInventory() override = default;
 
-    OpenInventory(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit OpenInventory(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       windowId = buffer->ReadVarInt();
       windowType = buffer->ReadVarInt();
       windowTitle = buffer->ReadString();

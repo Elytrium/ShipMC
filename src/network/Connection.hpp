@@ -3,6 +3,7 @@
 #include "../protocol/handlers/PacketHandler.hpp"
 #include "../protocol/packets/Packet.hpp"
 #include "../utils/exceptions/InvalidArgumentException.hpp"
+#include "../utils/threads/EventLoop.hpp"
 #include "pipe/Pipe.hpp"
 #include "readwritecloser/ReadWriteCloser.hpp"
 #include <list>
@@ -18,10 +19,12 @@ namespace Ship {
     ByteBuffer* readerBuffer;
     ByteBuffer* writerBuffer;
     ReadWriteCloser* readWriteCloser;
+    EventLoop* eventLoop;
+    std::function<void()> onClose;
 
    public:
     Connection(BytePacketPipe* byte_packet_pipe, PacketHandler* main_packet_handler, size_t reader_buffer_length, size_t writer_buffer_length,
-      ReadWriteCloser* read_write_closer);
+      ReadWriteCloser* read_write_closer, EventLoop* event_loop);
 
     ~Connection();
 
@@ -50,7 +53,10 @@ namespace Ship {
     void WriteDirect(ByteBuffer* buffer, size_t length);
 
     ReadWriteCloser* GetReadWriteCloser();
+    EventLoop* GetEventLoop();
 
     void Flush();
+
+    void SetOnClose(const std::function<void()>& on_close);
   };
 }

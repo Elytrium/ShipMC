@@ -18,7 +18,8 @@ namespace Ship {
 
     ~OpenBook() override = default;
 
-    OpenBook(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit OpenBook(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       hand = buffer->ReadVarInt();
     }
 

@@ -58,7 +58,9 @@ namespace Ship {
       delete registryContainer;
     }
 
-    JoinGame(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit JoinGame(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       entityId = buffer->ReadInt();
       if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
         isHardcore = buffer->ReadBoolean();

@@ -28,7 +28,8 @@ namespace Ship {
 
     ~InitializeWorldBorder() override = default;
 
-    InitializeWorldBorder(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit InitializeWorldBorder(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       x = buffer->ReadDouble();
       z = buffer->ReadDouble();
       oldDiameter = buffer->ReadDouble();

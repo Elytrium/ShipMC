@@ -1,47 +1,42 @@
 #pragma once
 
+#include "../../utils/threads/EventLoop.hpp"
 #include "../Connection.hpp"
-#include <map>
-#include <queue>
 
 #ifdef __linux__
-#include <sys/epoll.h>
+  #include <sys/epoll.h>
 #endif
 
 #if defined(__APPLE__) || defined(__FreeBSD__)
-#include <sys/event.h>
+  #include <sys/event.h>
 #endif
 
 namespace Ship {
-  class EventLoop {
-   private:
-    std::function<Connection*(ReadWriteCloser*)> initializer;
-    std::queue<std::function<void()>> immediateTasks;
-    std::multimap<time_t, std::function<void()>> delayedTasks;
-
-   public:
-    virtual ~EventLoop() = default;
-
-    explicit EventLoop(std::function<Connection*(ReadWriteCloser*)> initializer);
-    void Execute(const std::function<void()>& function);
-    void Delay(const std::function<void()>& function, time_t millis);
-    void ProceedTasks();
-
-    Connection* NewConnection(ReadWriteCloser* writer);
-
-    virtual void StartLoop() {
-    }
-  };
 
   class GracefulDisconnectException : public Exception {
    public:
-    GracefulDisconnectException() : Exception("Gracefully disconnected") {}
+    GracefulDisconnectException() : Exception("Gracefully disconnected") {
+    }
   };
 
-  class UnixEventLoop : public EventLoop {
+  class NetworkEventLoop : public EventLoop {
+   private:
+    std::function<Connection*(EventLoop*, ReadWriteCloser*)> initializer;
+
    public:
-    explicit UnixEventLoop(std::function<Connection*(ReadWriteCloser*)> initializer)
-      : EventLoop(std::move(initializer)) {}
+    explicit NetworkEventLoop(std::function<Connection*(EventLoop*, ReadWriteCloser*)> initializer) : initializer(std::move(initializer)) {
+    }
+
+    ~NetworkEventLoop() override = default;
+    inline Connection* NewConnection(ReadWriteCloser* writer) {
+      return initializer(this, writer);
+    }
+  };
+
+  class UnixEventLoop : public NetworkEventLoop {
+   public:
+    explicit UnixEventLoop(std::function<Connection*(EventLoop*, ReadWriteCloser*)> initializer) : NetworkEventLoop(std::move(initializer)) {
+    }
 
     ~UnixEventLoop() override = default;
 
@@ -59,7 +54,7 @@ namespace Ship {
     epoll_event epollEvent {};
 
    public:
-    EpollEventLoop(std::function<Connection*(ReadWriteCloser*)> initializer, int max_events, int timeout, int buffer_size);
+    EpollEventLoop(std::function<Connection*(EventLoop*, ReadWriteCloser*)> initializer, int max_events, int timeout, int buffer_size);
 
     ~EpollEventLoop() override;
 
@@ -84,7 +79,7 @@ namespace Ship {
     struct kevent kevent {};
 
    public:
-    KqueueEventLoop(std::function<Connection*(ReadWriteCloser*)> initializer, int max_events, const timespec* timeout, int buffer_size);
+    KqueueEventLoop(std::function<Connection*(EventLoop*, ReadWriteCloser*)> initializer, int max_events, const timespec* timeout, int buffer_size);
 
     ~KqueueEventLoop() override;
 

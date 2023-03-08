@@ -19,7 +19,8 @@ namespace Ship {
 
     ~EntityAnimation() override = default;
 
-    EntityAnimation(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit EntityAnimation(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       entityId = buffer->ReadVarInt();
       animationId = buffer->ReadByte();
     }

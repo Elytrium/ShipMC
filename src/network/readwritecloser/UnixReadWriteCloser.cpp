@@ -1,6 +1,6 @@
 #include "../../utils/exceptions/ErrnoException.hpp"
 #include "../../utils/exceptions/Exception.hpp"
-#include "../eventloop/EventLoop.hpp"
+#include "../../utils/threads/EventLoop.hpp"
 #include "ReadWriteCloser.hpp"
 #include <unistd.h>
 

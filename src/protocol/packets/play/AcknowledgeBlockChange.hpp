@@ -16,7 +16,8 @@ namespace Ship {
     explicit AcknowledgeBlockChange(uint32_t sequence) : sequence(sequence) {
     }
 
-    AcknowledgeBlockChange(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit AcknowledgeBlockChange(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       sequence = buffer->ReadVarInt();
     }
 

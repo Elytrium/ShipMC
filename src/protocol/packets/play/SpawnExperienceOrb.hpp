@@ -22,7 +22,8 @@ namespace Ship {
 
     ~SpawnExperienceOrb() override = default;
 
-    SpawnExperienceOrb(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit SpawnExperienceOrb(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       entityId = buffer->ReadVarInt();
       x = buffer->ReadDouble();
       y = buffer->ReadDouble();

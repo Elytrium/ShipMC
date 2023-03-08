@@ -62,9 +62,12 @@ namespace Ship {
       }
     }
 
-    PlayerListAddPlayer(const ProtocolVersion* version, ByteBuffer* buffer)
-      : gameProfile(GameProfile(buffer->ReadUUID(), buffer->ReadString(), buffer->ReadProperties())), gamemode((Gamemode) buffer->ReadVarInt()),
-        ping(buffer->ReadVarInt()) {
+    explicit PlayerListAddPlayer(const PacketHolder& holder)
+      : gameProfile(
+        GameProfile(holder.GetCurrentBuffer()->ReadUUID(), holder.GetCurrentBuffer()->ReadString(), holder.GetCurrentBuffer()->ReadProperties())),
+        gamemode((Gamemode) holder.GetCurrentBuffer()->ReadVarInt()), ping(holder.GetCurrentBuffer()->ReadVarInt()) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       if (buffer->ReadBoolean()) {
         displayName = buffer->ReadString();
       } else {
@@ -117,7 +120,8 @@ namespace Ship {
     PlayerListUpdateGamemode(const UUID& uuid, Gamemode gamemode) : uuid(uuid), gamemode(gamemode) {
     }
 
-    PlayerListUpdateGamemode(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit PlayerListUpdateGamemode(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       uuid = buffer->ReadUUID();
       gamemode = (Gamemode) buffer->ReadVarInt();
     }
@@ -145,7 +149,8 @@ namespace Ship {
     PlayerListUpdateLatency(const UUID& uuid, uint32_t ping) : uuid(uuid), ping(ping) {
     }
 
-    PlayerListUpdateLatency(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit PlayerListUpdateLatency(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       uuid = buffer->ReadUUID();
       ping = buffer->ReadVarInt();
     }
@@ -173,7 +178,8 @@ namespace Ship {
     PlayerListUpdateDisplayName(const UUID& uuid, std::optional<std::string> displayName) : uuid(uuid), displayName(std::move(displayName)) {
     }
 
-    PlayerListUpdateDisplayName(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit PlayerListUpdateDisplayName(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       uuid = buffer->ReadUUID();
       if (buffer->ReadBoolean()) {
         displayName = buffer->ReadString();
@@ -207,7 +213,8 @@ namespace Ship {
     explicit PlayerListRemovePlayer(const UUID& uuid) : uuid(uuid) {
     }
 
-    PlayerListRemovePlayer(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit PlayerListRemovePlayer(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       uuid = buffer->ReadUUID();
     }
 
@@ -233,29 +240,30 @@ namespace Ship {
 
     ~PlayerListItem() override = default;
 
-    PlayerListItem(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit PlayerListItem(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       action = buffer->ReadVarInt();
       players.resize(buffer->ReadVarInt());
       for (PlayerListAction*& player : players) {
         switch (action) {
           case 0:
-            player = new PlayerListAddPlayer(version, buffer);
+            player = new PlayerListAddPlayer(holder);
             break;
 
           case 1:
-            player = new PlayerListUpdateGamemode(version, buffer);
+            player = new PlayerListUpdateGamemode(holder);
             break;
 
           case 2:
-            player = new PlayerListUpdateLatency(version, buffer);
+            player = new PlayerListUpdateLatency(holder);
             break;
 
           case 3:
-            player = new PlayerListUpdateDisplayName(version, buffer);
+            player = new PlayerListUpdateDisplayName(holder);
             break;
 
           case 4:
-            player = new PlayerListRemovePlayer(version, buffer);
+            player = new PlayerListRemovePlayer(holder);
             break;
 
           default:

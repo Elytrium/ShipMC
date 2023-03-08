@@ -17,7 +17,8 @@ namespace Ship {
     explicit LoginDisconnect(std::string reason) : reason(std::move(reason)) {
     }
 
-    LoginDisconnect(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit LoginDisconnect(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       reason = buffer->ReadString();
     }
 

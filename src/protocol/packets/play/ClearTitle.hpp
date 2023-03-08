@@ -18,7 +18,8 @@ namespace Ship {
 
     ~ClearTitle() override = default;
 
-    ClearTitle(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit ClearTitle(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       reset = buffer->ReadBoolean();
     }
 

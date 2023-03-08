@@ -17,7 +17,8 @@ namespace Ship {
     MessageHeader(ByteBuffer* precedingSignature, const UUID& sender) : precedingSignature(precedingSignature), sender(sender) {
     }
 
-    MessageHeader(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit MessageHeader(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       delete precedingSignature;
       if (buffer->ReadBoolean()) {
         uint32_t size = buffer->GetReadableBytes() - ByteBuffer::UUID_SIZE;

@@ -62,7 +62,7 @@ namespace Ship {
     writerIndex += ANGLE_SIZE;
   }
 
-  void ByteCounter::WriteBytes(uint8_t *input, size_t size) {
+  void ByteCounter::WriteBytes(const uint8_t *input, size_t size) {
     writerIndex += size;
   }
 
@@ -77,7 +77,7 @@ namespace Ship {
   void ByteCounter::ReadBytes(uint8_t *output, size_t size) {
   }
 
-  void ByteCounter::WriteBytesAndDelete(uint8_t *input, size_t size) {
+  void ByteCounter::WriteBytesAndDelete(const uint8_t *input, size_t size) {
     delete[] input;
   }
 
@@ -107,7 +107,7 @@ namespace Ship {
     return SIZE_MAX;
   }
 
-  std::deque<uint8_t *> ByteCounter::GetDirectBuffers() const {
+  std::deque<const uint8_t*> ByteCounter::GetDirectBuffers() const {
     return {};
   }
 

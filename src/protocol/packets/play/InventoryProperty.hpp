@@ -20,7 +20,8 @@ namespace Ship {
 
     ~InventoryProperty() override = default;
 
-    InventoryProperty(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit InventoryProperty(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       windowId = buffer->ReadByte();
       property = buffer->ReadShort();
       value = buffer->ReadShort();

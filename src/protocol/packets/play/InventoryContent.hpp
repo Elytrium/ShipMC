@@ -24,7 +24,9 @@ namespace Ship {
 
     ~InventoryContent() override = default;
 
-    InventoryContent(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit InventoryContent(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       windowId = buffer->ReadByte();
       uint32_t vectorSize;
       if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {

@@ -15,7 +15,8 @@ namespace Ship {
 
     explicit SetCompression(uint32_t threshold) : threshold(threshold) {}
 
-    SetCompression(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit SetCompression(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       threshold = buffer->ReadVarInt();
     }
 

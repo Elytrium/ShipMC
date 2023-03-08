@@ -19,7 +19,8 @@ namespace Ship {
 
     ~EntityEvent() override = default;
 
-    EntityEvent(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit EntityEvent(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       entityId = buffer->ReadInt();
       entityStatus = buffer->ReadByte();
     }

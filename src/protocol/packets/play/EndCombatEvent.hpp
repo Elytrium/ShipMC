@@ -19,7 +19,8 @@ namespace Ship {
 
     ~EndCombatEvent() override = default;
 
-    EndCombatEvent(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit EndCombatEvent(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       duration = buffer->ReadVarInt();
       entityId = buffer->ReadInt();
     }

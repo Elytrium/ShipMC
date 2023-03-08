@@ -22,7 +22,9 @@ namespace Ship {
     CommandSuggestion() : CommandSuggestion("") {
     }
 
-    CommandSuggestion(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit CommandSuggestion(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       match = buffer->ReadString();
 
       if (version >= &ProtocolVersion::MINECRAFT_1_13) {
@@ -79,7 +81,9 @@ namespace Ship {
 
     ~CommandSuggestionResponse() override = default;
 
-    CommandSuggestionResponse(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit CommandSuggestionResponse(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       if (version >= &ProtocolVersion::MINECRAFT_1_13) {
         id = buffer->ReadVarInt();
         start = buffer->ReadVarInt();
@@ -88,7 +92,7 @@ namespace Ship {
 
       uint32_t vectorSize = buffer->ReadVarInt();
       for (int i = 0; i < vectorSize; ++i) {
-        matches.emplace_back(version, buffer);
+        matches.emplace_back(holder);
       }
     }
 

@@ -29,7 +29,9 @@ namespace Ship {
 
     ~CustomSoundEffect() override = default;
 
-    CustomSoundEffect(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit CustomSoundEffect(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       soundName = buffer->ReadString();
       soundCategory = buffer->ReadVarInt();
       effectPositionX = buffer->ReadInt();

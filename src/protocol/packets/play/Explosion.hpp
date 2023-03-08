@@ -30,7 +30,9 @@ namespace Ship {
 
     ~Explosion() override = default;
 
-    Explosion(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit Explosion(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       if (version == &ProtocolVersion::MINECRAFT_1_19) {
         x = buffer->ReadFloat();
         y = buffer->ReadFloat();

@@ -19,7 +19,8 @@ namespace Ship {
 
     ~GameEvent() override = default;
 
-    GameEvent(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit GameEvent(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       event = buffer->ReadByte();
       value = buffer->ReadFloat();
     }

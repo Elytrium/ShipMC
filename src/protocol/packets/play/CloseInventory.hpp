@@ -18,7 +18,8 @@ namespace Ship {
 
     ~CloseInventory() override = default;
 
-    CloseInventory(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit CloseInventory(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       windowId = buffer->ReadByte();
     }
 

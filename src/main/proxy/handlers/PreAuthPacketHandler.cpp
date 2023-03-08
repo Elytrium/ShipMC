@@ -1,10 +1,13 @@
 #include "../../../network/Connection.hpp"
+#include "../../../protocol/packets/login/EncryptionRequest.hpp"
 #include "../../../utils/ShipUtils.hpp"
 #include "ProxyPacketHandler.hpp"
 
 namespace Ship {
   void PreAuthPacketHandler::Init() {
     SetPacketCallback(PreAuthPacketHandler, LoginStart, OnLoginStart);
+    SetPacketCallback(PreAuthPacketHandler, EncryptionResponse, OnEncryptionResponse);
+    SetPacketCallback(PreAuthPacketHandler, LoginPluginResponse, OnLoginPluginResponse);
   }
 
   inline bool PreAuthPacketHandler::OnLoginStart(Connection* connection, const LoginStart& loginStart) {
@@ -12,10 +15,64 @@ namespace Ship {
     currentState = LoginState::LOGIN_PACKET_RECEIVED;
     if (loginStart.HasSigData()) {
       if (loginStart.GetExpiry() > ShipUtils::GetCurrentMillis()) {
-        client.DisconnectWithReason(""); // TODO translatable: multiplayer.disconnect.invalid_public_key_signature
+        client.DisconnectWithReason("multiplayer.disconnect.invalid_public_key_signature"); // TODO: translatable
+        return true;
       }
+
+      bool isKeyValid = true; // TODO: check if key is valid
+
+      if (!isKeyValid) {
+        client.DisconnectWithReason("multiplayer.disconnect.invalid_public_key"); // TODO: translatable
+        return true;
+      }
+    } else if (client.GetMinecraftPipe()->GetProtocolVersion() >= &ProtocolVersion::MINECRAFT_1_19
+               && client.GetMinecraftPipe()->GetProtocolVersion() < &ProtocolVersion::MINECRAFT_1_19_3 /*&& forceKeyAuthentication*/) {
+      client.DisconnectWithReason("multiplayer.disconnect.missing_public_key"); // TODO: translatable
+      return true;
     }
 
+    client.SetPlayerKey();
+    // TODO: event
+    [&]() {
+      if (!client.IsActive()) {
+        // The player was disconnected
+        return;
+      }
+
+      // TODO: plugin messages queue
+      [&]() {
+        if (!client.IsActive()) {
+          // The player was disconnected
+          return;
+        }
+
+        client.GetConnection()->GetEventLoop()->Execute([&]() {
+          if (/*!event.IsForceOfflineMode() && (isOnlineMode || event.IsOnlineModeAllowed())*/ false) {
+            EncryptionRequest request = EncryptionRequest("", {}, {}); // TODO: public key / rnd verify token
+            verifyToken = request.GetVerifyToken()->ReadInt(); // TODO: check buffer size
+            client.GetConnection()->Write(request);
+            currentState = LoginState::ENCRYPTION_REQUEST_SENT;
+          } else {
+            client.GetConnection()->ReplaceMainPacketHandler(new PostAuthPacketHandler(client, GameProfile::ForOfflinePlayer(loginStart.GetUsername())));
+          }
+        });
+      }();
+    }();
+
+    return true;
+  }
+
+  inline bool PreAuthPacketHandler::OnEncryptionResponse(Connection* connection, const EncryptionResponse& serverLogin) {
+    AssertState(LoginState::ENCRYPTION_REQUEST_SENT);
+    currentState = LoginState::ENCRYPTION_RESPONSE_RECEIVED;
+
+    // TODO: verify and replace main packet handler
+
+    return true;
+  }
+
+  bool PreAuthPacketHandler::OnLoginPluginResponse(Connection* connection, const LoginPluginResponse& serverLogin) {
+    // TODO: handle plugin messages in loginClient
     return true;
   }
 

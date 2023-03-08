@@ -23,7 +23,9 @@ namespace Ship {
       : locationX(locationX), locationY(locationY), locationZ(locationZ), type(type), data(data) {
     }
 
-    BlockEntityData(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BlockEntityData(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       buffer->ReadPosition(locationX, locationY, locationZ);
       if (version >= &ProtocolVersion::MINECRAFT_1_18) {
         type = buffer->ReadVarInt();

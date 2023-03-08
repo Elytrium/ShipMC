@@ -20,7 +20,8 @@ namespace Ship {
 
     ~OpenHorseInventory() override = default;
 
-    OpenHorseInventory(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit OpenHorseInventory(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       windowId = buffer->ReadByte();
       slotCount = buffer->ReadVarInt();
       entityId = buffer->ReadInt();

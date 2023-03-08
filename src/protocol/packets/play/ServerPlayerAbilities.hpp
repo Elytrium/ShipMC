@@ -31,7 +31,8 @@ namespace Ship {
 
     ~ServerPlayerAbilities() override = default;
 
-    ServerPlayerAbilities(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit ServerPlayerAbilities(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       flags.value = buffer->ReadByte();
       flyingSpeed = buffer->ReadFloat();
       fovModifier = buffer->ReadFloat();

@@ -33,7 +33,9 @@ namespace Ship {
 
     ~SpawnEntity() override = default;
 
-    SpawnEntity(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit SpawnEntity(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       entityId = buffer->ReadVarInt();
       entityUuid = buffer->ReadUUID();
       if (version >= &ProtocolVersion::MINECRAFT_1_14) {

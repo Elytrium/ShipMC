@@ -23,7 +23,9 @@ namespace Ship {
 
     ~InventorySlot() override = default;
 
-    InventorySlot(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit InventorySlot(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       windowId = buffer->ReadByte();
       if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
         stateId = buffer->ReadVarInt();

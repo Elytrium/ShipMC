@@ -23,7 +23,9 @@ namespace Ship {
       : uuid(uuid), username(std::move(username)), properties(std::move(properties)) {
     }
 
-    LoginSuccess(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit LoginSuccess(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         uuid = buffer->ReadUUID();
       } else if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {

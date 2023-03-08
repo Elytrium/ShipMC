@@ -21,7 +21,8 @@ namespace Ship {
 
     ~ServerChatPreview() override = default;
 
-    ServerChatPreview(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit ServerChatPreview(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       queryId = buffer->ReadInt();
       if (buffer->ReadBoolean()) {
         message = buffer->ReadString();

@@ -19,7 +19,8 @@ namespace Ship {
 
     ~UnloadChunk() override = default;
 
-    UnloadChunk(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit UnloadChunk(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       chunkX = buffer->ReadInt();
       chunkZ = buffer->ReadInt();
     }

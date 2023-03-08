@@ -21,7 +21,8 @@ namespace Ship {
 
     ~DeathCombatEvent() override = default;
 
-    DeathCombatEvent(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit DeathCombatEvent(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       playerId = buffer->ReadVarInt();
       entityId = buffer->ReadInt();
       message = buffer->ReadString();

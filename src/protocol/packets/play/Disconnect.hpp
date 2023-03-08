@@ -18,7 +18,8 @@ namespace Ship {
 
     ~Disconnect() override = default;
 
-    Disconnect(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit Disconnect(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       reason = buffer->ReadString();
     }
 

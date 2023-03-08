@@ -22,7 +22,8 @@ namespace Ship {
       : locationX(locationX), locationY(locationY), locationZ(locationZ), block(block), status(status), successful(successful) {
     }
 
-    AcknowledgePlayerDigging(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit AcknowledgePlayerDigging(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       buffer->ReadPosition(locationX, locationY, locationZ);
       block = buffer->ReadVarInt();
       status = buffer->ReadVarInt();

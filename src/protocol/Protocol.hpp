@@ -118,14 +118,15 @@ namespace Ship {
     virtual void WriteVarInt(uint32_t input);
     virtual void WriteLong(uint64_t input);
     virtual void WriteVarLong(uint64_t input);
-    virtual void WriteBytes(uint8_t* input, size_t size) = 0;
-    virtual void WriteBytesAndDelete(uint8_t* input, size_t size) = 0;
+    virtual void WriteBytes(const uint8_t* input, size_t size) = 0;
+    virtual void WriteBytesAndDelete(const uint8_t* input, size_t size) = 0;
     virtual void WriteBytes(ByteBuffer* input, size_t size) = 0;
     virtual void WriteUUID(UUID input);
     virtual void WriteUUIDIntArray(UUID input);
     virtual void WriteDouble(double input);
     virtual void WriteFloat(float input);
     virtual void WriteString(const std::string& input);
+    virtual void WriteByteArray(ByteBuffer* input);
     virtual void WriteProperties(const std::vector<GameProfileProperty>& properties);
     virtual void WritePosition(int x, int y, int z);
     virtual void WriteAngle(float input);
@@ -147,6 +148,8 @@ namespace Ship {
     virtual UUID ReadUUIDIntArray();
     virtual std::string ReadString();
     virtual std::string ReadString(uint32_t max_size);
+    virtual ByteBuffer* ReadByteArray();
+    virtual ByteBuffer* ReadByteArray(uint32_t max_size);
     virtual std::vector<GameProfileProperty> ReadProperties();
     virtual void ReadPosition(int& x, int& y, int& z);
     virtual float ReadAngle();
@@ -174,7 +177,7 @@ namespace Ship {
     [[nodiscard]] virtual size_t GetWriterIndex() const = 0;
     [[nodiscard]] virtual size_t GetReadableBytes() const = 0;
     [[nodiscard]] virtual size_t GetSingleCapacity() const = 0;
-    [[nodiscard]] virtual std::deque<uint8_t*> GetDirectBuffers() const = 0;
+    [[nodiscard]] virtual std::deque<const uint8_t*> GetDirectBuffers() const = 0;
     virtual void TryRefreshReaderBuffer() = 0;
     virtual void TryRefreshWriterBuffer() = 0;
     virtual void AppendBuffer() = 0;
@@ -214,7 +217,7 @@ namespace Ship {
 
   class ByteBufferImpl : public ByteBuffer {
    private:
-    std::deque<uint8_t*> buffers;
+    std::deque<const uint8_t*> buffers;
     size_t singleCapacity;
     uint8_t* currentReadBuffer;
     uint8_t* currentWriteBuffer;
@@ -230,12 +233,12 @@ namespace Ship {
     ~ByteBufferImpl() override;
 
     void WriteByte(uint8_t input) override;
-    void WriteBytes(uint8_t* input, size_t size) override;
+    void WriteBytes(const uint8_t* input, size_t size) override;
     void WriteBytes(ByteBuffer* buffer, size_t size) override;
+    void WriteBytesAndDelete(const uint8_t* input, size_t size) override;
 
     uint8_t ReadByteUnsafe() override;
     void ReadBytes(uint8_t* output, size_t size) override;
-    void WriteBytesAndDelete(uint8_t* input, size_t size) override;
 
     void Release() override;
     void ResetReaderIndex() override;
@@ -244,7 +247,7 @@ namespace Ship {
     [[nodiscard]] size_t GetWriterIndex() const override;
     [[nodiscard]] size_t GetReadableBytes() const override;
     [[nodiscard]] size_t GetSingleCapacity() const override;
-    [[nodiscard]] std::deque<uint8_t*> GetDirectBuffers() const override;
+    [[nodiscard]] std::deque<const uint8_t*> GetDirectBuffers() const override;
     void TryRefreshReaderBuffer() override;
     void TryRefreshWriterBuffer() override;
     void AppendBuffer() override;
@@ -267,8 +270,9 @@ namespace Ship {
     ~ByteCounter() override = default;
 
     void WriteByte(uint8_t input) override;
-    void WriteBytes(uint8_t* input, size_t size) override;
+    void WriteBytes(const uint8_t* input, size_t size) override;
     void WriteBytes(ByteBuffer* buffer, size_t size) override;
+    void WriteBytesAndDelete(const uint8_t* input, size_t size) override;
 
     void WriteBoolean(bool input) override;
     void WriteShort(uint16_t input) override;
@@ -287,7 +291,6 @@ namespace Ship {
 
     uint8_t ReadByteUnsafe() override;
     void ReadBytes(uint8_t* output, size_t size) override;
-    void WriteBytesAndDelete(uint8_t* input, size_t size) override;
 
     void Release() override;
     void ResetReaderIndex() override;
@@ -296,7 +299,7 @@ namespace Ship {
     [[nodiscard]] size_t GetWriterIndex() const override;
     [[nodiscard]] size_t GetReadableBytes() const override;
     [[nodiscard]] size_t GetSingleCapacity() const override;
-    [[nodiscard]] std::deque<uint8_t*> GetDirectBuffers() const override;
+    [[nodiscard]] std::deque<const uint8_t*> GetDirectBuffers() const override;
     void TryRefreshReaderBuffer() override;
     void TryRefreshWriterBuffer() override;
     void AppendBuffer() override;

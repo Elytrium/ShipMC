@@ -24,7 +24,8 @@ namespace Ship {
 
     ~WorldEvent() override = default;
 
-    WorldEvent(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit WorldEvent(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       event = buffer->ReadInt();
       buffer->ReadPosition(locationX, locationY, locationZ);
       data = buffer->ReadInt();

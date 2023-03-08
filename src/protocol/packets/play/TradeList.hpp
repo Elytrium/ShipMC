@@ -96,7 +96,9 @@ namespace Ship {
 
     ~TradeList() override = default;
 
-    TradeList(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit TradeList(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       windowId = buffer->ReadVarInt();
       uint32_t vectorSize;
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {

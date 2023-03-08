@@ -30,7 +30,9 @@ namespace Ship {
         signatureLength(signatureLength), signature(signature) {
     }
 
-    LoginStart(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit LoginStart(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       username = buffer->ReadString(MAXIMUM_USERNAME_SIZE);
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         hasSigData = buffer->ReadBoolean();

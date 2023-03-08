@@ -22,7 +22,8 @@ namespace Ship {
       delete data;
     }
 
-    PluginMessage(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit PluginMessage(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       channel = buffer->ReadString();
       delete data;
       uint32_t size = buffer->GetReadableBytes();

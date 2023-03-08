@@ -21,7 +21,8 @@ namespace Ship {
 
     ~EntityRotation() override = default;
 
-    EntityRotation(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit EntityRotation(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       entityId = buffer->ReadVarInt();
       yaw = buffer->ReadAngle();
       pitch = buffer->ReadAngle();

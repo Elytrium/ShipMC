@@ -19,7 +19,9 @@ namespace Ship {
 
     ~ServerChangeDifficulty() override = default;
 
-    ServerChangeDifficulty(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit ServerChangeDifficulty(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       difficulty = (Difficulty) buffer->ReadByte();
       if (version >= &ProtocolVersion::MINECRAFT_1_14) {
         locked = buffer->ReadBoolean();

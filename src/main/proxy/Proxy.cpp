@@ -12,10 +12,10 @@ namespace Ship {
     ProxyPacketHandler::Init();
 
     auto* eventLoop = new SystemEventLoop(
-      [](ReadWriteCloser* writer) {
+      [](EventLoop* eventLoop, ReadWriteCloser* writer) {
         auto pipe = new MinecraftFramedBytePacketPipe(
           &BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, MAX_PACKET_SIZE, SERVERBOUND, CLIENTBOUND, LONG_PACKET_BUFFER_CAPACITY);
-        auto* connection = new Connection(pipe, new HandshakePacketHandler(), LONG_PACKET_BUFFER_CAPACITY, LONG_PACKET_BUFFER_CAPACITY, writer);
+        auto* connection = new Connection(pipe, new HandshakePacketHandler(), LONG_PACKET_BUFFER_CAPACITY, LONG_PACKET_BUFFER_CAPACITY, writer, eventLoop);
 
         return connection;
       },

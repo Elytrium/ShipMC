@@ -20,7 +20,8 @@ namespace Ship {
       : locationX(locationX), locationY(locationY), locationZ(locationZ), blockId(blockId) {
     }
 
-    BlockUpdate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit BlockUpdate(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       buffer->ReadPosition(locationX, locationX, locationZ);
       buffer->WriteVarInt(blockId);
     }

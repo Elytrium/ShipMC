@@ -30,7 +30,9 @@ namespace Ship {
       delete metadata;
     }
 
-    SpawnPlayer(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit SpawnPlayer(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       entityId = buffer->ReadVarInt();
       playerUuid = buffer->ReadUUID();
       x = buffer->ReadDouble();

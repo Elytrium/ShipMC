@@ -21,7 +21,9 @@ namespace Ship {
       delete[] unknownBytes;
     }
 
-    PreparedPacket(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit PreparedPacket(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      const ProtocolVersion* version = holder.GetVersion();
       unknownBytes[version->GetOrdinal()] = buffer;
     }
 

@@ -13,7 +13,8 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    SingleVersionPreparedPacket(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit SingleVersionPreparedPacket(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       unknownBytes = buffer;
     }
 

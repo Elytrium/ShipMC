@@ -19,6 +19,7 @@ namespace Ship {
   const uint32_t ByteBuffer::ANGLE_SIZE = BYTE_SIZE;
   const uint32_t ByteBuffer::UUID_SIZE = LONG_SIZE * 2;
 
+  thread_local uint8_t* readBuffer = new uint8_t[MAX_PACKET_SIZE];
   thread_local uint8_t* writeBuffer = new uint8_t[MAX_PACKET_SIZE];
 
   ByteBuffer::~ByteBuffer() = default;
@@ -65,7 +66,7 @@ namespace Ship {
     return VarIntBytes(string.size()) + string.size();
   }
 
-  uint32_t ByteBuffer::PropertiesBytes(const std::vector<GameProfileProperty> &properties) {
+  uint32_t ByteBuffer::PropertiesBytes(const std::vector<GameProfileProperty>& properties) {
     uint32_t size = 0;
     for (const GameProfileProperty& property : properties) {
       size += StringBytes(property.GetName()) + StringBytes(property.GetValue()) + StringBytes(property.GetSignature()) + BYTE_SIZE;
@@ -160,9 +161,14 @@ namespace Ship {
     WriteBytes((uint8_t*) input.c_str(), input.size());
   }
 
-  void ByteBuffer::WriteProperties(const std::vector<GameProfileProperty> &properties) {
+  void ByteBuffer::WriteByteArray(ByteBuffer* input) {
+    WriteVarInt(input->GetReadableBytes());
+    WriteBytes(input, input->GetReadableBytes());
+  }
+
+  void ByteBuffer::WriteProperties(const std::vector<GameProfileProperty>& properties) {
     WriteVarInt(properties.size());
-    for (const GameProfileProperty &property : properties) {
+    for (const GameProfileProperty& property : properties) {
       WriteString(property.GetName());
       WriteString(property.GetValue());
       if (property.GetSignature().empty()) {
@@ -290,6 +296,20 @@ namespace Ship {
     }
 
     return (const char*) ReadBytes(length);
+  }
+
+  ByteBuffer* ByteBuffer::ReadByteArray() {
+    uint32_t length = ReadVarInt();
+    return new ByteBufferImpl(ReadBytes(length), length);
+  }
+
+  ByteBuffer* ByteBuffer::ReadByteArray(uint32_t max_size) {
+    uint32_t length = ReadVarInt();
+    if (length > max_size) {
+      throw InvalidArgumentException("Invalid received string size", length);
+    }
+
+    return new ByteBufferImpl(ReadBytes(length), length);
   }
 
   std::vector<GameProfileProperty> ByteBuffer::ReadProperties() {
@@ -470,7 +490,7 @@ namespace Ship {
     currentWriteBuffer[localWriterIndex++] = input;
   }
 
-  void ByteBufferImpl::WriteBytes(uint8_t* input, size_t size) {
+  void ByteBufferImpl::WriteBytes(const uint8_t* input, size_t size) {
     size_t bytesIndex = 0;
     TryRefreshWriterBuffer();
 
@@ -498,7 +518,7 @@ namespace Ship {
     readableBytes += size;
   }
 
-  void ByteBufferImpl::WriteBytesAndDelete(uint8_t* input, size_t size) {
+  void ByteBufferImpl::WriteBytesAndDelete(const uint8_t* input, size_t size) {
     if (localWriterIndex == 0 && size == singleCapacity) {
       buffers.pop_back();
       buffers.push_back(input);
@@ -592,7 +612,7 @@ namespace Ship {
     localReaderIndex = 0;
     delete buffers.front();
     buffers.pop_front();
-    currentReadBuffer = buffers.front();
+    currentReadBuffer = (uint8_t*) buffers.front();
   }
 
   bool ByteBufferImpl::CanReadDirect(size_t read_size) const {
@@ -623,7 +643,7 @@ namespace Ship {
     return singleCapacity;
   }
 
-  std::deque<uint8_t*> ByteBufferImpl::GetDirectBuffers() const {
+  std::deque<const uint8_t*> ByteBufferImpl::GetDirectBuffers() const {
     return buffers;
   }
 }

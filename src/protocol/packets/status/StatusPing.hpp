@@ -17,7 +17,8 @@ namespace Ship {
 
     ~StatusPing() override = default;
 
-    StatusPing(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit StatusPing(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       id = buffer->ReadLong();
     }
 

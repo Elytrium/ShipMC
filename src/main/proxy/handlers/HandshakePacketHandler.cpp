@@ -12,7 +12,7 @@ namespace Ship {
     auto minecraftPipe = (MinecraftFramedBytePacketPipe*) connection->GetBytePacketPipe();
     minecraftPipe->SetProtocolVersion(handshake.GetProtocolVersion());
 
-    Client client(connection, minecraftPipe, handshake.GetSocketAddress());
+    LoginClient client(connection, minecraftPipe, handshake.GetSocketAddress());
     switch (handshake.GetNextStatus()) {
       case HandshakeNextStatus::STATUS:
         minecraftPipe->SetRegistry(&BuiltInPacketRegistry::STATUS);

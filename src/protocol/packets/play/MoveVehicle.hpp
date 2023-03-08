@@ -22,7 +22,8 @@ namespace Ship {
 
     ~MoveVehicle() override = default;
 
-    MoveVehicle(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit MoveVehicle(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       x = buffer->ReadDouble();
       y = buffer->ReadDouble();
       z = buffer->ReadDouble();

@@ -3,16 +3,20 @@
 
 namespace Ship {
   Connection::Connection(BytePacketPipe* byte_packet_pipe, PacketHandler* main_packet_handler, size_t reader_buffer_length, size_t writer_buffer_length,
-    ReadWriteCloser* read_write_closer)
+    ReadWriteCloser* read_write_closer, EventLoop* event_loop)
     : bytePacketPipe(byte_packet_pipe), mainPacketHandler(main_packet_handler), readerBuffer(new ByteBufferImpl(reader_buffer_length)),
-      writerBuffer(new ByteBufferImpl(writer_buffer_length)), readWriteCloser(read_write_closer) {
+      writerBuffer(new ByteBufferImpl(writer_buffer_length)), readWriteCloser(read_write_closer), eventLoop(event_loop) {
   }
 
   Connection::~Connection() {
+    onClose();
     delete bytePacketPipe;
     delete readerBuffer;
     delete writerBuffer;
     delete mainPacketHandler;
+    for (const auto& item : packetHandlers) {
+      delete item;
+    }
     delete readWriteCloser;
   }
 
@@ -156,7 +160,15 @@ namespace Ship {
     return readWriteCloser;
   }
 
+  EventLoop* Connection::GetEventLoop() {
+    return eventLoop;
+  }
+
   void Connection::Flush() {
     readWriteCloser->Write(writerBuffer);
+  }
+
+  void Connection::SetOnClose(const std::function<void()>& on_close) {
+    onClose = on_close;
   }
 }

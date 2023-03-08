@@ -17,7 +17,8 @@ namespace Ship {
     explicit StatusResponse(std::string status) : status(std::move(status)) {
     }
 
-    StatusResponse(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit StatusResponse(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       status = buffer->ReadString();
     }
 

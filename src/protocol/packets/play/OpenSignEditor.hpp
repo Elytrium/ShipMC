@@ -20,7 +20,8 @@ namespace Ship {
 
     ~OpenSignEditor() override = default;
 
-    OpenSignEditor(const ProtocolVersion* version, ByteBuffer* buffer) {
+    explicit OpenSignEditor(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
       buffer->ReadPosition(locationX, locationY, locationZ);
     }
 
