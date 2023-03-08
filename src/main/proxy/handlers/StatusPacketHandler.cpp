@@ -1,4 +1,5 @@
 #include "../../../network/Connection.hpp"
+#include "../../../protocol/handlers/server/ServerPacketHandler.hpp"
 #include "../../../protocol/packets/status/StatusResponse.hpp"
 #include "ProxyPacketHandler.hpp"
 

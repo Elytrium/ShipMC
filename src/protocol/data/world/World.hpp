@@ -2,7 +2,7 @@
 
 #include "../../packets/prepared/PreparedPacket.hpp"
 #include "../nbt/NBT.hpp"
-#include "../player/Player.hpp"
+#include "../client/Player.hpp"
 #include <functional>
 #include <map>
 #include <optional>

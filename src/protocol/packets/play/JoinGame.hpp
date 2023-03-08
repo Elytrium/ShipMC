@@ -3,7 +3,7 @@
 #include "../../../utils/ordinal/OrdinalRegistry.hpp"
 #include "../../ProtocolUtils.hpp"
 #include "../../data/nbt/NBT.hpp"
-#include "../../data/player/Player.hpp"
+#include "../../data/client/Player.hpp"
 #include "../../data/world/World.hpp"
 #include "../Packet.hpp"
 #include <set>

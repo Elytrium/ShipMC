@@ -35,7 +35,7 @@ namespace Ship {
   }
 
   GameProfile* GameProfile::ForOfflinePlayer(const std::string& name) {
-    // TODO: game profile for offline player
+    // TODO: game profile for offline client
     return nullptr;
   }
 }

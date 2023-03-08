@@ -1,7 +1,7 @@
 #include "../../../network/Connection.hpp"
-#include "../../../protocol/packets/login/EncryptionRequest.hpp"
 #include "../../../utils/ShipUtils.hpp"
-#include "ProxyPacketHandler.hpp"
+#include "../../packets/login/EncryptionRequest.hpp"
+#include "ServerPacketHandler.hpp"
 
 namespace Ship {
   void PreAuthPacketHandler::Init() {
@@ -35,14 +35,14 @@ namespace Ship {
     // TODO: event
     [&]() {
       if (!client.IsActive()) {
-        // The player was disconnected
+        // The client was disconnected
         return;
       }
 
       // TODO: plugin messages queue
       [&]() {
         if (!client.IsActive()) {
-          // The player was disconnected
+          // The client was disconnected
           return;
         }
 
@@ -53,7 +53,8 @@ namespace Ship {
             client.GetConnection()->Write(request);
             currentState = LoginState::ENCRYPTION_REQUEST_SENT;
           } else {
-            client.GetConnection()->ReplaceMainPacketHandler(new PostAuthPacketHandler(client, GameProfile::ForOfflinePlayer(loginStart.GetUsername())));
+            client.GetConnection()->ReplaceMainPacketHandler(new PostAuthPacketHandler(
+              client, GameProfile::ForOfflinePlayer(loginStart.GetUsername()), std::function<PacketHandler*(const LoginClient&)>()));
           }
         });
       }();
