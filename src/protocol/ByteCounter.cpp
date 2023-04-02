@@ -54,7 +54,7 @@ namespace Ship {
     writerIndex += input.size();
   }
 
-  void ByteCounter::WritePosition(int x, int y, int z) {
+  void ByteCounter::WritePosition(Position position) {
     writerIndex += POSITION_SIZE;
   }
 
@@ -74,7 +74,8 @@ namespace Ship {
     return 0;
   }
 
-  void ByteCounter::ReadBytes(uint8_t *output, size_t size) {
+  Errorable<uint8_t*> ByteCounter::ReadBytes(uint8_t *output, size_t size) {
+    return SuccessErrorable<uint8_t*>(nullptr);
   }
 
   void ByteCounter::WriteBytesAndDelete(const uint8_t *input, size_t size) {
@@ -139,9 +140,11 @@ namespace Ship {
   void ByteCounter::PopBuffer() {
   }
 
-  void ByteCounter::SkipReadBytes(size_t count) {
+  Errorable<size_t> ByteCounter::SkipReadBytes(size_t count) {
+    return SuccessErrorable<size_t>(0);
   }
 
-  void ByteCounter::SkipWriteBytes(size_t count) {
+  size_t ByteCounter::SkipWriteBytes(size_t count) {
+    return 0;
   }
 }

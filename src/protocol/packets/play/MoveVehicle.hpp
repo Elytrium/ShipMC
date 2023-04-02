@@ -22,13 +22,13 @@ namespace Ship {
 
     ~MoveVehicle() override = default;
 
-    explicit MoveVehicle(const PacketHolder& holder) {
+    static Errorable<MoveVehicle> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      x = buffer->ReadDouble();
-      y = buffer->ReadDouble();
-      z = buffer->ReadDouble();
-      yaw = buffer->ReadFloat();
-      pitch = buffer->ReadFloat();
+      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(yaw, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(pitch, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

@@ -1,5 +1,4 @@
 #ifdef __linux__
-  #include "../../utils/exceptions/ErrnoException.hpp"
   #include "NetworkEventLoop.hpp"
   #include <cstring>
   #include <fcntl.h>
@@ -9,16 +8,10 @@
   #include <utility>
 
 namespace Ship {
-  thread_local char* eventLoopErrorBuffer = new char[64];
-
-  EpollEventLoop::EpollEventLoop(std::function<Connection*(EventLoop*, ReadWriteCloser* writer)> initializer, int max_events, int timeout, int buffer_size)
-    : UnixEventLoop(std::move(initializer)), maxEvents(max_events), timeout(timeout), buffer(new uint8_t[buffer_size]), bufferSize(buffer_size) {
-    epollEvent.events = EPOLLIN | EPOLLRDHUP | EPOLLET;
-    epollFileDescriptor = epoll_create1(O_CLOEXEC);
-
-    if (epollFileDescriptor == -1) {
-      throw Exception("Error while creating epoll. Old kernel/no permissions?");
-    }
+  EpollEventLoop::EpollEventLoop(
+    std::function<Connection*(EventLoop*, ReadWriteCloser *writer)> initializer, int epoll_file_descriptor, int max_events, int timeout, int buffer_size)
+    : UnixEventLoop(std::move(initializer)), epollFileDescriptor(epoll_file_descriptor), maxEvents(max_events), timeout(timeout),
+      buffer(new uint8_t[buffer_size]), bufferSize(buffer_size), epollEvent({EPOLLIN | EPOLLRDHUP | EPOLLET, {}}) {
   }
 
   EpollEventLoop::~EpollEventLoop() {
@@ -43,41 +36,50 @@ namespace Ship {
       ProceedTasks();
       int amount = epoll_wait(epollFileDescriptor, (epoll_event*) events, maxEvents, timeout);
 
+      bool disconnected;
       for (int i = 0; i < amount; ++i) {
         event = events[i];
-        auto connection = (Connection*) event.data.ptr;
+        auto connection = (Connection *) event.data.ptr;
 
-        try {
-          if (!(event.events & EPOLLIN) || (event.events & EPOLLERR) || (event.events & EPOLLHUP)) {
-            throw InvalidArgumentException("Got unknown epoll events: ", event.events);
-          } else if (event.events & EPOLLRDHUP) {
-            throw GracefulDisconnectException();
-          } else {
-            while (true) {
-              ssize_t count = connection->GetReadWriteCloser()->Read(buffer, bufferSize);
+        if (event.events & EPOLLRDHUP) {
+          delete connection;
+        } else {
+          while (true) {
+            Errorable<ssize_t> readRequest = connection->GetReadWriteCloser()->Read(buffer, bufferSize);
 
-              if (count == -1) {
-                if (errno != EAGAIN) {
-                  throw ErrnoException(eventLoopErrorBuffer, 64);
-                }
-
-                break;
-              } else if (count == 0) {
-                throw GracefulDisconnectException();
-              } else {
-                connection->HandleNewBytes(buffer, (size_t) count);
-              }
+            if (readRequest.GetTypeOrdinal() == SuccessErrorable<ssize_t>::TYPE_ORDINAL) {
+              connection->HandleNewBytes(buffer, (size_t) readRequest.GetValue());
+            } else if (readRequest.GetTypeOrdinal() == ErrnoErrorable<ssize_t>::TYPE_ORDINAL && errno == EAGAIN) {
+              break;
+            } else if (readRequest.GetTypeOrdinal() == GracefulDisconnectErrorable::TYPE_ORDINAL) {
+              delete connection;
+              disconnected = true;
+              break;
+            } else {
+              // TODO: Log exception via logger class
+              delete connection;
+              disconnected = true;
+              break;
             }
           }
-        } catch (const GracefulDisconnectException& exception) {
-          delete connection;
+
+          if (disconnected) {
+            break;
+          }
         }
-        /* catch (const std::exception& exception) {
-          delete connection;
-          // TODO: Log exception via logger class
-        } */
       }
     }
+  }
+
+  Errorable<EpollEventLoop*> EpollEventLoop::NewEventLoop(
+    std::function<Connection*(EventLoop*, ReadWriteCloser*)> initializer, int max_events, int timeout, int buffer_size) {
+    int epollFileDescriptor = epoll_create1(O_CLOEXEC);
+
+    if (epollFileDescriptor == -1) {
+      return ErrnoErrorable<EpollEventLoop*>(nullptr);
+    }
+
+    return SuccessErrorable<EpollEventLoop*>(new EpollEventLoop(std::move(initializer), epollFileDescriptor, max_events, timeout, buffer_size));
   }
 }
 #endif

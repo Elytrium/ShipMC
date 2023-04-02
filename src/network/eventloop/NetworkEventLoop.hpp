@@ -13,9 +13,14 @@
 
 namespace Ship {
 
-  class GracefulDisconnectException : public Exception {
+  class GracefulDisconnectErrorable : public Errorable<ssize_t> {
    public:
-    GracefulDisconnectException() : Exception("Gracefully disconnected") {
+    static inline const uint32_t TYPE_ORDINAL = OrdinalRegistry::ErrorableTypeRegistry.RegisterOrdinal();
+
+    GracefulDisconnectErrorable() : Errorable<ssize_t>(TYPE_ORDINAL, {}, 0L) {}
+
+    static void Print(std::ostream o) {
+      o << "Gracefully disconnected";
     }
   };
 
@@ -51,10 +56,12 @@ namespace Ship {
     int timeout;
     uint8_t* buffer;
     int bufferSize;
-    epoll_event epollEvent {};
+    epoll_event epollEvent;
 
    public:
-    EpollEventLoop(std::function<Connection*(EventLoop*, ReadWriteCloser*)> initializer, int max_events, int timeout, int buffer_size);
+    static Errorable<EpollEventLoop*> NewEventLoop(std::function<Connection*(EventLoop*, ReadWriteCloser*)> initializer, int max_events, int timeout, int buffer_size);
+
+    EpollEventLoop(std::function<Connection*(EventLoop*, ReadWriteCloser*)> initializer, int epoll_file_descriptor, int max_events, int timeout, int buffer_size);
 
     ~EpollEventLoop() override;
 

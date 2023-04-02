@@ -17,7 +17,7 @@ namespace Ship {
     delete[] value;
 
     valueLength = buffer->ReadInt();
-    value = buffer->ReadBytes(valueLength);
+    ProceedErrorable(value, uint8_t*, buffer->ReadBytes(valueLength), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   uint32_t ByteArrayTag::GetSize() {

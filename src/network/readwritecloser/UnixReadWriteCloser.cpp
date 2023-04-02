@@ -1,18 +1,15 @@
-#include "../../utils/exceptions/ErrnoException.hpp"
-#include "../../utils/exceptions/Exception.hpp"
 #include "../../utils/threads/EventLoop.hpp"
 #include "ReadWriteCloser.hpp"
 #include <unistd.h>
 
 namespace Ship {
-  thread_local char* readWriteCloserErrorBuffer = new char[64];
-
   UnixReadWriteCloser::UnixReadWriteCloser(int socket_file_descriptor) : socketFileDescriptor(socket_file_descriptor) {
   }
 
-  void UnixReadWriteCloser::Write(ByteBuffer* buffer) {
+  Errorable<ssize_t> UnixReadWriteCloser::Write(ByteBuffer* buffer) {
+    ssize_t totalBytesWritten = 0;
     if (closed) {
-      return;
+      return SuccessErrorable<ssize_t>(totalBytesWritten);
     }
 
     size_t singleCapacity = buffer->GetSingleCapacity();
@@ -21,13 +18,14 @@ namespace Ship {
       if (bytesWritten == -1) {
         if (errno == ECONNRESET) {
           Close();
-          return;
+          return SuccessErrorable<ssize_t>(totalBytesWritten);
         }
 
-        throw ErrnoException(readWriteCloserErrorBuffer, 64);
+        return ErrnoErrorable<ssize_t>({});
       }
 
       buffer->SkipReadBytes(bytesWritten);
+      totalBytesWritten += bytesWritten;
     }
 
     while (buffer->GetReadableBytes() != 0) {
@@ -35,21 +33,29 @@ namespace Ship {
       if (bytesWritten == -1) {
         if (errno == ECONNRESET) {
           Close();
-          return;
+          return SuccessErrorable<ssize_t>(totalBytesWritten);
         }
 
-        throw ErrnoException(readWriteCloserErrorBuffer, 64);
+        return ErrnoErrorable<ssize_t>({});
       }
 
       buffer->SkipReadBytes(bytesWritten);
+      totalBytesWritten += bytesWritten;
     }
+
+    return SuccessErrorable<ssize_t>(totalBytesWritten);
   }
 
-  ssize_t UnixReadWriteCloser::Read(uint8_t* buffer, size_t buffer_size) {
+  Errorable<ssize_t> UnixReadWriteCloser::Read(uint8_t* buffer, size_t buffer_size) {
     if (!closed) {
-      return read(socketFileDescriptor, buffer, buffer_size);
+      ssize_t bytesRead = read(socketFileDescriptor, buffer, buffer_size);
+      if (bytesRead == -1) {
+        return ErrnoErrorable<ssize_t>(0);
+      }
+
+      return SuccessErrorable<ssize_t>(bytesRead);
     } else {
-      return 0;
+      return SuccessErrorable<ssize_t>(0);
     }
   }
 

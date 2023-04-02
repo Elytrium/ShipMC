@@ -10,7 +10,7 @@ namespace Ship {
   }
 
   FallingDustParticle::FallingDustParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    blockState = buffer->ReadVarInt();
+    ProceedErrorable(blockState, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   std::string FallingDustParticle::GetIdentifier() const {

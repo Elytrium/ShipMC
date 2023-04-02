@@ -13,10 +13,10 @@ namespace Ship {
   }
 
   DustParticle::DustParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    red = buffer->ReadFloat();
-    green = buffer->ReadFloat();
-    blue = buffer->ReadFloat();
-    scale = buffer->ReadFloat();
+    ProceedErrorable(red, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(green, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(blue, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(scale, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   std::string DustParticle::GetIdentifier() const {

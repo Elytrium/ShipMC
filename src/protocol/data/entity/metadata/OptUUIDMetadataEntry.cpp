@@ -16,7 +16,7 @@ namespace Ship {
 
   OptUUIDMetadataEntry::OptUUIDMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     if (buffer->ReadBoolean()) {
-      optValue = buffer->ReadUUID();
+      ProceedErrorable(optValue, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     } else {
       optValue.reset();
     }

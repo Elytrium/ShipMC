@@ -23,25 +23,25 @@ namespace Ship {
     MapIcon() : MapIcon(0, 0, 0, 0, {}) {
     }
 
-    explicit MapIcon(const PacketHolder& holder) {
+    static Errorable<MapIcon> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
       if (version >= &ProtocolVersion::MINECRAFT_1_13) {
-        type = buffer->ReadVarInt();
-        x = buffer->ReadByte();
-        z = buffer->ReadByte();
-        direction = buffer->ReadByte();
+        ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(x, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(z, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(direction, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         if (buffer->ReadBoolean()) {
-          displayName = buffer->ReadString();
+          ProceedErrorable(displayName, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         } else {
           displayName = std::nullopt;
         }
       } else {
-        uint8_t directionAndType = buffer->ReadByte();
+        uint8_t ProceedErrorable(directionAndType, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         direction = directionAndType & 0xF;
         type = (directionAndType & 0xF) >> 4;
-        x = buffer->ReadByte();
-        z = buffer->ReadByte();
+        ProceedErrorable(x, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(z, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         displayName = std::nullopt;
       }
     }
@@ -114,32 +114,32 @@ namespace Ship {
       delete[] data;
     }
 
-    explicit MapData(const PacketHolder& holder) {
+    static Errorable<MapData> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      mapId = buffer->ReadVarInt();
-      scale = buffer->ReadByte();
+      ProceedErrorable(mapId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(scale, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (version >= &ProtocolVersion::MINECRAFT_1_17) {
-        locked = buffer->ReadBoolean();
-        trackingPosition = buffer->ReadBoolean();
+        ProceedErrorable(locked, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(trackingPosition, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
-        trackingPosition = buffer->ReadBoolean();
+        ProceedErrorable(trackingPosition, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         if (version >= &ProtocolVersion::MINECRAFT_1_14) {
-          locked = buffer->ReadBoolean();
+          ProceedErrorable(locked, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         }
       }
-      uint32_t vectorSize = buffer->ReadVarInt();
+      uint32_t ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       for (int i = 0; i < vectorSize; ++i) {
         icons.emplace_back(holder);
       }
-      columns = buffer->ReadByte();
+      ProceedErrorable(columns, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (columns) {
-        rows = buffer->ReadByte();
-        x = buffer->ReadByte();
-        z = buffer->ReadByte();
-        length = buffer->ReadVarInt();
+        ProceedErrorable(rows, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(x, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(z, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(length, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         delete[] data;
-        data = buffer->ReadBytes(length);
+        ProceedErrorable(data, uint8_t*, buffer->ReadBytes(length), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
     }
 
@@ -182,7 +182,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

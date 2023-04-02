@@ -19,10 +19,10 @@ namespace Ship {
 
     ~EntityEvent() override = default;
 
-    explicit EntityEvent(const PacketHolder& holder) {
+    static Errorable<EntityEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       entityId = buffer->ReadInt();
-      entityStatus = buffer->ReadByte();
+      ProceedErrorable(entityStatus, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -30,7 +30,7 @@ namespace Ship {
       buffer->WriteByte(entityStatus);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

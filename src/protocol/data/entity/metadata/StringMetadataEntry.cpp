@@ -11,7 +11,7 @@ namespace Ship {
   }
 
   StringMetadataEntry::StringMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadString();
+    ProceedErrorable(value, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   MetadataEntryType StringMetadataEntry::GetType() const {

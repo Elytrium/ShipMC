@@ -12,7 +12,7 @@ namespace Ship {
   }
 
   GlobalPosMetadataEntry::GlobalPosMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    dimension = buffer->ReadString();
+    ProceedErrorable(dimension, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     buffer->ReadPosition(x, y, z);
   }
 

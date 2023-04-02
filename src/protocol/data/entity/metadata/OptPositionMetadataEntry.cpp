@@ -2,25 +2,25 @@
 
 namespace Ship {
 
-  OptPositionMetadataEntry::OptPositionMetadataEntry() : present(false), x(0), y(0), z(0) {
+  OptPositionMetadataEntry::OptPositionMetadataEntry() : present(false), position() {
   }
 
-  OptPositionMetadataEntry::OptPositionMetadataEntry(int x, int y, int z) : present(true), x(x), y(y), z(z) {
+  OptPositionMetadataEntry::OptPositionMetadataEntry(Position position) : present(true), position(position) {
   }
 
   void OptPositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteBoolean(present);
     if (present) {
-      buffer->WritePosition(x, y, z);
+      buffer->WritePosition(position);
     }
   }
 
   OptPositionMetadataEntry::OptPositionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    present = buffer->ReadBoolean();
+    ProceedErrorable(present, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     if (present) {
-      buffer->ReadPosition(x, y, z);
+      position = buffer->ReadPosition();
     } else {
-      x = y = z = 0;
+      position = Position();
     }
   }
 
@@ -40,46 +40,18 @@ namespace Ship {
     present = value;
   }
 
-  int OptPositionMetadataEntry::GetX() const {
-    return x;
-  }
-
-  void OptPositionMetadataEntry::SetX(int value) {
-    x = value;
-  }
-
-  int OptPositionMetadataEntry::GetY() const {
-    return y;
-  }
-
-  void OptPositionMetadataEntry::SetY(int value) {
-    y = value;
-  }
-
-  int OptPositionMetadataEntry::GetZ() const {
-    return z;
-  }
-
-  void OptPositionMetadataEntry::SetZ(int value) {
-    z = value;
-  }
-
-  void OptPositionMetadataEntry::Get(bool& outPresent, int& outX, int& outY, int& outZ) const {
+  void OptPositionMetadataEntry::Get(bool& outPresent, Position& out) const {
     outPresent = present;
-    outX = x;
-    outY = y;
-    outZ = z;
+    out = position;
   }
 
-  void OptPositionMetadataEntry::Set(int newX, int newY, int newZ) {
+  void OptPositionMetadataEntry::Set(Position value) {
     present = true;
-    x = newX;
-    y = newY;
-    z = newZ;
+    position = value;
   }
 
   void OptPositionMetadataEntry::Reset() {
     present = false;
-    x = y = z = 0;
+    position = Position();
   }
 }

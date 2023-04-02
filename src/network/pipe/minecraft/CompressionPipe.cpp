@@ -1,5 +1,4 @@
 #include "../../../Ship.hpp"
-#include "../../../utils/exceptions/InvalidArgumentException.hpp"
 #include "MinecraftPipe.hpp"
 
 namespace Ship {
@@ -39,7 +38,7 @@ namespace Ship {
 
   void CompressionPipe::DecodeFrame(ByteBuffer* in, uint32_t frame_size) {
     ByteBuffer* buffer = GetReaderBuffer();
-    uint32_t decompressedSize = in->ReadVarInt();
+    ProceedErrorable(decompressedSize, uint32_t, in->ReadVarInt(), InvalidFrameErrorable(frame_size))
     if (decompressedSize == 0) {
       decompressedSize = frame_size - 1;
       buffer->WriteVarInt(decompressedSize);

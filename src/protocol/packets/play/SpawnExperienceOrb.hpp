@@ -22,13 +22,13 @@ namespace Ship {
 
     ~SpawnExperienceOrb() override = default;
 
-    explicit SpawnExperienceOrb(const PacketHolder& holder) {
+    static Errorable<SpawnExperienceOrb> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      entityId = buffer->ReadVarInt();
-      x = buffer->ReadDouble();
-      y = buffer->ReadDouble();
-      z = buffer->ReadDouble();
-      count = buffer->ReadShort();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(count, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -39,7 +39,7 @@ namespace Ship {
       buffer->WriteShort(count);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

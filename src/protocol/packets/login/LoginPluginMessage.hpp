@@ -18,10 +18,10 @@ namespace Ship {
     LoginPluginMessage(uint32_t id, std::string  channel, ByteBuffer* data) : id(id), channel(std::move(channel)), data(data) {
     }
 
-    explicit LoginPluginMessage(const PacketHolder& holder) {
+    static Errorable<LoginPluginMessage> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      id = buffer->ReadVarInt();
-      channel = buffer->ReadString();
+      ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(channel, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       size_t dataLen = holder.GetExpectedSize() - ByteBuffer::VarIntBytes(id) - ByteBuffer::StringBytes(channel);
       data = new ByteBufferImpl(buffer->ReadBytes(dataLen), dataLen);
     }

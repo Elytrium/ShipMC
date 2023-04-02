@@ -20,10 +20,10 @@ namespace Ship {
 
     ~ChatSuggestions() override = default;
 
-    explicit ChatSuggestions(const PacketHolder& holder) {
+    static Errorable<ChatSuggestions> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      action = buffer->ReadVarInt();
-      uint32_t vectorSize = buffer->ReadVarInt();
+      ProceedErrorable(action, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      uint32_t ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       for (int i = 0; i < vectorSize; ++i) {
          entries.push_back(buffer->ReadString());
       }

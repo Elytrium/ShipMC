@@ -336,15 +336,13 @@ namespace Ship {
   class OptPositionMetadataEntry : public MetadataEntry {
    private:
     bool present;
-    int x;
-    int y;
-    int z;
+    Position position;
 
    public:
     static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     OptPositionMetadataEntry();
-    explicit OptPositionMetadataEntry(int x, int y, int z);
+    explicit OptPositionMetadataEntry(Position position);
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     OptPositionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
@@ -353,15 +351,11 @@ namespace Ship {
 
     [[nodiscard]] bool IsPresent() const;
     void SetPresent(bool value);
-    [[nodiscard]] int GetX() const;
-    void SetX(int value);
-    [[nodiscard]] int GetY() const;
-    void SetY(int value);
-    [[nodiscard]] int GetZ() const;
-    void SetZ(int value);
+    [[nodiscard]] Position GetPosition() const;
+    void SetPosition(Position value);
 
-    void Get(bool& outPresent, int& outX, int& outY, int& outZ) const;
-    void Set(int newX, int newY, int newZ);
+    void Get(bool& outPresent, Position& out) const;
+    void Set(Position value);
     void Reset();
   };
 

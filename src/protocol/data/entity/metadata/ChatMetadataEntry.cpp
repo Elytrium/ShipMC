@@ -10,7 +10,7 @@ namespace Ship {
   }
 
   ChatMetadataEntry::ChatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadString();
+    ProceedErrorable(value, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   MetadataEntryType ChatMetadataEntry::GetType() const {

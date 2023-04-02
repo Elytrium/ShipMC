@@ -20,10 +20,10 @@ namespace Ship {
 
     ~LegacyCraftRecipeResponse() override = default;
 
-    explicit LegacyCraftRecipeResponse(const PacketHolder& holder) {
+    static Errorable<LegacyCraftRecipeResponse> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      windowId = buffer->ReadByte();
-      recipe = buffer->ReadVarInt();
+      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(recipe, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -31,7 +31,7 @@ namespace Ship {
       buffer->WriteVarInt(recipe);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

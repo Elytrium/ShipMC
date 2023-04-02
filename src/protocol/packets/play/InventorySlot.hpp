@@ -23,14 +23,14 @@ namespace Ship {
 
     ~InventorySlot() override = default;
 
-    explicit InventorySlot(const PacketHolder& holder) {
+    static Errorable<InventorySlot> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      windowId = buffer->ReadByte();
+      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (version >= &ProtocolVersion::MINECRAFT_1_17_1) {
-        stateId = buffer->ReadVarInt();
+        ProceedErrorable(stateId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
-      slot = buffer->ReadShort();
+      ProceedErrorable(slot, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       item = ItemStack(version, buffer);
     }
 

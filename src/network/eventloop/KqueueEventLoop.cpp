@@ -51,7 +51,7 @@ namespace Ship {
 
         try {
           if (event.flags & EV_EOF) {
-            throw GracefulDisconnectException();
+            throw GracefulDisconnectErrorable();
           } else {
             while (true) {
               ssize_t count = connection->GetReadWriteCloser()->Read(buffer, bufferSize);
@@ -63,13 +63,13 @@ namespace Ship {
 
                 break;
               } else if (count == 0) {
-                throw GracefulDisconnectException();
+                throw GracefulDisconnectErrorable();
               } else {
                 connection->HandleNewBytes(buffer, (size_t) count);
               }
             }
           }
-        } catch (const GracefulDisconnectException& exception) {
+        } catch (const GracefulDisconnectErrorable& exception) {
           delete connection;
         }
 

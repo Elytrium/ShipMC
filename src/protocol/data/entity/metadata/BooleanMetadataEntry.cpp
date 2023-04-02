@@ -6,7 +6,7 @@ namespace Ship {
   }
 
   BooleanMetadataEntry::BooleanMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadBoolean();
+    ProceedErrorable(value, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   void BooleanMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {

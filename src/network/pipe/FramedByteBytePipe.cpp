@@ -1,4 +1,3 @@
-#include "../../utils/exceptions/InvalidArgumentException.hpp"
 #include "FramedPipe.hpp"
 
 namespace Ship {
@@ -9,10 +8,14 @@ namespace Ship {
         return;
       }
 
-      try {
-        nextWriteFrameLength = in->ReadVarInt();
-      } catch (const IncompleteVarIntException& exception) {
+      Errorable<uint32_t> nextWriteFrameLengthErrorable = in->ReadVarInt();
+      uint32_t frameLength = nextWriteFrameLengthErrorable.GetValue();
+      if (nextWriteFrameLengthErrorable.IsSuccess()) {
+        nextWriteFrameLength = frameLength;
+      } else if (nextWriteFrameLengthErrorable.GetTypeOrdinal() == IncompleteFrameErrorable::TYPE_ORDINAL) {
         return;
+      } else {
+        return InvalidFrameErrorable(frameLength);
       }
     }
 
@@ -24,14 +27,18 @@ namespace Ship {
 
   void FramedByteBytePipe::Read(ByteBuffer* in) {
     if (nextReadFrameLength == 0) {
-      try {
-        nextReadFrameLength = in->ReadVarInt();
-      } catch (const IncompleteVarIntException& exception) {
-        return;
-      }
+      Errorable<uint32_t> nextReadFrameLengthErrorable = in->ReadVarInt();
+      uint32_t frameLength = nextReadFrameLengthErrorable.GetValue();
+      if (nextReadFrameLengthErrorable.IsSuccess()) {
+        if (frameLength > maxReadSize) {
+          return InvalidFrameErrorable(frameLength);
+        }
 
-      if (nextReadFrameLength > maxReadSize) {
-        throw InvalidArgumentException("Invalid frame size: ", nextReadFrameLength);
+        nextReadFrameLength = frameLength;
+      } else if (nextReadFrameLengthErrorable.GetTypeOrdinal() == IncompleteFrameErrorable::TYPE_ORDINAL) {
+        return;
+      } else {
+        return InvalidFrameErrorable(frameLength);
       }
     }
 

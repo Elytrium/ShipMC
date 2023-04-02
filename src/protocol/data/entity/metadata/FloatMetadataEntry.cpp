@@ -10,7 +10,7 @@ namespace Ship {
   }
 
   FloatMetadataEntry::FloatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadFloat();
+    ProceedErrorable(value, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   MetadataEntryType FloatMetadataEntry::GetType() const {

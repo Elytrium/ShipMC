@@ -9,7 +9,7 @@ namespace Ship {
   }
 
   BlockIDMetadataEntry::BlockIDMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadVarInt();
+    ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   void BlockIDMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {

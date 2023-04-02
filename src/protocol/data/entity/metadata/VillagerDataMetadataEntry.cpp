@@ -15,7 +15,7 @@ namespace Ship {
   VillagerDataMetadataEntry::VillagerDataMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     type = VILLAGER_TYPE_REGISTRY.GetValue(version, buffer->ReadVarInt());
     profession = VILLAGER_PROFESSION_REGISTRY.GetValue(version, buffer->ReadVarInt());
-    level = buffer->ReadVarInt();
+    ProceedErrorable(level, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   MetadataEntryType VillagerDataMetadataEntry::GetType() const {

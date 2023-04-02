@@ -22,14 +22,14 @@ namespace Ship {
     CommandSuggestion() : CommandSuggestion("") {
     }
 
-    explicit CommandSuggestion(const PacketHolder& holder) {
+    static Errorable<CommandSuggestion> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      match = buffer->ReadString();
+      ProceedErrorable(match, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
 
       if (version >= &ProtocolVersion::MINECRAFT_1_13) {
         if (buffer->ReadBoolean()) {
-          tooltip = buffer->ReadString();
+          ProceedErrorable(tooltip, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         } else {
           tooltip = std::nullopt;
         }
@@ -81,16 +81,16 @@ namespace Ship {
 
     ~CommandSuggestionResponse() override = default;
 
-    explicit CommandSuggestionResponse(const PacketHolder& holder) {
+    static Errorable<CommandSuggestionResponse> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
       if (version >= &ProtocolVersion::MINECRAFT_1_13) {
-        id = buffer->ReadVarInt();
-        start = buffer->ReadVarInt();
-        length = buffer->ReadVarInt();
+        ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(start, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(length, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
 
-      uint32_t vectorSize = buffer->ReadVarInt();
+      uint32_t ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       for (int i = 0; i < vectorSize; ++i) {
         matches.emplace_back(holder);
       }
@@ -111,7 +111,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

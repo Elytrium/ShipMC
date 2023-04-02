@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../utils/exceptions/Exception.hpp"
-#include "../utils/exceptions/InvalidArgumentException.hpp"
+#include "../utils/exceptions/Errorable.hpp"
 #include "data/profile/GameProfile.hpp"
 #include "data/uuid/UUID.hpp"
 #include <deque>
@@ -18,6 +17,40 @@ namespace Ship {
     SOUTH = 3,
     WEST = 4,
     EAST = 5,
+  };
+
+  class Position {
+   private:
+    int x, y, z;
+
+   public:
+    Position() : x(0), y(0), z(0) {
+    }
+
+    Position(int x, int y, int z) : x(x), y(y), z(z) {
+    }
+
+    [[nodiscard]] int GetX() const {
+      return x;
+    }
+    [[nodiscard]] int GetY() const {
+      return y;
+    }
+    [[nodiscard]] int GetZ() const {
+      return z;
+    }
+
+    void SetX(int _x) {
+      this->x = _x;
+    }
+
+    void SetY(int _y) {
+      this->y = _y;
+    }
+
+    void SetZ(int _z) {
+      this->z = _z;
+    }
   };
 
   class ProtocolVersion {
@@ -128,47 +161,31 @@ namespace Ship {
     virtual void WriteString(const std::string& input);
     virtual void WriteByteArray(ByteBuffer* input);
     virtual void WriteProperties(const std::vector<GameProfileProperty>& properties);
-    virtual void WritePosition(int x, int y, int z);
+    virtual void WritePosition(Position position);
     virtual void WriteAngle(float input);
 
-    virtual bool ReadBoolean();
-    virtual uint8_t ReadByte();
+    virtual Errorable<bool> ReadBoolean();
+    virtual Errorable<uint8_t> ReadByte();
     virtual uint8_t ReadByteUnsafe() = 0;
-    virtual uint16_t ReadShort();
-    virtual uint32_t ReadMedium();
-    virtual uint32_t ReadInt();
-    virtual uint32_t ReadVarInt();
-    virtual uint64_t ReadLong();
-    virtual uint64_t ReadVarLong();
-    virtual uint8_t* ReadBytes(size_t size);
-    virtual void ReadBytes(uint8_t* output, size_t size) = 0;
-    virtual double ReadDouble();
-    virtual float ReadFloat();
-    virtual UUID ReadUUID();
-    virtual UUID ReadUUIDIntArray();
-    virtual std::string ReadString();
-    virtual std::string ReadString(uint32_t max_size);
-    virtual ByteBuffer* ReadByteArray();
-    virtual ByteBuffer* ReadByteArray(uint32_t max_size);
-    virtual std::vector<GameProfileProperty> ReadProperties();
-    virtual void ReadPosition(int& x, int& y, int& z);
-    virtual float ReadAngle();
-
-    friend ByteBuffer& operator<<(ByteBuffer& buffer, bool input);
-    friend ByteBuffer& operator<<(ByteBuffer& buffer, uint8_t input);
-    friend ByteBuffer& operator<<(ByteBuffer& buffer, uint16_t input);
-    friend ByteBuffer& operator<<(ByteBuffer& buffer, uint32_t input);
-    friend ByteBuffer& operator<<(ByteBuffer& buffer, uint64_t input);
-    friend ByteBuffer& operator<<(ByteBuffer& buffer, double input);
-    friend ByteBuffer& operator<<(ByteBuffer& buffer, float input);
-
-    friend ByteBuffer& operator>>(ByteBuffer& buffer, bool& output);
-    friend ByteBuffer& operator>>(ByteBuffer& buffer, uint8_t& output);
-    friend ByteBuffer& operator>>(ByteBuffer& buffer, uint16_t& output);
-    friend ByteBuffer& operator>>(ByteBuffer& buffer, uint32_t& output);
-    friend ByteBuffer& operator>>(ByteBuffer& buffer, uint64_t& output);
-    friend ByteBuffer& operator>>(ByteBuffer& buffer, double& input);
-    friend ByteBuffer& operator>>(ByteBuffer& buffer, float& input);
+    virtual Errorable<uint16_t> ReadShort();
+    virtual Errorable<uint32_t> ReadMedium();
+    virtual Errorable<uint32_t> ReadInt();
+    virtual Errorable<uint32_t> ReadVarInt();
+    virtual Errorable<uint64_t> ReadLong();
+    virtual Errorable<uint64_t> ReadVarLong();
+    virtual Errorable<uint8_t*> ReadBytes(size_t size);
+    virtual Errorable<uint8_t*> ReadBytes(uint8_t* output, size_t size) = 0;
+    virtual Errorable<double> ReadDouble();
+    virtual Errorable<float> ReadFloat();
+    virtual Errorable<UUID> ReadUUID();
+    virtual Errorable<UUID> ReadUUIDIntArray();
+    virtual Errorable<std::string> ReadString();
+    virtual Errorable<std::string> ReadString(uint32_t max_size);
+    virtual Errorable<ByteBuffer*> ReadByteArray();
+    virtual Errorable<ByteBuffer*> ReadByteArray(uint32_t max_size);
+    virtual Errorable<std::vector<GameProfileProperty>> ReadProperties();
+    virtual Errorable<Position> ReadPosition();
+    virtual Errorable<float> ReadAngle();
 
     virtual void Release() = 0;
     virtual void ResetReaderIndex() = 0;
@@ -182,8 +199,8 @@ namespace Ship {
     virtual void TryRefreshWriterBuffer() = 0;
     virtual void AppendBuffer() = 0;
     virtual void PopBuffer() = 0;
-    virtual void SkipReadBytes(size_t count) = 0;
-    virtual void SkipWriteBytes(size_t count) = 0;
+    virtual Errorable<size_t> SkipReadBytes(size_t count) = 0;
+    virtual size_t SkipWriteBytes(size_t count) = 0;
 
     [[nodiscard]] virtual bool CanReadDirect(size_t read_size) const = 0;
     virtual uint8_t* GetDirectReadAddress() = 0;
@@ -210,10 +227,27 @@ namespace Ship {
     static const uint32_t UUID_SIZE;
   };
 
-  class IncompleteVarIntException : public Exception {
-   public:
-    IncompleteVarIntException() : Exception("ByteBuffer doesn't contain enough data to read VarInt correctly") {}
-  };
+  CreateInvalidArgumentErrorable(InvalidUUIDErrorable, UUID, "Invalid UUID read");
+  CreateInvalidArgumentErrorable(InvalidVarIntErrorable, uint32_t, "Invalid VarInt read");
+  CreateInvalidArgumentErrorable(IncompleteVarIntErrorable, uint32_t, "ByteBuffer doesn't contain enough data to read VarInt correctly");
+  CreateInvalidArgumentErrorable(InvalidVarLongErrorable, uint64_t, "Invalid VarLong read");
+  CreateInvalidArgumentErrorable(IncompleteVarLongErrorable, uint64_t, "ByteBuffer doesn't contain enough data to read VarLong correctly");
+  CreateInvalidArgumentErrorable(IncompleteBooleanErrorable, bool, "ByteBuffer doesn't contain enough data to read boolean correctly");
+  CreateInvalidArgumentErrorable(IncompleteByteErrorable, uint8_t, "ByteBuffer doesn't contain enough data to read byte correctly");
+  CreateInvalidArgumentErrorable(IncompleteShortErrorable, uint16_t, "ByteBuffer doesn't contain enough data to read short correctly");
+  CreateInvalidArgumentErrorable(IncompleteMediumErrorable, uint32_t, "ByteBuffer doesn't contain enough data to read medium correctly");
+  CreateInvalidArgumentErrorable(IncompleteIntErrorable, uint32_t, "ByteBuffer doesn't contain enough data to read int correctly");
+  CreateInvalidArgumentErrorable(IncompleteLongErrorable, uint64_t, "ByteBuffer doesn't contain enough data to read long correctly");
+  CreateInvalidArgumentErrorable(IncompleteFloatErrorable, float, "ByteBuffer doesn't contain enough data to read float correctly");
+  CreateInvalidArgumentErrorable(IncompleteDoubleErrorable, double, "ByteBuffer doesn't contain enough data to read double correctly");
+  CreateInvalidArgumentErrorable(IncompleteByteArrayErrorable, uint8_t*, "ByteBuffer doesn't contain enough data to read byte array correctly");
+  CreateInvalidArgumentErrorable(InvalidStringSizeErrorable, std::string, "Invalid received string size");
+  CreateInvalidArgumentErrorable(InvalidByteArraySizeErrorable, ByteBuffer*, "Invalid received byte array size");
+  CreateInvalidArgumentErrorable(InvalidGamePropertiesSizeErrorable, std::vector<GameProfileProperty>, "Invalid received GameProfileProperty array size");
+  CreateInvalidArgumentErrorable(InvalidGamePropertiesErrorable, std::vector<GameProfileProperty>, "Invalid GameProfileProperty read");
+  CreateInvalidArgumentErrorable(InvalidPositionErrorable, Position, "Invalid position read");
+  CreateInvalidArgumentErrorable(IncompleteAngleErrorable, float, "ByteBuffer doesn't contain enough data to read angle correctly");
+  CreateInvalidArgumentErrorable(InvalidReadSkipRequest, size_t, "Not enough readable bytes to skip them");
 
   class ByteBufferImpl : public ByteBuffer {
    private:
@@ -238,7 +272,7 @@ namespace Ship {
     void WriteBytesAndDelete(const uint8_t* input, size_t size) override;
 
     uint8_t ReadByteUnsafe() override;
-    void ReadBytes(uint8_t* output, size_t size) override;
+    Errorable<uint8_t*> ReadBytes(uint8_t* output, size_t size) override;
 
     void Release() override;
     void ResetReaderIndex() override;
@@ -252,8 +286,8 @@ namespace Ship {
     void TryRefreshWriterBuffer() override;
     void AppendBuffer() override;
     void PopBuffer() override;
-    void SkipReadBytes(size_t count) override;
-    void SkipWriteBytes(size_t count) override;
+    Errorable<size_t> SkipReadBytes(size_t count) override;
+    size_t SkipWriteBytes(size_t count) override;
 
     [[nodiscard]] bool CanReadDirect(size_t read_size) const override;
     uint8_t* GetDirectReadAddress() override;
@@ -286,11 +320,11 @@ namespace Ship {
     void WriteDouble(double input) override;
     void WriteFloat(float input) override;
     void WriteString(const std::string& input) override;
-    void WritePosition(int x, int y, int z) override;
+    void WritePosition(Position position) override;
     void WriteAngle(float input) override;
 
     uint8_t ReadByteUnsafe() override;
-    void ReadBytes(uint8_t* output, size_t size) override;
+    Errorable<uint8_t*> ReadBytes(uint8_t* output, size_t size) override;
 
     void Release() override;
     void ResetReaderIndex() override;
@@ -304,8 +338,8 @@ namespace Ship {
     void TryRefreshWriterBuffer() override;
     void AppendBuffer() override;
     void PopBuffer() override;
-    void SkipReadBytes(size_t count) override;
-    void SkipWriteBytes(size_t count) override;
+    Errorable<size_t> SkipReadBytes(size_t count) override;
+    size_t SkipWriteBytes(size_t count) override;
 
     [[nodiscard]] bool CanReadDirect(size_t read_size) const override;
     uint8_t* GetDirectReadAddress() override;

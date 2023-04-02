@@ -8,7 +8,7 @@ namespace Ship {
   }
 
   void ByteTag::Read(ByteBuffer* buffer) {
-    value = buffer->ReadByte();
+    ProceedErrorable(value, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   void ByteTag::Write(ByteBuffer* buffer) {

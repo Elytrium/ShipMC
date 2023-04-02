@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../../utils/exceptions/InvalidArgumentException.hpp"
 #include <string>
 
 namespace Ship {

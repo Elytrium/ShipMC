@@ -15,7 +15,7 @@ namespace Ship {
   }
 
   void StringTag::Read(ByteBuffer* buffer) {
-    uint32_t valueLength = buffer->ReadShort();
+    ProceedErrorable(valueLength, uint16_t, buffer->ReadShort(), )
     value = (char*) buffer->ReadBytes(valueLength * sizeof(uint16_t));
   }
 

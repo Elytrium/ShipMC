@@ -1,6 +1,4 @@
 #include "../Ship.hpp"
-#include "../utils/exceptions/Exception.hpp"
-#include "../utils/exceptions/InvalidArgumentException.hpp"
 #include "Protocol.hpp"
 #include "data/profile/GameProfile.hpp"
 #include <cmath>
@@ -180,158 +178,177 @@ namespace Ship {
     }
   }
 
-  void ByteBuffer::WritePosition(int x, int y, int z) {
-    WriteLong(((x & 0x3FFFFFFULL) << 38) | ((z & 0x3FFFFFFULL) << 12) | (y & 0xFFF));
+  void ByteBuffer::WritePosition(Position position) {
+    WriteLong(((position.GetX() & 0x3FFFFFFULL) << 38) | ((position.GetZ() & 0x3FFFFFFULL) << 12) | (position.GetY() & 0xFFF));
   }
 
   void ByteBuffer::WriteAngle(float input) {
     WriteByte((uint8_t) (input * (256.0F / 360.0F)));
   }
 
-  bool ByteBuffer::ReadBoolean() {
+  Errorable<bool> ByteBuffer::ReadBoolean() {
     if (GetReadableBytes() < 1) {
-      throw Exception("Tried to read boolean, but not enough readable bytes");
+      return IncompleteBooleanErrorable(GetReadableBytes());
     }
 
-    return ReadByteUnsafe() != 0;
+    return SuccessErrorable<bool>(ReadByteUnsafe() != 0);
   }
 
-  uint8_t ByteBuffer::ReadByte() {
+  Errorable<uint8_t> ByteBuffer::ReadByte() {
     if (GetReadableBytes() < 1) {
-      throw Exception("Tried to read byte, but not enough readable bytes");
+      return IncompleteByteErrorable(GetReadableBytes());
     }
 
-    return ReadByteUnsafe();
+    return SuccessErrorable<uint8_t>(ReadByteUnsafe());
   }
 
-  uint16_t ByteBuffer::ReadShort() {
+  Errorable<uint16_t> ByteBuffer::ReadShort() {
     if (GetReadableBytes() < 2) {
-      throw Exception("Tried to read short, but not enough readable bytes");
+      return IncompleteShortErrorable(GetReadableBytes());
     }
 
-    return ReadByteUnsafe() << 8 | ReadByteUnsafe();
+    return SuccessErrorable<uint16_t>(ReadByteUnsafe() << 8 | ReadByteUnsafe());
   }
 
-  uint32_t ByteBuffer::ReadMedium() {
+  Errorable<uint32_t> ByteBuffer::ReadMedium() {
     if (GetReadableBytes() < 3) {
-      throw Exception("Tried to read medium, but not enough readable bytes");
+      return IncompleteMediumErrorable(GetReadableBytes());
     }
 
-    return ReadByteUnsafe() << 16 | ReadByteUnsafe() << 8 | ReadByteUnsafe();
+    return SuccessErrorable<uint32_t>(ReadByteUnsafe() << 16 | ReadByteUnsafe() << 8 | ReadByteUnsafe());
   }
 
-  uint32_t ByteBuffer::ReadInt() {
+  Errorable<uint32_t> ByteBuffer::ReadInt() {
     if (GetReadableBytes() < 4) {
-      throw Exception("Tried to read int, but not enough readable bytes");
+      return IncompleteIntErrorable(GetReadableBytes());
     }
 
-    return ReadByteUnsafe() << 24 | ReadByteUnsafe() << 16 | ReadByteUnsafe() << 8 | ReadByteUnsafe();
+    return SuccessErrorable<uint32_t>(ReadByteUnsafe() << 24 | ReadByteUnsafe() << 16 | ReadByteUnsafe() << 8 | ReadByteUnsafe());
   }
 
-  uint32_t ByteBuffer::ReadVarInt() {
+  Errorable<uint32_t> ByteBuffer::ReadVarInt() {
     uint32_t decodedVarInt = 0;
     for (uint32_t byteIndex = 0; byteIndex < 5; ++byteIndex) {
       if (GetReadableBytes() < 1) {
-        throw IncompleteVarIntException();
+        return IncompleteVarIntErrorable(GetReadableBytes());
       }
 
       uint8_t byte = ReadByteUnsafe();
       decodedVarInt |= (byte & 0x7F) << byteIndex * 7;
       if ((byte & 0x80) == 0) {
-        return decodedVarInt;
+        return SuccessErrorable<uint32_t>(decodedVarInt);
       }
     }
 
-    throw Exception("Invalid VarInt");
+    return InvalidVarIntErrorable(decodedVarInt);
   }
 
-  uint64_t ByteBuffer::ReadLong() {
+  Errorable<uint64_t> ByteBuffer::ReadLong() {
     if (GetReadableBytes() < 8) {
-      throw Exception("Tried to read long, but not enough readable bytes");
+      return IncompleteLongErrorable(GetReadableBytes());
     }
 
-    return (uint64_t) ReadByteUnsafe() << 56 | (uint64_t) ReadByteUnsafe() << 48 | (uint64_t) ReadByteUnsafe() << 40 | (uint64_t) ReadByteUnsafe() << 32
-         | (uint64_t) ReadByteUnsafe() << 24 | (uint64_t) ReadByteUnsafe() << 16 | (uint64_t) ReadByteUnsafe() << 8 | (uint64_t) ReadByteUnsafe();
+    return SuccessErrorable<uint64_t>((uint64_t) ReadByteUnsafe() << 56 | (uint64_t) ReadByteUnsafe() << 48 | (uint64_t) ReadByteUnsafe() << 40
+                                      | (uint64_t) ReadByteUnsafe() << 32 | (uint64_t) ReadByteUnsafe() << 24 | (uint64_t) ReadByteUnsafe() << 16
+                                      | (uint64_t) ReadByteUnsafe() << 8 | (uint64_t) ReadByteUnsafe());
   }
 
-  uint64_t ByteBuffer::ReadVarLong() {
+  Errorable<uint64_t> ByteBuffer::ReadVarLong() {
     uint64_t decodedVarLong = 0;
     for (uint32_t byteIndex = 0; byteIndex < 10; ++byteIndex) {
+      if (GetReadableBytes() < 1) {
+        return IncompleteVarLongErrorable(GetReadableBytes());
+      }
+
       uint8_t byte = ReadByteUnsafe();
       decodedVarLong |= ((uint64_t) (byte & 0x7FULL)) << byteIndex * 7;
       if ((byte & 0x80) == 0) {
-        return decodedVarLong;
+        return SuccessErrorable<uint64_t>(decodedVarLong);
       }
     }
 
-    throw Exception("Invalid VarLong");
+    return InvalidVarLongErrorable(decodedVarLong);
   }
 
-  UUID ByteBuffer::ReadUUID() {
-    return {ReadLong(), ReadLong()};
+  Errorable<UUID> ByteBuffer::ReadUUID() {
+    ProceedErrorable(mostSignificant, uint64_t, ReadLong(), InvalidUUIDErrorable(GetReadableBytes()))
+    ProceedErrorable(leastSignificant, uint64_t, ReadLong(), InvalidUUIDErrorable(GetReadableBytes()))
+    return SuccessErrorable<UUID>({mostSignificant, leastSignificant});
   }
 
-  UUID ByteBuffer::ReadUUIDIntArray() {
-    return {(uint64_t) ReadInt() << 32 | ((uint64_t) ReadInt() & 0xFFFFFFFFLL), (uint64_t) ReadInt() << 32 | ((uint64_t) ReadInt() & 0xFFFFFFFFLL)};
+  Errorable<UUID> ByteBuffer::ReadUUIDIntArray() {
+    ProceedErrorable(mostSignificantLeft, uint32_t, ReadInt(), InvalidUUIDErrorable(GetReadableBytes()))
+    ProceedErrorable(mostSignificantRight, uint32_t, ReadInt(), InvalidUUIDErrorable(GetReadableBytes()))
+    ProceedErrorable(leastSignificantLeft, uint32_t, ReadInt(), InvalidUUIDErrorable(GetReadableBytes()))
+    ProceedErrorable(leastSignificantRight, uint32_t, ReadInt(), InvalidUUIDErrorable(GetReadableBytes()))
+
+    return SuccessErrorable<UUID>({(uint64_t) mostSignificantLeft | ((uint64_t) mostSignificantRight & 0xFFFFFFFFLL),
+      (uint64_t) leastSignificantLeft << 32 | ((uint64_t) leastSignificantRight & 0xFFFFFFFFLL)});
   }
 
-  double ByteBuffer::ReadDouble() {
-    uint64_t value = ReadLong();
-    return *((double*) &value);
+  Errorable<double> ByteBuffer::ReadDouble() {
+    ProceedErrorable(value, uint64_t, ReadLong(), IncompleteDoubleErrorable(GetReadableBytes()))
+    return SuccessErrorable<double>(*((double*) &value));
   }
 
-  float ByteBuffer::ReadFloat() {
-    uint32_t value = ReadInt();
-    return *((float*) &value);
+  Errorable<float> ByteBuffer::ReadFloat() {
+    ProceedErrorable(value, uint32_t, ReadInt(), IncompleteFloatErrorable(GetReadableBytes()))
+    return SuccessErrorable<float>(*((float*) &value));
   }
 
-  std::string ByteBuffer::ReadString() {
+  Errorable<std::string> ByteBuffer::ReadString() {
     return ReadString(65536);
   }
 
-  std::string ByteBuffer::ReadString(uint32_t max_size) {
-    uint32_t length = ReadVarInt();
+  Errorable<std::string> ByteBuffer::ReadString(uint32_t max_size) {
+    ProceedErrorable(length, uint32_t, ReadVarInt(), InvalidStringSizeErrorable(-1))
     if (length > max_size) {
-      throw InvalidArgumentException("Invalid received string size", length);
+      return InvalidStringSizeErrorable(length);
     }
 
-    return (const char*) ReadBytes(length);
+    ProceedErrorable(bytes, uint8_t*, ReadBytes(length), InvalidStringSizeErrorable(length))
+    return SuccessErrorable<std::string>((const char*) bytes);
   }
 
-  ByteBuffer* ByteBuffer::ReadByteArray() {
-    uint32_t length = ReadVarInt();
-    return new ByteBufferImpl(ReadBytes(length), length);
+  Errorable<ByteBuffer*> ByteBuffer::ReadByteArray() {
+    ProceedErrorable(length, uint32_t, ReadVarInt(), InvalidByteArraySizeErrorable(-1))
+    ProceedErrorable(bytes, uint8_t*, ReadBytes(length), InvalidByteArraySizeErrorable(length))
+    return SuccessErrorable<ByteBuffer*>(new ByteBufferImpl(bytes, length));
   }
 
-  ByteBuffer* ByteBuffer::ReadByteArray(uint32_t max_size) {
-    uint32_t length = ReadVarInt();
+  Errorable<ByteBuffer*> ByteBuffer::ReadByteArray(uint32_t max_size) {
+    ProceedErrorable(length, uint32_t, ReadVarInt(), InvalidByteArraySizeErrorable(-1))
     if (length > max_size) {
-      throw InvalidArgumentException("Invalid received string size", length);
+      return InvalidByteArraySizeErrorable(length);
     }
 
-    return new ByteBufferImpl(ReadBytes(length), length);
+    ProceedErrorable(bytes, uint8_t*, ReadBytes(length), InvalidByteArraySizeErrorable(length))
+    return SuccessErrorable<ByteBuffer*>(new ByteBufferImpl(bytes, length));
   }
 
-  std::vector<GameProfileProperty> ByteBuffer::ReadProperties() {
+  Errorable<std::vector<GameProfileProperty>> ByteBuffer::ReadProperties() {
     std::vector<GameProfileProperty> properties;
-    for (uint32_t i = 0; i < ReadVarInt(); ++i) {
-      std::string name = ReadString();
-      std::string value = ReadString();
-      if (ReadBoolean()) {
-        properties.emplace_back(name, value, ReadString());
+    ProceedErrorable(length, uint32_t, ReadVarInt(), InvalidGamePropertiesSizeErrorable(-1))
+    for (uint32_t i = 0; i < length; ++i) {
+      ProceedErrorable(name, std::string, ReadString(), InvalidGamePropertiesErrorable(GetReadableBytes()))
+      ProceedErrorable(value, std::string, ReadString(), InvalidGamePropertiesErrorable(GetReadableBytes()))
+      ProceedErrorable(hasString, bool, ReadBoolean(), InvalidGamePropertiesErrorable(GetReadableBytes()))
+      if (hasString) {
+        ProceedErrorable(string, std::string, ReadString(), InvalidGamePropertiesErrorable(GetReadableBytes()))
+        properties.emplace_back(name, value, string);
       } else {
         properties.emplace_back(name, value, "");
       }
     }
 
-    return properties;
+    return SuccessErrorable<std::vector<GameProfileProperty>>(properties);
   }
 
-  void ByteBuffer::ReadPosition(int& x, int& y, int& z) {
-    uint64_t value = ReadLong();
-    x = (int) (value >> 38);
-    y = (int) (value & 0xFFF);
-    z = (int) (value >> 12) & 0x3FFFFFF;
+  Errorable<Position> ByteBuffer::ReadPosition() {
+    ProceedErrorable(value, uint64_t, ReadLong(), InvalidPositionErrorable(GetReadableBytes()))
+    int x = (int) (value >> 38);
+    int y = (int) (value & 0xFFF);
+    int z = (int) (value >> 12) & 0x3FFFFFF;
 
     if (x >= 1 << 25) {
       x -= 1 << 26;
@@ -344,91 +361,23 @@ namespace Ship {
     if (z >= 1 << 25) {
       z -= 1 << 26;
     }
+
+    return SuccessErrorable<Position>({x, y, z});
   }
 
-  float ByteBuffer::ReadAngle() {
-    return (float) ReadByte() / (256.0F / 360.0F);
+  Errorable<float> ByteBuffer::ReadAngle() {
+    ProceedErrorable(value, uint8_t, ReadByte(), IncompleteAngleErrorable(GetReadableBytes()))
+    return SuccessErrorable<float>((float) value / (256.0F / 360.0F));
   }
 
-  ByteBuffer& operator<<(ByteBuffer& buffer, bool input) {
-    buffer.WriteBoolean(input);
-    return buffer;
-  }
-
-  ByteBuffer& operator<<(ByteBuffer& buffer, uint8_t input) {
-    buffer.WriteByte(input);
-    return buffer;
-  }
-
-  ByteBuffer& operator<<(ByteBuffer& buffer, uint16_t input) {
-    buffer.WriteShort(input);
-    return buffer;
-  }
-
-  ByteBuffer& operator<<(ByteBuffer& buffer, uint32_t input) {
-    buffer.WriteInt(input);
-    return buffer;
-  }
-
-  ByteBuffer& operator<<(ByteBuffer& buffer, uint64_t input) {
-    buffer.WriteLong(input);
-    return buffer;
-  }
-
-  ByteBuffer& operator<<(ByteBuffer& buffer, double input) {
-    buffer.WriteDouble(input);
-    return buffer;
-  }
-
-  ByteBuffer& operator<<(ByteBuffer& buffer, float input) {
-    buffer.WriteFloat(input);
-    return buffer;
-  }
-
-  ByteBuffer& operator>>(ByteBuffer& buffer, bool& output) {
-    output = buffer.ReadBoolean();
-    return buffer;
-  }
-
-  ByteBuffer& operator>>(ByteBuffer& buffer, uint8_t& output) {
-    output = buffer.ReadByteUnsafe();
-    return buffer;
-  }
-
-  ByteBuffer& operator>>(ByteBuffer& buffer, uint16_t& output) {
-    output = buffer.ReadShort();
-    return buffer;
-  }
-
-  ByteBuffer& operator>>(ByteBuffer& buffer, uint32_t& output) {
-    output = buffer.ReadInt();
-    return buffer;
-  }
-
-  ByteBuffer& operator>>(ByteBuffer& buffer, uint64_t& output) {
-    output = buffer.ReadLong();
-    return buffer;
-  }
-
-  ByteBuffer& operator>>(ByteBuffer& buffer, double& output) {
-    output = buffer.ReadDouble();
-    return buffer;
-  }
-
-  ByteBuffer& operator>>(ByteBuffer& buffer, float& output) {
-    output = buffer.ReadFloat();
-    return buffer;
-  }
-
-  uint8_t* ByteBuffer::ReadBytes(size_t size) {
+  Errorable<uint8_t*> ByteBuffer::ReadBytes(size_t size) {
     auto* bytes = new uint8_t[size];
-    ReadBytes(bytes, size);
-    return bytes;
+    return ReadBytes(bytes, size);
   }
 
-  void ByteBufferImpl::SkipReadBytes(size_t count) {
+  Errorable<size_t> ByteBufferImpl::SkipReadBytes(size_t count) {
     if (count > readableBytes) {
-      throw Exception("Not enough readable bytes to skip them");
+      return InvalidReadSkipRequest(count);
     }
 
     readableBytes -= count;
@@ -440,9 +389,10 @@ namespace Ship {
 
     localReaderIndex = count;
     TryRefreshReaderBuffer();
+    return SuccessErrorable<size_t>(count);
   }
 
-  void ByteBufferImpl::SkipWriteBytes(size_t count) {
+  size_t ByteBufferImpl::SkipWriteBytes(size_t count) {
     readableBytes += count;
     while (count > singleCapacity - localWriterIndex) {
       count -= singleCapacity;
@@ -451,6 +401,7 @@ namespace Ship {
 
     localWriterIndex = count;
     TryRefreshWriterBuffer();
+    return count;
   }
 
   ByteBufferImpl::ByteBufferImpl(size_t cap) {
@@ -533,9 +484,9 @@ namespace Ship {
     WriteBytes(writeBuffer, size);
   }
 
-  void ByteBufferImpl::ReadBytes(uint8_t* output, size_t size) {
+  Errorable<uint8_t*> ByteBufferImpl::ReadBytes(uint8_t* output, size_t size) {
     if (GetReadableBytes() < size) {
-      throw Exception("Tried to read byte array, but not enough readable bytes");
+      return IncompleteByteArrayErrorable(GetReadableBytes());
     }
 
     uint32_t bytesIndex = 0;
@@ -563,6 +514,7 @@ namespace Ship {
     std::copy(currentReadBuffer + localReaderIndex, currentReadBuffer + localReaderIndex + size, output + bytesIndex);
     localReaderIndex += size;
     readableBytes -= size;
+    return SuccessErrorable<uint8_t*>(output);
   }
 
   ByteBufferImpl::~ByteBufferImpl() {

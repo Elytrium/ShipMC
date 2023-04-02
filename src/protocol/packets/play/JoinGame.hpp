@@ -58,22 +58,22 @@ namespace Ship {
       delete registryContainer;
     }
 
-    explicit JoinGame(const PacketHolder& holder) {
+    static Errorable<JoinGame> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
       entityId = buffer->ReadInt();
       if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
-        isHardcore = buffer->ReadBoolean();
+        ProceedErrorable(isHardcore, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         gamemode = (Gamemode) buffer->ReadByte();
       } else {
-        uint8_t gamemodeByte = buffer->ReadByte();
+        uint8_t ProceedErrorable(gamemodeByte, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         isHardcore = gamemodeByte & 0x08;
         gamemode = (Gamemode) (gamemodeByte & ~0x08);
       }
 
       if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
         previousGamemode = (Gamemode) buffer->ReadByte();
-        uint32_t arraySize = buffer->ReadVarInt();
+        uint32_t ProceedErrorable(arraySize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         for (int i = 0; i < arraySize; ++i) {
           levelNames.insert(buffer->ReadString());
         }
@@ -97,31 +97,31 @@ namespace Ship {
           auto* currentDimDataTag = (CompoundTag*) (ProtocolUtils::ReadNBT(buffer));
           dimension = Dimension::FromNBT(currentDimDataTag);
           delete currentDimDataTag;
-          registryIdentifier = buffer->ReadString();
+          ProceedErrorable(registryIdentifier, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
           levelName = "world";
         } else {
-          registryIdentifier = buffer->ReadString();
-          levelName = buffer->ReadString();
+          ProceedErrorable(registryIdentifier, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          ProceedErrorable(levelName, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         }
 
-        partialHashedSeed = buffer->ReadLong();
+        ProceedErrorable(partialHashedSeed, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
-          maxPlayers = buffer->ReadVarInt();
+          ProceedErrorable(maxPlayers, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         } else {
-          maxPlayers = buffer->ReadByte();
+          ProceedErrorable(maxPlayers, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         }
 
-        viewDistance = buffer->ReadVarInt();
+        ProceedErrorable(viewDistance, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
-          simulationDistance = buffer->ReadVarInt();
+          ProceedErrorable(simulationDistance, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         } else {
           simulationDistance = viewDistance;
         }
 
-        reducedDebugInfo = buffer->ReadBoolean();
-        showRespawnScreen = buffer->ReadBoolean();
-        isDebugType = buffer->ReadBoolean();
-        isFlat = buffer->ReadBoolean();
+        ProceedErrorable(reducedDebugInfo, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(showRespawnScreen, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(isDebugType, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(isFlat, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         if (version >= &ProtocolVersion::MINECRAFT_1_19 && buffer->ReadBoolean()) {
           hasLastDeathPosition = true;
           lastDeathPosition = {buffer->ReadString(), buffer->ReadLong()};
@@ -143,7 +143,7 @@ namespace Ship {
         }
 
         if (version >= &ProtocolVersion::MINECRAFT_1_15) {
-          partialHashedSeed = buffer->ReadLong();
+          ProceedErrorable(partialHashedSeed, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         } else {
           partialHashedSeed = 0;
         }
@@ -151,20 +151,20 @@ namespace Ship {
         levelName = "world";
         levelNames.insert(levelName);
 
-        maxPlayers = buffer->ReadByte();
+        ProceedErrorable(maxPlayers, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         isFlat = buffer->ReadString(16) == "flat";
         isDebugType = false;
 
         if (version >= &ProtocolVersion::MINECRAFT_1_14) {
-          viewDistance = buffer->ReadVarInt();
+          ProceedErrorable(viewDistance, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         } else {
           viewDistance = 10;
         }
 
         simulationDistance = viewDistance;
-        reducedDebugInfo = buffer->ReadBoolean();
+        ProceedErrorable(reducedDebugInfo, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         if (version >= &ProtocolVersion::MINECRAFT_1_15) {
-          showRespawnScreen = buffer->ReadBoolean();
+          ProceedErrorable(showRespawnScreen, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         } else {
           showRespawnScreen = true;
         }
@@ -270,7 +270,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

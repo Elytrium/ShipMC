@@ -10,7 +10,7 @@
     handlerClass::HANDLER_ORDINAL, packetClass::PACKET_ORDINAL, [](PacketHandler* handlerPtr, void* connectionPtr, const PacketHolder& holder) { \
       ByteBuffer* buffer = holder.GetCurrentBuffer();                                                                                            \
       uint32_t oldReadableBytes = buffer->GetReadableBytes();                                                                                    \
-      packetClass pkt = packetClass(holder);                                                                                                     \
+      packetClass pkt = packetClass::Instantiate(holder);                                                                                        \
                                                                                                                                                  \
       if (oldReadableBytes - buffer->GetReadableBytes() != holder.GetExpectedSize()) {                                                           \
         throw InvalidArgumentException("Invalid packet size, expected: ", holder.GetExpectedSize());                                             \

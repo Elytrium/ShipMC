@@ -10,7 +10,7 @@ namespace Ship {
   }
 
   VarIntMetadataEntry::VarIntMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadVarInt();
+    ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   MetadataEntryType VarIntMetadataEntry::GetType() const {

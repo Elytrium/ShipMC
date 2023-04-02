@@ -8,35 +8,37 @@ namespace Ship {
 
   class BlockDestroyStage : public Packet {
    private:
-    uint32_t entityId;
-    int locationX;
-    int locationY;
-    int locationZ;
-    uint8_t destroyStage;
+    uint32_t entityId{};
+    Position location{};
+    uint8_t destroyStage{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    BlockDestroyStage(uint32_t entityId, int locationX, int locationY, int locationZ, uint8_t destroyStage)
-      : entityId(entityId), locationX(locationX), locationY(locationY), locationZ(locationZ), destroyStage(destroyStage) {
+    BlockDestroyStage() = default;
+
+    BlockDestroyStage(uint32_t entityId, Position location, uint8_t destroyStage)
+      : entityId(entityId), location(location), destroyStage(destroyStage) {
     }
 
-    explicit BlockDestroyStage(const PacketHolder& holder) {
+    static Errorable<BlockDestroyStage> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      entityId = buffer->ReadVarInt();
-      buffer->ReadPosition(locationX, locationY, locationZ);
-      destroyStage = buffer->ReadByte();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BlockDestroyStage>(PACKET_ORDINAL))
+      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<BlockDestroyStage>(PACKET_ORDINAL))
+      ProceedErrorable(destroyStage, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BlockDestroyStage>(PACKET_ORDINAL))
+
+      return SuccessErrorable<BlockDestroyStage>({entityId, location, destroyStage});
     }
 
     ~BlockDestroyStage() override = default;
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
-      buffer->WritePosition(locationX, locationY, locationZ);
+      buffer->WritePosition(location);
       buffer->WriteByte(destroyStage);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 
@@ -44,16 +46,8 @@ namespace Ship {
       return entityId;
     }
 
-    [[nodiscard]] int GetLocationX() const {
-      return locationX;
-    }
-
-    [[nodiscard]] int GetLocationY() const {
-      return locationY;
-    }
-
-    [[nodiscard]] int GetLocationZ() const {
-      return locationZ;
+    [[nodiscard]] Position GetLocation() const {
+      return location;
     }
 
     [[nodiscard]] uint8_t GetDestroyStage() const {

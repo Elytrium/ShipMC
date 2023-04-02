@@ -19,10 +19,10 @@ namespace Ship {
 
     ~GameEvent() override = default;
 
-    explicit GameEvent(const PacketHolder& holder) {
+    static Errorable<GameEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      event = buffer->ReadByte();
-      value = buffer->ReadFloat();
+      ProceedErrorable(event, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(value, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -30,7 +30,7 @@ namespace Ship {
       buffer->WriteFloat(value);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

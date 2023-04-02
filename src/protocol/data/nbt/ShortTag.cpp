@@ -8,7 +8,7 @@ namespace Ship {
   }
 
   void ShortTag::Read(ByteBuffer* buffer) {
-    value = buffer->ReadShort();
+    ProceedErrorable(value, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   void ShortTag::Write(ByteBuffer* buffer) {

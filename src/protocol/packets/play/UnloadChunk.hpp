@@ -19,7 +19,7 @@ namespace Ship {
 
     ~UnloadChunk() override = default;
 
-    explicit UnloadChunk(const PacketHolder& holder) {
+    static Errorable<UnloadChunk> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       chunkX = buffer->ReadInt();
       chunkZ = buffer->ReadInt();

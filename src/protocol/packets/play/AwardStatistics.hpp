@@ -10,31 +10,25 @@ namespace Ship {
   class Statistic {
    private:
     std::string name;
-    uint32_t categoryId;
-    uint32_t statisticId;
-    uint32_t value;
+    uint32_t categoryId {};
+    uint32_t statisticId {};
+    uint32_t value {};
 
    public:
-    Statistic(std::string name) : name(std::move(name)) {
+    explicit Statistic(std::string name) : name(std::move(name)) {
     }
 
     Statistic(uint32_t categoryId, uint32_t statisticId, uint32_t value) : categoryId(categoryId), statisticId(statisticId), value(value) {
     }
 
+    Statistic(std::string name, uint32_t categoryId, uint32_t statisticId, uint32_t value)
+      : name(std::move(name)), categoryId(categoryId), statisticId(statisticId), value(value) {
+    }
+
     Statistic() : Statistic(0, 0, 0) {
     }
 
-    explicit Statistic(const PacketHolder& holder) {
-      ByteBuffer* buffer = holder.GetCurrentBuffer();
-      const ProtocolVersion* version = holder.GetVersion();
-      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
-        categoryId = buffer->ReadVarInt();
-        statisticId = buffer->ReadVarInt();
-      } else {
-        name = buffer->ReadString();
-      }
-      value = buffer->ReadVarInt();
-    }
+    static Errorable<Statistic> Instantiate(const PacketHolder& holder);
 
     [[nodiscard]] uint32_t GetCategoryId() const {
       return categoryId;
@@ -76,15 +70,22 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    AwardStatistics() = default;
+
     explicit AwardStatistics(std::vector<Statistic> statistics) : statistics(std::move(statistics)) {
     }
 
-    explicit AwardStatistics(const PacketHolder& holder) {
+    static Errorable<AwardStatistics> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      uint32_t vectorSize = buffer->ReadVarInt();
+      ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<AwardStatistics>(PACKET_ORDINAL))
+
+      std::vector<Statistic> statistics;
       for (int i = 0; i < vectorSize; ++i) {
-        statistics.emplace_back(holder);
+        ProceedErrorable(statistic, Statistic, Statistic::Instantiate(holder), InvalidPacketErrorable<AwardStatistics>(PACKET_ORDINAL))
+        statistics.push_back(statistic);
       }
+
+      return SuccessErrorable<AwardStatistics>(AwardStatistics(statistics));
     }
 
     ~AwardStatistics() override = default;
@@ -102,7 +103,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 
@@ -110,4 +111,23 @@ namespace Ship {
       return statistics;
     }
   };
+
+  Errorable<Statistic> Statistic::Instantiate(const PacketHolder& holder) {
+    ByteBuffer* buffer = holder.GetCurrentBuffer();
+    const ProtocolVersion* version = holder.GetVersion();
+    std::string name;
+    uint32_t categoryId;
+    uint32_t statisticId;
+    uint32_t value;
+
+    if (version >= &ProtocolVersion::MINECRAFT_1_13) {
+      SetFromErrorable(categoryId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<Statistic>(AwardStatistics::PACKET_ORDINAL))
+      SetFromErrorable(statisticId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<Statistic>(AwardStatistics::PACKET_ORDINAL))
+    } else {
+      SetFromErrorable(name, std::string, buffer->ReadString(), InvalidPacketErrorable<Statistic>(AwardStatistics::PACKET_ORDINAL))
+    }
+    SetFromErrorable(value, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<Statistic>(AwardStatistics::PACKET_ORDINAL))
+
+    return SuccessErrorable<Statistic>({name, categoryId, statisticId, value});
+  }
 }

@@ -10,7 +10,7 @@ namespace Ship {
   }
 
   LongMetadataEntry::LongMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadLong();
+    ProceedErrorable(value, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   MetadataEntryType LongMetadataEntry::GetType() const {

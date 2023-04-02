@@ -18,7 +18,7 @@ namespace Ship {
 
   ItemStack::ItemStack(const ProtocolVersion* version, ByteBuffer* buffer) : ItemStack() {
     if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
-      present = buffer->ReadBoolean();
+      ProceedErrorable(present, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     } else {
       present = buffer->ReadShort() != (uint16_t) -1;
     }
@@ -26,15 +26,15 @@ namespace Ship {
     delete nbt;
     if (present) {
       if (version < &ProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
-        itemID = buffer->ReadShort();
+        ProceedErrorable(itemID, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
-        itemID = buffer->ReadVarInt();
+        ProceedErrorable(itemID, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
 
-      itemCount = buffer->ReadByte();
+      ProceedErrorable(itemCount, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
 
       if (version < &ProtocolVersion::MINECRAFT_1_13) {
-        data = buffer->ReadShort();
+        ProceedErrorable(data, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
 
       nbt = ProtocolUtils::ReadNBT(buffer);

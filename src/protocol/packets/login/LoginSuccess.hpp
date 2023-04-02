@@ -23,18 +23,18 @@ namespace Ship {
       : uuid(uuid), username(std::move(username)), properties(std::move(properties)) {
     }
 
-    explicit LoginSuccess(const PacketHolder& holder) {
+    static Errorable<LoginSuccess> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
-        uuid = buffer->ReadUUID();
+        ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
         uuid = buffer->ReadUUIDIntArray();
       } else {
         uuid = UUID(buffer->ReadString(36));
       }
 
-      username = buffer->ReadString(MAXIMUM_USERNAME_SIZE);
+      ProceedErrorable(username, std::string, buffer->ReadString(MAXIMUM_USERNAME_SIZE), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         properties = buffer->ReadProperties();
       }
@@ -57,7 +57,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

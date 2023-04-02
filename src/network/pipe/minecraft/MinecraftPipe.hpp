@@ -49,6 +49,6 @@ namespace Ship {
     void SetProtocolVersion(const ProtocolVersion* new_protocol_version);
 
     ByteBuffer* Write(const Packet& in) override;
-    PacketHolder ReadPacket(ByteBuffer* in, uint32_t frame_size) override;
+    Errorable<PacketHolder> ReadPacket(ByteBuffer* in, uint32_t frame_size) override;
   };
 } // namespace Ship

@@ -18,7 +18,7 @@ namespace Ship {
 
     ~Ping() override = default;
 
-    explicit Ping(const PacketHolder& holder) {
+    static Errorable<Ping> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       id = buffer->ReadInt();
     }
@@ -27,7 +27,7 @@ namespace Ship {
       buffer->WriteInt(id);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

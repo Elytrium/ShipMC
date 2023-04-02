@@ -32,14 +32,14 @@ namespace Ship {
   }
 
   VibrationParticle::VibrationParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    sourceType = buffer->ReadString();
+    ProceedErrorable(sourceType, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     if (sourceType == "minecraft:block") {
       buffer->ReadPosition(blockX, blockY, blockZ);
     } else if (sourceType == "minecraft:entity") {
-      entityId = buffer->ReadVarInt();
-      entityEyeHeight = buffer->ReadFloat();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(entityEyeHeight, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
-    ticks = buffer->ReadVarInt();
+    ProceedErrorable(ticks, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   std::string VibrationParticle::GetIdentifier() const {

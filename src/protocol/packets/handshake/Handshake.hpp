@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../../../network/SocketAddress.hpp"
-#include "../../../utils/exceptions/InvalidArgumentException.hpp"
 #include "../../../utils/ordinal/OrdinalRegistry.hpp"
 #include "../Packet.hpp"
 #include <string>
+#include <utility>
 
 namespace Ship {
 
@@ -25,13 +25,19 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    explicit Handshake(const PacketHolder& holder) {
-      ByteBuffer* buffer = holder.GetCurrentBuffer();
-      protocolVersionID = buffer->ReadVarInt();
+    Handshake() = default;
 
-      hostname = buffer->ReadString(MAXIMUM_HOSTNAME_SIZE);
-      port = buffer->ReadShort();
-      nextStatus = (HandshakeNextStatus) buffer->ReadVarInt();
+    Handshake(uint32_t protocolVersionId, std::string hostname, uint16_t port, HandshakeNextStatus nextStatus)
+      : protocolVersionID(protocolVersionId), hostname(std::move(hostname)), port(port), nextStatus(nextStatus) {
+    }
+
+    static Errorable<Handshake> Instantiate(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      ProceedErrorable(protocolVersionID, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<Handshake>(PACKET_ORDINAL))
+      ProceedErrorable(hostname, std::string, buffer->ReadString(MAXIMUM_HOSTNAME_SIZE), InvalidPacketErrorable<Handshake>(PACKET_ORDINAL))
+      ProceedErrorable(port, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<Handshake>(PACKET_ORDINAL))
+      ProceedErrorable(nextStatus, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<Handshake>(PACKET_ORDINAL))
+      return SuccessErrorable<Handshake>({protocolVersionID, hostname, port, (HandshakeNextStatus) nextStatus});
     }
 
     ~Handshake() override = default;
@@ -43,7 +49,7 @@ namespace Ship {
       buffer->WriteVarInt((uint32_t) nextStatus);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

@@ -17,7 +17,7 @@ namespace Ship {
 
   OptChatMetadataEntry::OptChatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
     if (buffer->ReadBoolean()) {
-      optValue = buffer->ReadString();
+      ProceedErrorable(optValue, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     } else {
       optValue.reset();
     }

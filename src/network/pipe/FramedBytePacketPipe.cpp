@@ -1,30 +1,32 @@
-#include "../../utils/exceptions/InvalidArgumentException.hpp"
 #include "FramedPipe.hpp"
 
 namespace Ship {
-  PacketHolder FramedBytePacketPipe::Read(ByteBuffer* in) {
+  Errorable<PacketHolder> FramedBytePacketPipe::Read(ByteBuffer* in) {
     size_t readableBytes = in->GetReadableBytes();
     if (nextReadFrameLength == 0) {
       if (readableBytes == 0) {
-        throw IncompleteFrameException();
+        return IncompleteFrameErrorable(readableBytes);
       }
 
-      try {
-        nextReadFrameLength = in->ReadVarInt();
-        if (nextReadFrameLength > maxReadSize) {
-          throw InvalidArgumentException("Invalid packet size: ", nextReadFrameLength);
+      Errorable<uint32_t> nextReadFrameLengthErrorable = in->ReadVarInt();
+      uint32_t frameLength = nextReadFrameLengthErrorable.GetValue();
+      if (nextReadFrameLengthErrorable.IsSuccess()) {
+        if (frameLength > maxReadSize) {
+          return InvalidFrameErrorable(frameLength);
         }
-      } catch (const IncompleteVarIntException& exception) {
-        throw IncompleteFrameException();
+
+        nextReadFrameLength = frameLength;
+      } else if (nextReadFrameLengthErrorable.GetTypeOrdinal() != IncompleteFrameErrorable::TYPE_ORDINAL) {
+        return InvalidFrameErrorable(frameLength);
       }
     }
 
     if (nextReadFrameLength != 0 && readableBytes >= nextReadFrameLength) {
-      PacketHolder packet = ReadPacket(in, nextReadFrameLength);
+      Errorable<PacketHolder> packet = ReadPacket(in, nextReadFrameLength);
       nextReadFrameLength = 0;
       return packet;
     }
 
-    throw IncompleteFrameException();
+    return IncompleteFrameErrorable(readableBytes);
   }
 } // namespace Ship

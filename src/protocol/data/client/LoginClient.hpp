@@ -22,19 +22,19 @@ namespace Ship {
         });
       }
 
-      Connection* GetConnection() const {
+      [[nodiscard]] Connection* GetConnection() const {
         return connection;
       }
 
-      MinecraftFramedBytePacketPipe* GetMinecraftPipe() const {
+      [[nodiscard]] MinecraftFramedBytePacketPipe* GetMinecraftPipe() const {
         return minecraftPipe;
       }
 
-      const SocketAddress& GetAddress() const {
+      [[nodiscard]] const SocketAddress& GetAddress() const {
         return address;
       }
 
-      bool IsActive() const {
+      [[nodiscard]] bool IsActive() const {
         return active;
       }
 

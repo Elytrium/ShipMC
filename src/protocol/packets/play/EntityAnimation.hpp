@@ -19,10 +19,10 @@ namespace Ship {
 
     ~EntityAnimation() override = default;
 
-    explicit EntityAnimation(const PacketHolder& holder) {
+    static Errorable<EntityAnimation> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      entityId = buffer->ReadVarInt();
-      animationId = buffer->ReadByte();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(animationId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -30,7 +30,7 @@ namespace Ship {
       buffer->WriteByte(animationId);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

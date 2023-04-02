@@ -15,14 +15,16 @@ namespace Ship {
 
     std::string username;
     bool hasSigData = false;
-    uint64_t expiry;
-    uint32_t publicKeyLength;
-    uint8_t* publicKey;
-    uint32_t signatureLength;
-    uint8_t* signature;
+    uint64_t expiry{};
+    uint32_t publicKeyLength{};
+    uint8_t* publicKey{};
+    uint32_t signatureLength{};
+    uint8_t* signature{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
+
+    LoginStart() = default;
 
     LoginStart(std::string username, bool hasSigData, uint64_t expiry, uint32_t publicKeyLength, uint8_t* publicKey, uint32_t signatureLength,
       uint8_t* signature)
@@ -30,29 +32,7 @@ namespace Ship {
         signatureLength(signatureLength), signature(signature) {
     }
 
-    explicit LoginStart(const PacketHolder& holder) {
-      ByteBuffer* buffer = holder.GetCurrentBuffer();
-      const ProtocolVersion* version = holder.GetVersion();
-      username = buffer->ReadString(MAXIMUM_USERNAME_SIZE);
-      if (version >= &ProtocolVersion::MINECRAFT_1_19) {
-        hasSigData = buffer->ReadBoolean();
-        if (hasSigData) {
-          expiry = buffer->ReadLong();
-
-          publicKeyLength = buffer->ReadVarInt();
-          if (publicKeyLength > MAXIMUM_PUBLIC_KEY_SIZE) {
-            throw InvalidArgumentException("Invalid public key length: ", publicKeyLength);
-          }
-          publicKey = buffer->ReadBytes(publicKeyLength);
-
-          signatureLength = buffer->ReadVarInt();
-          if (signatureLength > MAXIMUM_SIGNATURE_SIZE) {
-            throw InvalidArgumentException("Invalid signature length: ", publicKeyLength);
-          }
-          signature = buffer->ReadBytes(signatureLength);
-        }
-      }
-    }
+    static Errorable<LoginStart> Instantiate(const PacketHolder& holder);
 
     ~LoginStart() override {
       if (hasSigData) {
@@ -107,4 +87,40 @@ namespace Ship {
       return signature;
     }
   };
+
+  CreateInvalidArgumentErrorable(InvalidLoginPublicKeyErrorable, LoginStart, "Invalid public key length");
+  CreateInvalidArgumentErrorable(InvalidLoginSignatureErrorable, LoginStart, "Invalid signature length");
+
+  Errorable<LoginStart> LoginStart::Instantiate(const PacketHolder& holder) {
+    ByteBuffer* buffer = holder.GetCurrentBuffer();
+    const ProtocolVersion* version = holder.GetVersion();
+    ProceedErrorable(username, std::string, buffer->ReadString(MAXIMUM_USERNAME_SIZE), InvalidPacketErrorable<LoginStart>(PACKET_ORDINAL))
+
+    bool hasSigData = false;
+    uint64_t expiry{};
+    uint32_t publicKeyLength{};
+    uint8_t* publicKey{};
+    uint32_t signatureLength{};
+    uint8_t* signature{};
+    if (version >= &ProtocolVersion::MINECRAFT_1_19) {
+      SetFromErrorable(hasSigData, bool, buffer->ReadBoolean(), InvalidPacketErrorable<LoginStart>(PACKET_ORDINAL))
+      if (hasSigData) {
+        SetFromErrorable(expiry, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<LoginStart>(PACKET_ORDINAL))
+
+          SetFromErrorable(publicKeyLength, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<LoginStart>(PACKET_ORDINAL))
+        if (publicKeyLength > MAXIMUM_PUBLIC_KEY_SIZE) {
+          return InvalidLoginPublicKeyErrorable(publicKeyLength);
+        }
+        SetFromErrorable(publicKey, uint8_t*, buffer->ReadBytes(publicKeyLength), InvalidPacketErrorable<LoginStart>(PACKET_ORDINAL))
+
+        SetFromErrorable(signatureLength, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<LoginStart>(PACKET_ORDINAL))
+        if (signatureLength > MAXIMUM_SIGNATURE_SIZE) {
+          return InvalidLoginSignatureErrorable(publicKeyLength);
+        }
+        SetFromErrorable(signature, uint8_t*, buffer->ReadBytes(signatureLength), InvalidPacketErrorable<LoginStart>(PACKET_ORDINAL))
+      }
+    }
+
+    return SuccessErrorable<LoginStart>({username, hasSigData, expiry, publicKeyLength, publicKey, signatureLength, signature});
+  }
 }

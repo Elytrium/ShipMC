@@ -8,17 +8,20 @@ namespace Ship {
 
   class AcknowledgeBlockChange : public Packet {
    private:
-    uint32_t sequence;
+    uint32_t sequence{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    AcknowledgeBlockChange() = default;
+
     explicit AcknowledgeBlockChange(uint32_t sequence) : sequence(sequence) {
     }
 
-    explicit AcknowledgeBlockChange(const PacketHolder& holder) {
+    static Errorable<AcknowledgeBlockChange> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      sequence = buffer->ReadVarInt();
+      ProceedErrorable(sequence, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<AcknowledgeBlockChange>(PACKET_ORDINAL))
+      return SuccessErrorable<AcknowledgeBlockChange>(AcknowledgeBlockChange(sequence));
     }
 
     ~AcknowledgeBlockChange() override = default;
@@ -27,7 +30,7 @@ namespace Ship {
       buffer->WriteVarInt(sequence);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

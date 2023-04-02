@@ -33,24 +33,24 @@ namespace Ship {
 
     ~SpawnEntity() override = default;
 
-    explicit SpawnEntity(const PacketHolder& holder) {
+    static Errorable<SpawnEntity> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      entityId = buffer->ReadVarInt();
-      entityUuid = buffer->ReadUUID();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(entityUuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (version >= &ProtocolVersion::MINECRAFT_1_14) {
-        type = buffer->ReadVarInt();
+        ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
-        type = buffer->ReadByte();
+        ProceedErrorable(type, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
-      x = buffer->ReadDouble();
-      y = buffer->ReadDouble();
-      z = buffer->ReadDouble();
+      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       pitch = buffer->ReadAngle();
       yaw = buffer->ReadAngle();
       if (version >= &ProtocolVersion::MINECRAFT_1_19) {
         headYaw = buffer->ReadAngle();
-        data = buffer->ReadVarInt();
+        ProceedErrorable(data, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
         data = buffer->ReadInt();
       }
@@ -83,7 +83,7 @@ namespace Ship {
       buffer->WriteShort((uint16_t) (velocityZ * 8000.0F));
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

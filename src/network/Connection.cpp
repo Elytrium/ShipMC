@@ -111,17 +111,17 @@ namespace Ship {
       currentBuffer = byteBytePipe->GetReaderBuffer();
     }
 
-    try {
-      PacketHolder packet = bytePacketPipe->Read(currentBuffer);
-      if (!mainPacketHandler->Handle(mainPacketHandler, this, packet)) {
+    Errorable<PacketHolder> packet = bytePacketPipe->Read(currentBuffer);
+    if (packet.IsSuccess()) {
+      if (!mainPacketHandler->Handle(mainPacketHandler, this, packet.GetValue())) {
         for (const auto& item : packetHandlers) {
-          if (item->Handle(item, this, packet)) {
+          if (item->Handle(item, this, packet.GetValue())) {
             break;
           }
         }
       }
-    } catch (IncompleteFrameException& exception) {
-      // Wait until more data is available
+    } else if (packet.GetTypeOrdinal() != IncompleteFrameErrorable::TYPE_ORDINAL) {
+      // TODO: Log error.
     }
   }
 
@@ -146,14 +146,6 @@ namespace Ship {
 
   void Connection::WriteDirect(ByteBuffer* buffer) {
     writerBuffer->WriteBytes(buffer, buffer->GetReadableBytes());
-  }
-
-  void Connection::WriteDirect(ByteBuffer* buffer, size_t length) {
-    if (buffer->GetReadableBytes() < length) {
-      throw InvalidArgumentException("Incorrect length in WriteDirect: ", length);
-    }
-
-    writerBuffer->WriteBytes(buffer, length);
   }
 
   ReadWriteCloser* Connection::GetReadWriteCloser() {

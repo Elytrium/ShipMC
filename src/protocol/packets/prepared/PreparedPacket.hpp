@@ -21,10 +21,11 @@ namespace Ship {
       delete[] unknownBytes;
     }
 
-    explicit PreparedPacket(const PacketHolder& holder) {
-      ByteBuffer* buffer = holder.GetCurrentBuffer();
-      const ProtocolVersion* version = holder.GetVersion();
-      unknownBytes[version->GetOrdinal()] = buffer;
+    static Errorable<PreparedPacket> Instantiate(const PacketHolder& holder) {
+      // ByteBuffer* buffer = holder.GetCurrentBuffer();
+      // const ProtocolVersion* version = holder.GetVersion();
+      // unknownBytes[version->GetOrdinal()] = buffer;
+      return SuccessErrorable<PreparedPacket>({}); // TODO: should we instantiate prepared packet?
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

@@ -22,7 +22,7 @@ namespace Ship {
     inline bool OnStatusRequest(Connection* connection, const StatusRequest& statusRequest);
     inline bool OnStatusPing(Connection* connection, const StatusPing& statusRequest);
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return HANDLER_ORDINAL;
     }
   };
@@ -41,7 +41,7 @@ namespace Ship {
     static void Init();
     static inline const uint32_t HANDLER_ORDINAL = OrdinalRegistry::PacketHandlerRegistry.RegisterOrdinal();
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return HANDLER_ORDINAL;
     }
   };

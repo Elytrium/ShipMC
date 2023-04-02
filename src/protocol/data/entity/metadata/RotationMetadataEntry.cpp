@@ -12,9 +12,9 @@ namespace Ship {
   }
 
   RotationMetadataEntry::RotationMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    x = buffer->ReadFloat();
-    y = buffer->ReadFloat();
-    z = buffer->ReadFloat();
+    ProceedErrorable(x, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(y, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(z, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   MetadataEntryType RotationMetadataEntry::GetType() const {

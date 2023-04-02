@@ -13,9 +13,12 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    explicit SingleVersionPreparedPacket(const PacketHolder& holder) {
-      ByteBuffer* buffer = holder.GetCurrentBuffer();
-      unknownBytes = buffer;
+    explicit SingleVersionPreparedPacket(ByteBuffer* unknownBytes) : unknownBytes(unknownBytes) {
+    }
+
+    static Errorable<SingleVersionPreparedPacket> Instantiate(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer(); // TODO: we should possibly copy the buffer
+      return SuccessErrorable<SingleVersionPreparedPacket>(SingleVersionPreparedPacket(buffer));
     }
 
     ~SingleVersionPreparedPacket() override {
@@ -30,7 +33,7 @@ namespace Ship {
       return unknownBytes->GetReadableBytes();
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

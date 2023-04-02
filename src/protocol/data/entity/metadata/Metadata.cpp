@@ -5,12 +5,12 @@ namespace Ship {
 
   Metadata::Metadata(const ProtocolVersion* version, ByteBuffer* buffer) {
     while (true) {
-      uint8_t index = buffer->ReadByte();
+      uint8_t ProceedErrorable(index, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (index == 0xFF) {
         break;
       }
 
-      uint32_t type = buffer->ReadVarInt();
+      uint32_t ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       MetadataEntry* entry = METADATA_ENTRY_REGISTRY.GetObjectByID(version, type, buffer);
       Set(index, entry);
     }

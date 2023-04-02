@@ -18,13 +18,13 @@ namespace Ship {
   }
 
   DustColorTransitionParticle::DustColorTransitionParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    fromRed = buffer->ReadFloat();
-    fromGreen = buffer->ReadFloat();
-    fromBlue = buffer->ReadFloat();
-    scale = buffer->ReadFloat();
-    toRed = buffer->ReadFloat();
-    toGreen = buffer->ReadFloat();
-    toBlue = buffer->ReadFloat();
+    ProceedErrorable(fromRed, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(fromGreen, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(fromBlue, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(scale, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(toRed, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(toGreen, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+    ProceedErrorable(toBlue, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   std::string DustColorTransitionParticle::GetIdentifier() const {

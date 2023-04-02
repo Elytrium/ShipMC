@@ -8,7 +8,7 @@ namespace Ship {
   }
 
   void DoubleTag::Read(ByteBuffer* buffer) {
-    value = buffer->ReadDouble();
+    ProceedErrorable(value, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   void DoubleTag::Write(ByteBuffer* buffer) {

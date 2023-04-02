@@ -8,51 +8,44 @@ namespace Ship {
 
   class BlockAction : public Packet {
    private:
-    int locationX;
-    int locationY;
-    int locationZ;
-    uint8_t actionId;
-    uint8_t actionParameter;
-    uint32_t blockType;
+    Position location {};
+    uint8_t actionId {};
+    uint8_t actionParameter {};
+    uint32_t blockType {};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    BlockAction(int locationX, int locationY, int locationZ, uint8_t actionId, uint8_t actionParameter, uint32_t blockType)
-      : locationX(locationX), locationY(locationY), locationZ(locationZ), actionId(actionId), actionParameter(actionParameter), blockType(blockType) {
+    BlockAction() = default;
+
+    BlockAction(Position location, uint8_t actionId, uint8_t actionParameter, uint32_t blockType): location(location), actionId(actionId),
+        actionParameter(actionParameter), blockType(blockType) {
     }
 
-    explicit BlockAction(const PacketHolder& holder) {
+    static Errorable<BlockAction> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      buffer->ReadPosition(locationX, locationY, locationZ);
-      actionId = buffer->ReadByte();
-      actionParameter = buffer->ReadByte();
-      blockType = buffer->ReadVarInt();
+      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<BlockAction>(PACKET_ORDINAL))
+      ProceedErrorable(actionId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BlockAction>(PACKET_ORDINAL))
+      ProceedErrorable(actionParameter, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BlockAction>(PACKET_ORDINAL))
+      ProceedErrorable(blockType, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BlockAction>(PACKET_ORDINAL))
+      return SuccessErrorable<BlockAction>({location, actionId, actionParameter, blockType});
     }
 
     ~BlockAction() override = default;
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      buffer->WritePosition(locationX, locationY, locationZ);
+      buffer->WritePosition(location);
       buffer->WriteByte(actionId);
       buffer->WriteByte(actionParameter);
       buffer->WriteVarInt(blockType);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 
-    [[nodiscard]] int GetLocationX() const {
-      return locationX;
-    }
-
-    [[nodiscard]] int GetLocationY() const {
-      return locationY;
-    }
-
-    [[nodiscard]] int GetLocationZ() const {
-      return locationZ;
+    [[nodiscard]] int GetLocation() const {
+      return location;
     }
 
     [[nodiscard]] uint8_t GetActionId() const {

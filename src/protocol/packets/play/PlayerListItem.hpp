@@ -69,7 +69,7 @@ namespace Ship {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
       if (buffer->ReadBoolean()) {
-        displayName = buffer->ReadString();
+        ProceedErrorable(displayName, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
         displayName.reset();
       }
@@ -120,9 +120,9 @@ namespace Ship {
     PlayerListUpdateGamemode(const UUID& uuid, Gamemode gamemode) : uuid(uuid), gamemode(gamemode) {
     }
 
-    explicit PlayerListUpdateGamemode(const PacketHolder& holder) {
+    static Errorable<PlayerListUpdateGamemode> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      uuid = buffer->ReadUUID();
+      ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       gamemode = (Gamemode) buffer->ReadVarInt();
     }
 
@@ -149,10 +149,10 @@ namespace Ship {
     PlayerListUpdateLatency(const UUID& uuid, uint32_t ping) : uuid(uuid), ping(ping) {
     }
 
-    explicit PlayerListUpdateLatency(const PacketHolder& holder) {
+    static Errorable<PlayerListUpdateLatency> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      uuid = buffer->ReadUUID();
-      ping = buffer->ReadVarInt();
+      ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(ping, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -178,11 +178,11 @@ namespace Ship {
     PlayerListUpdateDisplayName(const UUID& uuid, std::optional<std::string> displayName) : uuid(uuid), displayName(std::move(displayName)) {
     }
 
-    explicit PlayerListUpdateDisplayName(const PacketHolder& holder) {
+    static Errorable<PlayerListUpdateDisplayName> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      uuid = buffer->ReadUUID();
+      ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (buffer->ReadBoolean()) {
-        displayName = buffer->ReadString();
+        ProceedErrorable(displayName, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
         displayName.reset();
       }
@@ -213,9 +213,9 @@ namespace Ship {
     explicit PlayerListRemovePlayer(const UUID& uuid) : uuid(uuid) {
     }
 
-    explicit PlayerListRemovePlayer(const PacketHolder& holder) {
+    static Errorable<PlayerListRemovePlayer> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      uuid = buffer->ReadUUID();
+      ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -240,9 +240,9 @@ namespace Ship {
 
     ~PlayerListItem() override = default;
 
-    explicit PlayerListItem(const PacketHolder& holder) {
+    static Errorable<PlayerListItem> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      action = buffer->ReadVarInt();
+      ProceedErrorable(action, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       players.resize(buffer->ReadVarInt());
       for (PlayerListAction*& player : players) {
         switch (action) {
@@ -276,7 +276,7 @@ namespace Ship {
       // TODO: Write PlayerListItem
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

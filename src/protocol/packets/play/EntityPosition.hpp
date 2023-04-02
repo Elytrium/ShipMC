@@ -23,13 +23,13 @@ namespace Ship {
 
     ~EntityPosition() override = default;
 
-    explicit EntityPosition(const PacketHolder& holder) {
+    static Errorable<EntityPosition> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      entityId = buffer->ReadVarInt();
-      deltaX = buffer->ReadShort();
-      deltaY = buffer->ReadShort();
-      deltaZ = buffer->ReadShort();
-      onGround = buffer->ReadBoolean();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(deltaX, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(deltaY, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(deltaZ, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(onGround, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -40,7 +40,7 @@ namespace Ship {
       buffer->WriteBoolean(onGround);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

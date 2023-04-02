@@ -1,4 +1,3 @@
-#include "../../utils/exceptions/ErrnoException.hpp"
 #include "Connector.hpp"
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
@@ -10,14 +9,14 @@ namespace Ship {
   UnixConnector::UnixConnector(UnixEventLoop* eventLoop) : eventLoop(eventLoop) {
   }
 
-  void UnixConnector::Connect(char* bind_address, int16_t port) {
+  Errorable<int> UnixConnector::Connect(char* bind_address, int16_t port) {
     int socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFileDescriptor == -1) {
-      throw Exception("Error while creating socket. No permissions?");
+      return ErrnoErrorable<int>(socketFileDescriptor);
     }
 
     if (ioctl(socketFileDescriptor, FIONBIO) == -1) {
-      throw ErrnoException(errorBuffer, 64);
+      return ErrnoErrorable<int>(socketFileDescriptor);
     }
 
     sockaddr_in bindAddress {};
@@ -26,9 +25,10 @@ namespace Ship {
     bindAddress.sin_addr.s_addr = inet_addr(bind_address);
 
     if (connect(socketFileDescriptor, (sockaddr*) &bindAddress, sizeof(sockaddr_in)) == -1) {
-      throw Exception("Error while connecting to socket. Server is down/no permissions?");
+      return ErrnoErrorable<int>(socketFileDescriptor);
     }
 
     eventLoop->Accept(socketFileDescriptor);
+    return SuccessErrorable<int>(socketFileDescriptor);
   }
 }

@@ -31,7 +31,7 @@ namespace Ship {
 
     virtual void Read(ByteBuffer* in) {};
     virtual void Write(ByteBuffer* in) {};
-    virtual uint32_t GetOrdinal() const = 0;
+    [[nodiscard]] virtual uint32_t GetOrdinal() const = 0;
   };
 
   class BytePacketPipe {
@@ -40,7 +40,7 @@ namespace Ship {
 
     virtual ~BytePacketPipe() = default;
 
-    virtual PacketHolder Read(ByteBuffer* in) = 0;
+    virtual Errorable<PacketHolder> Read(ByteBuffer* in) = 0;
     virtual ByteBuffer* Write(const Packet& in) = 0;
   };
 } // namespace Ship

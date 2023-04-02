@@ -15,15 +15,19 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    LoginPluginResponse() = default;
+
     LoginPluginResponse(uint32_t id, bool success, ByteBuffer* data) : id(id), success(success), data(data) {
     }
 
-    explicit LoginPluginResponse(const PacketHolder& holder) {
+    static Errorable<LoginPluginResponse> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      id = buffer->ReadVarInt();
-      success = buffer->ReadBoolean();
+      ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<LoginPluginResponse>(PACKET_ORDINAL))
+      ProceedErrorable(success, bool, buffer->ReadBoolean(), InvalidPacketErrorable<LoginPluginResponse>(PACKET_ORDINAL))
       size_t dataLen = holder.GetExpectedSize() - ByteBuffer::VarIntBytes(id) - ByteBuffer::BOOLEAN_SIZE;
-      data = new ByteBufferImpl(buffer->ReadBytes(dataLen), dataLen);
+      ProceedErrorable(rawData, uint8_t*, buffer->ReadBytes(dataLen), InvalidPacketErrorable<LoginPluginResponse>(PACKET_ORDINAL))
+      ByteBuffer* data = new ByteBufferImpl(rawData, dataLen);
+      return SuccessErrorable<LoginPluginResponse>({id, success, data});
     }
 
     ~LoginPluginResponse() override {

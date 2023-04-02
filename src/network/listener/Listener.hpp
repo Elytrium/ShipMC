@@ -14,7 +14,8 @@ namespace Ship {
    public:
     virtual ~Listener() = default;
 
-    virtual void StartListening(SocketAddress address) = 0;
+    virtual Errorable<int> Bind(SocketAddress address) = 0;
+    virtual void StartListening() = 0;
   };
 
 #ifdef __linux__
@@ -30,7 +31,8 @@ namespace Ship {
     ~EpollListener() override;
 
     EpollListener(EpollEventLoop* event_loop, int max_events, int timeout);
-    void StartListening(SocketAddress address) override;
+    Errorable<int> Bind(SocketAddress address) override;
+    [[noreturn]] void StartListening() override;
   };
 
   typedef EpollListener SystemListener;

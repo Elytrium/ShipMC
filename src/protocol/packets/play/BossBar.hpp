@@ -18,25 +18,28 @@ namespace Ship {
   class BossBarAdd : public BossBarAction {
    private:
     std::string title; // TODO: Chat components
-    float health;
-    uint32_t color;
-    uint32_t division;
-    uint8_t flags;
+    float health {};
+    uint32_t color {};
+    uint32_t division {};
+    uint8_t flags {};
 
    public:
+    BossBarAdd() = default;
+
     BossBarAdd(std::string title, float health, uint32_t color, uint32_t division, uint8_t flags)
       : title(std::move(title)), health(health), color(color), division(division), flags(flags) {
     }
 
     ~BossBarAdd() override = default;
 
-    explicit BossBarAdd(const PacketHolder& holder) {
+    static Errorable<BossBarAdd> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      title = buffer->ReadString();
-      health = buffer->ReadFloat();
-      color = buffer->ReadVarInt();
-      division = buffer->ReadVarInt();
-      flags = buffer->ReadByte();
+      ProceedErrorable(title, std::string, buffer->ReadString(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
+      ProceedErrorable(health, float, buffer->ReadFloat(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
+      ProceedErrorable(color, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
+      ProceedErrorable(division, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
+      ProceedErrorable(flags, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
+      return SuccessErrorable<BossBarAdd>({title, health, color, division, flags});
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -74,7 +77,7 @@ namespace Ship {
 
   class BossBarRemove : public BossBarAction {
    public:
-    explicit BossBarRemove(const PacketHolder& holder) {
+    static Errorable<BossBarRemove> Instantiate(const PacketHolder& holder) {
     }
 
     ~BossBarRemove() override = default;
@@ -89,15 +92,18 @@ namespace Ship {
 
   class BossBarUpdateHealth : public BossBarAction {
    private:
-    float health;
+    float health {};
 
    public:
+    BossBarUpdateHealth() = default;
+
     explicit BossBarUpdateHealth(float health) : health(health) {
     }
 
-    explicit BossBarUpdateHealth(const PacketHolder& holder) {
+    static Errorable<BossBarUpdateHealth> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      health = buffer->ReadFloat();
+      ProceedErrorable(health, float, buffer->ReadFloat(), InvalidPacketErrorable<BossBarUpdateHealth>(PACKET_ORDINAL))
+      return SuccessErrorable<BossBarUpdateHealth>(BossBarUpdateHealth(health));
     }
 
     ~BossBarUpdateHealth() override = default;
@@ -120,12 +126,15 @@ namespace Ship {
     std::string title; // TODO: Chat components
 
    public:
+    BossBarUpdateTitle() = default;
+
     explicit BossBarUpdateTitle(std::string title) : title(std::move(title)) {
     }
 
-    explicit BossBarUpdateTitle(const PacketHolder& holder) {
+    static Errorable<BossBarUpdateTitle> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      title = buffer->ReadString();
+      ProceedErrorable(title, std::string, buffer->ReadString(), InvalidPacketErrorable<BossBarUpdateTitle>(PACKET_ORDINAL))
+      return SuccessErrorable<BossBarUpdateTitle>(BossBarUpdateTitle(title));
     }
 
     ~BossBarUpdateTitle() override = default;
@@ -145,17 +154,20 @@ namespace Ship {
 
   class BossBarUpdateStyle : public BossBarAction {
    private:
-    uint32_t color;
-    uint32_t dividers;
+    uint32_t color {};
+    uint32_t dividers {};
 
    public:
+    BossBarUpdateStyle() = default;
+
     BossBarUpdateStyle(uint32_t color, uint32_t dividers) : color(color), dividers(dividers) {
     }
 
-    explicit BossBarUpdateStyle(const PacketHolder& holder) {
+    static Errorable<BossBarUpdateStyle> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      color = buffer->ReadVarInt();
-      dividers = buffer->ReadVarInt();
+      ProceedErrorable(color, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BossBarUpdateStyle>(PACKET_ORDINAL))
+      ProceedErrorable(dividers, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BossBarUpdateStyle>(PACKET_ORDINAL))
+      return SuccessErrorable<BossBarUpdateStyle>({color, dividers});
     }
 
     ~BossBarUpdateStyle() override = default;
@@ -183,12 +195,15 @@ namespace Ship {
     uint8_t flags;
 
    public:
+    BossBarUpdateFlags() = default;
+
     explicit BossBarUpdateFlags(uint8_t flags) : flags(flags) {
     }
 
-    explicit BossBarUpdateFlags(const PacketHolder& holder) {
+    static Errorable<BossBarUpdateFlags> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      flags = buffer->ReadByte();
+      ProceedErrorable(flags, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BossBarUpdateFlags>(PACKET_ORDINAL))
+      return SuccessErrorable<BossBarUpdateFlags>(BossBarUpdateFlags(flags));
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -215,12 +230,11 @@ namespace Ship {
     BossBar(const UUID& uuid, BossBarAction* action) : uuid(uuid), action(action) {
     }
 
-    explicit BossBar(const PacketHolder& holder) {
+    static Errorable<BossBar> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      uuid = buffer->ReadUUID();
-      uint32_t actionId = buffer->ReadVarInt();
+      ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(actionId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
 
-      delete action;
       switch (actionId) {
         case 0:
           action = new BossBarAdd(holder);
@@ -259,7 +273,7 @@ namespace Ship {
       action->Write(version, buffer);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

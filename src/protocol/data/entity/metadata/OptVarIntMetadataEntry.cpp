@@ -12,7 +12,7 @@ namespace Ship {
   }
 
   OptVarIntMetadataEntry::OptVarIntMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    uint32_t value = buffer->ReadVarInt();
+    uint32_t ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     if (value) {
       optValue = value - 1;
     } else {

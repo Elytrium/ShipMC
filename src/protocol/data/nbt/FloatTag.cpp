@@ -8,7 +8,7 @@ namespace Ship {
   }
 
   void FloatTag::Read(ByteBuffer* buffer) {
-    value = buffer->ReadFloat();
+    ProceedErrorable(value, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
   }
 
   void FloatTag::Write(ByteBuffer* buffer) {
