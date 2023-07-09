@@ -5,6 +5,8 @@
 #include "libdeflate.h"
 
 namespace Ship {
+  CreateInvalidArgumentErrorable(InvalidDecompressedSize, size_t, "Invalid decompressed size");
+
   class CompressionPipe : public FramedByteBytePipe {
    private:
     libdeflate_compressor* compressor;
@@ -19,8 +21,8 @@ namespace Ship {
       uint32_t max_decompress_length, uint32_t threshold, uint32_t max_read_size);
     ~CompressionPipe() override;
 
-    void EncodeFrame(ByteBuffer* in, uint32_t frame_size) override;
-    void DecodeFrame(ByteBuffer* in, uint32_t frame_size) override;
+    Errorable<size_t> EncodeFrame(ByteBuffer* in, uint32_t frame_size) override;
+    Errorable<size_t> DecodeFrame(ByteBuffer* in, uint32_t frame_size) override;
     uint32_t GetOrdinal() const override;
   };
 
@@ -47,6 +49,6 @@ namespace Ship {
     void SetProtocolVersion(const ProtocolVersion* new_protocol_version);
 
     ByteBuffer* Write(const Packet& in) override;
-    PacketHolder ReadPacket(ByteBuffer* in, uint32_t frame_size) override;
+    Errorable<PacketHolder> ReadPacket(ByteBuffer* in, uint32_t frame_size) override;
   };
 }

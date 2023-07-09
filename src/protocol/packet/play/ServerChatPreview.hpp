@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <optional>
 #include <string>
 #include <utility>
@@ -20,11 +20,11 @@ namespace Ship {
 
     ~ServerChatPreview() override = default;
 
-    explicit ServerChatPreview(const PacketHolder& holder) {
+    static Errorable<ServerChatPreview> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       queryId = buffer->ReadInt();
       if (buffer->ReadBoolean()) {
-        message = buffer->ReadString();
+        ProceedErrorable(message, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
         message.reset();
       }
@@ -38,7 +38,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

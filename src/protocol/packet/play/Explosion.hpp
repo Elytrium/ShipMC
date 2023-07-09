@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <array>
 #include <string>
 #include <utility>
@@ -29,19 +29,19 @@ namespace Ship {
 
     ~Explosion() override = default;
 
-    explicit Explosion(const PacketHolder& holder) {
+    static Errorable<Explosion> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
       if (version == &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        x = buffer->ReadFloat();
-        y = buffer->ReadFloat();
-        z = buffer->ReadFloat();
+        ProceedErrorable(x, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(y, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(z, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
-        x = buffer->ReadDouble();
-        y = buffer->ReadDouble();
-        z = buffer->ReadDouble();
+        ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
-      strength = buffer->ReadFloat();
+      ProceedErrorable(strength, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
         records.resize(buffer->ReadVarInt());
       } else {
@@ -49,12 +49,12 @@ namespace Ship {
       }
       for (std::array<uint8_t, 3>& record : records) {
         for (uint8_t& byte : record) {
-          byte = buffer->ReadByte();
+          ProceedErrorable(byte, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
         }
       }
-      playerMotionX = buffer->ReadFloat();
-      playerMotionY = buffer->ReadFloat();
-      playerMotionZ = buffer->ReadFloat();
+      ProceedErrorable(playerMotionX, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(playerMotionY, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(playerMotionZ, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -83,7 +83,7 @@ namespace Ship {
       buffer->WriteFloat(playerMotionZ);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

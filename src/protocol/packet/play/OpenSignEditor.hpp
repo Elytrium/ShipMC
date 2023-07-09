@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -19,7 +19,7 @@ namespace Ship {
 
     ~OpenSignEditor() override = default;
 
-    explicit OpenSignEditor(const PacketHolder& holder) {
+    static Errorable<OpenSignEditor> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       buffer->ReadPosition(locationX, locationY, locationZ);
     }
@@ -28,7 +28,7 @@ namespace Ship {
       buffer->WritePosition(locationX, locationY, locationZ);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

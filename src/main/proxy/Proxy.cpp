@@ -13,7 +13,7 @@ namespace Ship {
     ServerPacketHandler::Init();
     ProxyPacketHandler::Init();
 
-    auto* eventLoop = new SystemEventLoop(
+    Errorable<SystemEventLoop*> eventLoop = SystemEventLoop::NewEventLoop(
       [](EventLoop* eventLoop, ReadWriteCloser* writer) {
         auto pipe = new MinecraftFramedBytePacketPipe(
           &BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, MAX_PACKET_SIZE, SERVERBOUND, CLIENTBOUND, 1024);
@@ -31,9 +31,15 @@ namespace Ship {
       },
       64, NO_TIMEOUT, 1024);
 
-    std::thread t(&SystemEventLoop::StartLoop, eventLoop);
-    Listener* listener = new SystemListener(eventLoop, 64, NO_TIMEOUT);
+    std::thread t(&SystemEventLoop::StartLoop, eventLoop.GetValue());
+    Listener* listener = new SystemListener(eventLoop.GetValue(), 64, NO_TIMEOUT);
 
-    listener->StartListening(SocketAddress {"0.0.0.0", 25577});
+    Errorable<int> bindRequest = listener->Bind(SocketAddress {"0.0.0.0", 25577});
+    if (!bindRequest.IsSuccess()) {
+      // TODO: log error
+      return;
+    }
+
+    listener->StartListening();
   }
 }

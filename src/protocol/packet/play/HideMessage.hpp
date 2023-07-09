@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -15,7 +15,7 @@ namespace Ship {
     explicit HideMessage(ByteBuffer* signature) : signature(signature) {
     }
 
-    explicit HideMessage(const PacketHolder& holder) {
+    static Errorable<HideMessage> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       uint32_t size = buffer->GetReadableBytes();
       delete signature;
@@ -30,7 +30,7 @@ namespace Ship {
       buffer->WriteBytes(signature, signature->GetReadableBytes());
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

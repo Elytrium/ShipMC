@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 #include <utility>
 
@@ -19,10 +19,10 @@ namespace Ship {
 
     ~CraftRecipeResponse() override = default;
 
-    explicit CraftRecipeResponse(const PacketHolder& holder) {
+    static Errorable<CraftRecipeResponse> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      windowId = buffer->ReadByte();
-      recipe = buffer->ReadString();
+      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(recipe, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -30,7 +30,7 @@ namespace Ship {
       buffer->WriteString(recipe);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

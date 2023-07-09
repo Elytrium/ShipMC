@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -19,11 +19,11 @@ namespace Ship {
 
     ~InventoryProperty() override = default;
 
-    explicit InventoryProperty(const PacketHolder& holder) {
+    static Errorable<InventoryProperty> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      windowId = buffer->ReadByte();
-      property = buffer->ReadShort();
-      value = buffer->ReadShort();
+      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(property, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(value, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

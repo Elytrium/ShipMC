@@ -23,16 +23,16 @@ namespace Ship {
 
     ~InventoryContent() override = default;
 
-    explicit InventoryContent(const PacketHolder& holder) {
+    static Errorable<InventoryContent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      windowId = buffer->ReadByte();
+      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       uint32_t vectorSize;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17_1) {
-        stateId = buffer->ReadVarInt();
-        vectorSize = buffer->ReadVarInt();
+        ProceedErrorable(stateId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
-        vectorSize = buffer->ReadShort();
+        ProceedErrorable(vectorSize, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
 
       for (int i = 0; i < vectorSize; ++i) {
@@ -62,7 +62,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

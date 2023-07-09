@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -30,11 +30,11 @@ namespace Ship {
 
     ~ServerPlayerAbilities() override = default;
 
-    explicit ServerPlayerAbilities(const PacketHolder& holder) {
+    static Errorable<ServerPlayerAbilities> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      flags.value = buffer->ReadByte();
-      flyingSpeed = buffer->ReadFloat();
-      fovModifier = buffer->ReadFloat();
+      flags.ProceedErrorable(value, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(flyingSpeed, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(fovModifier, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -43,7 +43,7 @@ namespace Ship {
       buffer->WriteFloat(fovModifier);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -17,9 +17,9 @@ namespace Ship {
 
     ~ClearTitle() override = default;
 
-    explicit ClearTitle(const PacketHolder& holder) {
+    static Errorable<ClearTitle> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      reset = buffer->ReadBoolean();
+      ProceedErrorable(reset, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -20,12 +20,12 @@ namespace Ship {
 
     ~EntityRotation() override = default;
 
-    explicit EntityRotation(const PacketHolder& holder) {
+    static Errorable<EntityRotation> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      entityId = buffer->ReadVarInt();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       yaw = buffer->ReadAngle();
       pitch = buffer->ReadAngle();
-      onGround = buffer->ReadBoolean();
+      ProceedErrorable(onGround, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -35,7 +35,7 @@ namespace Ship {
       buffer->WriteBoolean(onGround);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

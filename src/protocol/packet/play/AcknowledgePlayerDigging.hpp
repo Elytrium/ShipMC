@@ -1,57 +1,50 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
 
   class AcknowledgePlayerDigging : public Packet {
    private:
-    int locationX;
-    int locationY;
-    int locationZ;
-    uint32_t block;
-    uint32_t status;
-    bool successful;
+    Position location{};
+    uint32_t block{};
+    uint32_t status{};
+    bool successful{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    AcknowledgePlayerDigging(int locationX, int locationY, int locationZ, uint32_t block, uint32_t status, bool successful)
-      : locationX(locationX), locationY(locationY), locationZ(locationZ), block(block), status(status), successful(successful) {
+    AcknowledgePlayerDigging() = default;
+
+    AcknowledgePlayerDigging(Position location, uint32_t block, uint32_t status, bool successful)
+      : location(location), block(block), status(status), successful(successful) {
     }
 
-    explicit AcknowledgePlayerDigging(const PacketHolder& holder) {
+    static Errorable<AcknowledgePlayerDigging> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      buffer->ReadPosition(locationX, locationY, locationZ);
-      block = buffer->ReadVarInt();
-      status = buffer->ReadVarInt();
-      successful = buffer->ReadBoolean();
+      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<AcknowledgePlayerDigging>(PACKET_ORDINAL))
+      ProceedErrorable(block, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<AcknowledgePlayerDigging>(PACKET_ORDINAL))
+      ProceedErrorable(status, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<AcknowledgePlayerDigging>(PACKET_ORDINAL))
+      ProceedErrorable(successful, bool, buffer->ReadBoolean(), InvalidPacketErrorable<AcknowledgePlayerDigging>(PACKET_ORDINAL))
+      return SuccessErrorable<AcknowledgePlayerDigging>({location, block, status, successful});
     }
 
     ~AcknowledgePlayerDigging() override = default;
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      buffer->WritePosition(locationX, locationY, locationZ);
+      buffer->WritePosition(location);
       buffer->WriteVarInt(block);
       buffer->WriteVarInt(status);
       buffer->WriteBoolean(successful);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 
-    [[nodiscard]] int GetLocationX() const {
-      return locationX;
-    }
-
-    [[nodiscard]] int GetLocationY() const {
-      return locationY;
-    }
-
-    [[nodiscard]] int GetLocationZ() const {
-      return locationZ;
+    [[nodiscard]] Position GetLocation() const {
+      return location;
     }
 
     [[nodiscard]] uint32_t GetBlock() const {

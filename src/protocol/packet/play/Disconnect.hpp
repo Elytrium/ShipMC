@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -14,18 +15,21 @@ namespace Ship {
     explicit Disconnect(std::string reason) : reason(std::move(reason)) {
     }
 
+    Disconnect() = default;
+
     ~Disconnect() override = default;
 
-    explicit Disconnect(const PacketHolder& holder) {
+    static Errorable<Disconnect> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      reason = buffer->ReadString();
+      ProceedErrorable(reason, std::string, buffer->ReadString(), InvalidPacketErrorable<Disconnect>(PACKET_ORDINAL))
+      return SuccessErrorable<Disconnect>(Disconnect(reason));
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(reason);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 
