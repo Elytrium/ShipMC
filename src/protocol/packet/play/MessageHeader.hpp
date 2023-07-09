@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -16,7 +16,7 @@ namespace Ship {
     MessageHeader(ByteBuffer* precedingSignature, const UUID& sender) : precedingSignature(precedingSignature), sender(sender) {
     }
 
-    explicit MessageHeader(const PacketHolder& holder) {
+    static Errorable<MessageHeader> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       delete precedingSignature;
       if (buffer->ReadBoolean()) {
@@ -25,7 +25,7 @@ namespace Ship {
       } else {
         precedingSignature = nullptr;
       }
-      sender = buffer->ReadUUID();
+      ProceedErrorable(sender, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     ~MessageHeader() override {
@@ -40,7 +40,7 @@ namespace Ship {
       buffer->WriteUUID(sender);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

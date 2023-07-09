@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -18,12 +18,12 @@ namespace Ship {
 
     ~ServerChangeDifficulty() override = default;
 
-    explicit ServerChangeDifficulty(const PacketHolder& holder) {
+    static Errorable<ServerChangeDifficulty> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
       difficulty = (Difficulty) buffer->ReadByte();
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
-        locked = buffer->ReadBoolean();
+        ProceedErrorable(locked, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
     }
 
@@ -34,7 +34,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

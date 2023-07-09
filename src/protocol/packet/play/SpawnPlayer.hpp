@@ -1,9 +1,8 @@
 #pragma once
 
 #include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
-#include "../../../protocol/ProtocolUtils.hpp"
+#include "../../ProtocolUtils.hpp"
 #include "../../data/entity/metadata/Metadata.hpp"
-#include "../../../../lib/ShipNet/src/protocol/packet/Packet.hpp"
 #include <string>
 
 namespace Ship {
@@ -30,14 +29,14 @@ namespace Ship {
       delete metadata;
     }
 
-    explicit SpawnPlayer(const PacketHolder& holder) {
+    static Errorable<SpawnPlayer> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      entityId = buffer->ReadVarInt();
-      playerUuid = buffer->ReadUUID();
-      x = buffer->ReadDouble();
-      y = buffer->ReadDouble();
-      z = buffer->ReadDouble();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(playerUuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       yaw = buffer->ReadAngle();
       pitch = buffer->ReadAngle();
       if (version <= &MinecraftProtocolVersion::MINECRAFT_1_14_4) {

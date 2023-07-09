@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 #include <utility>
 
@@ -95,23 +95,23 @@ namespace Ship {
 
     ~TradeList() override = default;
 
-    explicit TradeList(const PacketHolder& holder) {
+    static Errorable<TradeList> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      windowId = buffer->ReadVarInt();
+      ProceedErrorable(windowId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       uint32_t vectorSize;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        vectorSize = buffer->ReadVarInt();
+        ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
-        vectorSize = buffer->ReadByte();
+        ProceedErrorable(vectorSize, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
       for (int i = 0; i < vectorSize; ++i) {
         trades.emplace_back(version, buffer);
       }
-      villagerLevel = buffer->ReadVarInt();
-      experience = buffer->ReadVarInt();
-      regularVillager = buffer->ReadBoolean();
-      canRestock = buffer->ReadBoolean();
+      ProceedErrorable(villagerLevel, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(experience, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(regularVillager, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(canRestock, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

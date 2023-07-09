@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -18,10 +18,10 @@ namespace Ship {
 
     ~Cooldown() override = default;
 
-    explicit Cooldown(const PacketHolder& holder) {
+    static Errorable<Cooldown> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      itemId = buffer->ReadVarInt();
-      cooldownTicks = buffer->ReadVarInt();
+      ProceedErrorable(itemId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(cooldownTicks, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

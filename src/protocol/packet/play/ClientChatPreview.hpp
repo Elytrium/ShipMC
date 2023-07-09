@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <optional>
 #include <string>
 #include <utility>
@@ -20,10 +20,10 @@ namespace Ship {
 
     ~ClientChatPreview() override = default;
 
-    explicit ClientChatPreview(const PacketHolder& holder) {
+    static Errorable<ClientChatPreview> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       queryId = buffer->ReadInt();
-      message = buffer->ReadString();
+      ProceedErrorable(message, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

@@ -6,14 +6,14 @@ namespace Ship {
   thread_local uint8_t* localCompressionBuffer = new uint8_t[MAX_PACKET_SIZE];
   thread_local uint8_t* localDecompressionBuffer = new uint8_t[MAX_PACKET_SIZE];
 
-  void CompressionPipe::EncodeFrame(ByteBuffer* in, uint32_t frame_size) {
+  Errorable<size_t> CompressionPipe::EncodeFrame(ByteBuffer* in, uint32_t frame_size) {
     ByteBuffer* buffer = GetWriterBuffer();
 
     if (frame_size < threshold) {
       buffer->WriteVarInt(frame_size + 1);
       buffer->WriteByte(0);
       buffer->WriteBytes(in, frame_size);
-      return;
+      return SuccessErrorable<size_t>(frame_size);
     }
 
     uint8_t* compressionInputAddress;
@@ -35,20 +35,22 @@ namespace Ship {
     if (directRead) {
       in->SkipReadBytes(frame_size);
     }
+
+    return SuccessErrorable<size_t>(frame_size);
   }
 
-  void CompressionPipe::DecodeFrame(ByteBuffer* in, uint32_t frame_size) {
+  Errorable<size_t> CompressionPipe::DecodeFrame(ByteBuffer* in, uint32_t frame_size) {
     ByteBuffer* buffer = GetReaderBuffer();
-    uint32_t decompressedSize = in->ReadVarInt();
+    ProceedErrorable(decompressedSize, uint32_t, in->ReadVarInt(), InvalidByteFrameErrorable(frame_size));
     if (decompressedSize == 0) {
       decompressedSize = frame_size - 1;
       buffer->WriteVarInt(decompressedSize);
       buffer->WriteBytes(in, decompressedSize);
-      return;
+      return SuccessErrorable<size_t>(frame_size);
     }
 
     if (decompressedSize < threshold || decompressedSize > maxDecompressLength) {
-      throw InvalidArgumentException("Invalid decompressed size: ", maxDecompressLength);
+      return InvalidDecompressedSize(decompressedSize);
     }
 
     buffer->WriteVarInt(decompressedSize);
@@ -82,6 +84,8 @@ namespace Ship {
     } else {
       buffer->WriteBytes(compressionOutputAddress, decompressedSize);
     }
+
+    return SuccessErrorable<size_t>(frame_size);
   }
 
   CompressionPipe::CompressionPipe(size_t reader_buffer_length, size_t writer_buffer_length, libdeflate_compressor* compressor,

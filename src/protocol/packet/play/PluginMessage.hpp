@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 #include <utility>
 
@@ -21,9 +21,9 @@ namespace Ship {
       delete data;
     }
 
-    explicit PluginMessage(const PacketHolder& holder) {
+    static Errorable<PluginMessage> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      channel = buffer->ReadString();
+      ProceedErrorable(channel, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       delete data;
       uint32_t size = buffer->GetReadableBytes();
       data = new ByteBufferImpl(buffer->ReadBytes(size), size);
@@ -34,7 +34,7 @@ namespace Ship {
       buffer->WriteBytes(buffer, buffer->GetReadableBytes());
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

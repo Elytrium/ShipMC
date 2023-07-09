@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -23,12 +23,12 @@ namespace Ship {
 
     ~WorldEvent() override = default;
 
-    explicit WorldEvent(const PacketHolder& holder) {
+    static Errorable<WorldEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       event = buffer->ReadInt();
       buffer->ReadPosition(locationX, locationY, locationZ);
       data = buffer->ReadInt();
-      disableRelativeVolume = buffer->ReadBoolean();
+      ProceedErrorable(disableRelativeVolume, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

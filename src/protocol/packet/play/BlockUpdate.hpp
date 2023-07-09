@@ -1,51 +1,43 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
 
   class BlockUpdate : public Packet {
    private:
-    int locationX;
-    int locationY;
-    int locationZ;
-    uint32_t blockId;
+    Position location {};
+    uint32_t blockId {};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    BlockUpdate(int locationX, int locationY, int locationZ, uint32_t blockId)
-      : locationX(locationX), locationY(locationY), locationZ(locationZ), blockId(blockId) {
+    BlockUpdate() = default;
+
+    BlockUpdate(Position location, uint32_t blockId) : location(location), blockId(blockId) {
     }
 
-    explicit BlockUpdate(const PacketHolder& holder) {
+    static Errorable<BlockUpdate> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      buffer->ReadPosition(locationX, locationX, locationZ);
-      buffer->WriteVarInt(blockId);
+      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<BlockUpdate>(PACKET_ORDINAL))
+      ProceedErrorable(blockId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BlockUpdate>(PACKET_ORDINAL))
+      return SuccessErrorable<BlockUpdate>({location, blockId});
     }
 
     ~BlockUpdate() override = default;
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      buffer->WritePosition(locationX, locationY, locationZ);
+      buffer->WritePosition(location);
       buffer->WriteVarInt(blockId);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 
-    [[nodiscard]] int GetLocationX() const {
-      return locationX;
-    }
-
-    [[nodiscard]] int GetLocationY() const {
-      return locationY;
-    }
-
-    [[nodiscard]] int GetLocationZ() const {
-      return locationZ;
+    [[nodiscard]] Position GetLocation() const {
+      return location;
     }
 
     [[nodiscard]] uint32_t GetBlockId() const {

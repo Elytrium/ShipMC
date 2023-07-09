@@ -9,7 +9,7 @@ namespace Ship {
         break;
       }
 
-      uint32_t type = buffer->ReadVarInt();
+      ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), );
       MetadataEntry* entry = METADATA_ENTRY_REGISTRY.GetObjectByID(version, type, buffer);
       Set(index, entry);
     }

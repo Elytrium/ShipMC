@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -18,9 +18,9 @@ namespace Ship {
 
     ~EndCombatEvent() override = default;
 
-    explicit EndCombatEvent(const PacketHolder& holder) {
+    static Errorable<EndCombatEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      duration = buffer->ReadVarInt();
+      ProceedErrorable(duration, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       entityId = buffer->ReadInt();
     }
 
@@ -29,7 +29,7 @@ namespace Ship {
       buffer->WriteInt(entityId);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

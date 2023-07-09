@@ -62,11 +62,12 @@ namespace Ship {
     }
   }
 
-  PacketHolder MinecraftFramedBytePacketPipe::ReadPacket(ByteBuffer* in, uint32_t frame_size) {
+  Errorable<PacketHolder> MinecraftFramedBytePacketPipe::ReadPacket(ByteBuffer* in, uint32_t frame_size) {
     uint32_t oldReadableBytes = in->GetReadableBytes();
-    uint32_t packetID = in->ReadVarInt();
+    ProceedErrorable(packetID, uint32_t, in->ReadVarInt(), InvalidFrameErrorable(oldReadableBytes))
     uint32_t expectedSize = frame_size - (oldReadableBytes - in->GetReadableBytes());
+    ProceedErrorable(ordinal, uint32_t, readerRegistry->GetOrdinalByID(version, packetID), InvalidFrameErrorable(oldReadableBytes))
 
-    return {readerRegistry->GetOrdinalByID(version, packetID), version, in, expectedSize};
+    return SuccessErrorable<PacketHolder>({ordinal, version, in, expectedSize});
   }
 }

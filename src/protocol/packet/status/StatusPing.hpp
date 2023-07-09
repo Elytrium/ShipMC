@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -12,20 +12,23 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    StatusPing() = default;
+
     explicit StatusPing(uint64_t id) : id(id) {}
 
     ~StatusPing() override = default;
 
-    explicit StatusPing(const PacketHolder& holder) {
+    static Errorable<StatusPing> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      id = buffer->ReadLong();
+      ProceedErrorable(id, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<StatusPing>(PACKET_ORDINAL))
+      return SuccessErrorable<StatusPing>(StatusPing(id));
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteLong(id);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

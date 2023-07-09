@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
-#include "../../ProtocolUtils.hpp"
 #include "../../data/profile/GameProfile.hpp"
 #include <string>
 #include <utility>
@@ -23,20 +22,20 @@ namespace Ship {
       : uuid(uuid), username(std::move(username)), properties(std::move(properties)) {
     }
 
-    explicit LoginSuccess(const PacketHolder& holder) {
+    static Errorable<LoginSuccess> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        uuid = buffer->ReadUUID();
+        ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
         uuid = buffer->ReadUUIDIntArray();
       } else {
         uuid = UUID(buffer->ReadString(36));
       }
 
-      username = buffer->ReadString(MAXIMUM_USERNAME_SIZE);
+      ProceedErrorable(username, std::string, buffer->ReadString(MAXIMUM_USERNAME_SIZE), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        properties = ProtocolUtils::ReadProperties(buffer);
+        properties = buffer->ReadProperties();
       }
     }
 
@@ -53,11 +52,11 @@ namespace Ship {
 
       buffer->WriteString(username);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        ProtocolUtils::WriteProperties(buffer, properties);
+        buffer->WriteProperties(properties);
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

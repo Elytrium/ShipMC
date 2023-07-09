@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 #include <utility>
 
@@ -28,18 +28,18 @@ namespace Ship {
 
     ~CustomSoundEffect() override = default;
 
-    explicit CustomSoundEffect(const PacketHolder& holder) {
+    static Errorable<CustomSoundEffect> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      soundName = buffer->ReadString();
-      soundCategory = buffer->ReadVarInt();
+      ProceedErrorable(soundName, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(soundCategory, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       effectPositionX = buffer->ReadInt();
       effectPositionY = buffer->ReadInt();
       effectPositionZ = buffer->ReadInt();
-      volume = buffer->ReadFloat();
-      pitch = buffer->ReadFloat();
+      ProceedErrorable(volume, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(pitch, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        seed = buffer->ReadLong();
+        ProceedErrorable(seed, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
     }
 
@@ -56,7 +56,7 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

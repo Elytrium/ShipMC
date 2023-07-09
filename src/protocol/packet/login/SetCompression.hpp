@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -14,9 +14,9 @@ namespace Ship {
 
     explicit SetCompression(uint32_t threshold) : threshold(threshold) {}
 
-    explicit SetCompression(const PacketHolder& holder) {
+    static Errorable<SetCompression> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      threshold = buffer->ReadVarInt();
+      ProceedErrorable(threshold, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     ~SetCompression() override = default;
@@ -25,7 +25,7 @@ namespace Ship {
       buffer->WriteVarInt(threshold);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

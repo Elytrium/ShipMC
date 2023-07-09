@@ -1,40 +1,40 @@
 #pragma once
 
 #include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
-#include "../../../protocol/ProtocolUtils.hpp"
+#include "../../ProtocolUtils.hpp"
 #include "../../data/nbt/NBT.hpp"
-#include "../../../../lib/ShipNet/src/protocol/packet/Packet.hpp"
 #include <string>
 
 namespace Ship {
 
   class BlockEntityData : public Packet {
    private:
-    int locationX;
-    int locationY;
-    int locationZ;
+    Position location;
     uint32_t type;
     NBT* data;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    BlockEntityData(int locationX, int locationY, int locationZ, uint32_t type, NBT* data)
-      : locationX(locationX), locationY(locationY), locationZ(locationZ), type(type), data(data) {
+    BlockEntityData() = default;
+
+    BlockEntityData(Position location, uint32_t type, NBT* data)
+      : location(location), type(type), data(data) {
     }
 
-    explicit BlockEntityData(const PacketHolder& holder) {
+    static Errorable<BlockEntityData> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      buffer->ReadPosition(locationX, locationY, locationZ);
+      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<BlockEntityData>(PACKET_ORDINAL))
+      uint32_t type;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_18) {
-        type = buffer->ReadVarInt();
+        SetFromErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BlockEntityData>(PACKET_ORDINAL))
       } else {
-        type = buffer->ReadByte();
+        SetFromErrorable(type, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BlockEntityData>(PACKET_ORDINAL))
       }
 
-      delete data;
-      data = ProtocolUtils::ReadNBT(buffer);
+      NBT* data = ProtocolUtils::ReadNBT(buffer);
+      return SuccessErrorable<BlockEntityData>({location, type, data});
     }
 
     ~BlockEntityData() override {
@@ -42,7 +42,7 @@ namespace Ship {
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      buffer->WritePosition(locationX, locationY, locationZ);
+      buffer->WritePosition(location);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_18) {
         buffer->WriteVarInt(type);
       } else {
@@ -56,20 +56,12 @@ namespace Ship {
       }
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 
-    [[nodiscard]] int GetLocationX() const {
-      return locationX;
-    }
-
-    [[nodiscard]] int GetLocationY() const {
-      return locationY;
-    }
-
-    [[nodiscard]] int GetLocationZ() const {
-      return locationZ;
+    [[nodiscard]] Position GetLocation() const {
+      return location;
     }
 
     [[nodiscard]] uint32_t GetType() const {

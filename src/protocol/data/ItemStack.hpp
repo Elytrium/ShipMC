@@ -17,7 +17,7 @@ namespace Ship {
     ItemStack(uint32_t itemId, uint8_t itemCount, uint16_t data, NBT* nbt);
     ItemStack(uint32_t itemId, uint8_t itemCount, NBT* nbt);
     ItemStack(uint32_t itemId, uint8_t itemCount);
-    ItemStack(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<ItemStack> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     ~ItemStack() override;
 
@@ -40,7 +40,7 @@ namespace Ship {
     std::optional<ItemStack> itemStack;
    public:
     OptionalItemStack() = default;
-    OptionalItemStack(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<OptionalItemStack> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
   };
 }

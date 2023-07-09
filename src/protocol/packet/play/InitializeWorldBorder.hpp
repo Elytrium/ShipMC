@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
 namespace Ship {
@@ -27,16 +27,16 @@ namespace Ship {
 
     ~InitializeWorldBorder() override = default;
 
-    explicit InitializeWorldBorder(const PacketHolder& holder) {
+    static Errorable<InitializeWorldBorder> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      x = buffer->ReadDouble();
-      z = buffer->ReadDouble();
-      oldDiameter = buffer->ReadDouble();
-      newDiameter = buffer->ReadDouble();
+      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(oldDiameter, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(newDiameter, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       speed = buffer->ReadVarLong();
-      portalTeleportBoundary = buffer->ReadVarInt();
-      warningBlocks = buffer->ReadVarInt();
-      warningTime = buffer->ReadVarInt();
+      ProceedErrorable(portalTeleportBoundary, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(warningBlocks, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(warningTime, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

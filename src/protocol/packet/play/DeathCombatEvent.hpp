@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 #include <utility>
 
@@ -20,11 +20,11 @@ namespace Ship {
 
     ~DeathCombatEvent() override = default;
 
-    explicit DeathCombatEvent(const PacketHolder& holder) {
+    static Errorable<DeathCombatEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      playerId = buffer->ReadVarInt();
+      ProceedErrorable(playerId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       entityId = buffer->ReadInt();
-      message = buffer->ReadString();
+      ProceedErrorable(message, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
     void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -33,7 +33,7 @@ namespace Ship {
       buffer->WriteString(message);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

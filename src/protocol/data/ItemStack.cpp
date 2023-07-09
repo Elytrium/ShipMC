@@ -17,25 +17,30 @@ namespace Ship {
   ItemStack::ItemStack(uint32_t itemId, uint8_t itemCount) : present(true), itemID(itemId), itemCount(itemCount), data(0), nbt(nullptr) {
   }
 
-  ItemStack::ItemStack(const ProtocolVersion* version, ByteBuffer* buffer) : ItemStack() {
+  Errorable<ItemStack> ItemStack::Instantiate(const Ship::ProtocolVersion* version, Ship::ByteBuffer* buffer) {
+    bool present;
     if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
-      present = buffer->ReadBoolean();
+      SetFromErrorable(present, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     } else {
-      present = buffer->ReadShort() != (uint16_t) -1;
+      ProceedErrorable(presentShort, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      present = presentShort != (uint16_t) -1;
     }
 
-    delete nbt;
+    uint16_t itemID;
+    uint8_t itemCount;
+    uint16_t data;
+    NBT* nbt;
     if (present) {
       if (version < &MinecraftProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
-        itemID = buffer->ReadShort();
+        SetFromErrorable(itemID, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       } else {
-        itemID = buffer->ReadVarInt();
+        SetFromErrorable(itemID, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
 
-      itemCount = buffer->ReadByte();
+      SetFromErrorable(itemCount, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
 
       if (version < &MinecraftProtocolVersion::MINECRAFT_1_13) {
-        data = buffer->ReadShort();
+          SetFromErrorable(data, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
       }
 
       nbt = ProtocolUtils::ReadNBT(buffer);
@@ -120,11 +125,12 @@ namespace Ship {
     nbt = value;
   }
 
-  OptionalItemStack::OptionalItemStack(const ProtocolVersion* version, ByteBuffer* buffer) {
-    if (buffer->ReadBoolean()) {
+  Errorable<OptionalItemStack> OptionalItemStack::Instantiate(const Ship::ProtocolVersion* version, Ship::ByteBuffer* buffer) {
+    ProceedErrorable(hasItemStack, bool, buffer->ReadBoolean(), ss)
+    if (hasItemStack) {
       itemStack = ItemStack(version, buffer);
     } else {
-      itemStack = std::nullopt;
+      return SuccessErrorable<OptionalItemStack>({std::nullopt});
     }
   }
 

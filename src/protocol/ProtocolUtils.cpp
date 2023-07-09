@@ -62,7 +62,7 @@ namespace Ship {
 
   std::vector<GameProfileProperty> ProtocolUtils::ReadProperties(ByteBuffer* buffer) {
     std::vector<GameProfileProperty> properties;
-    for (uint32_t i = 0; i < buffer->ReadVarInt(); ++i) {
+    for (ProceedErrorable(i, uint32_t, 0; i < buffer->ReadVarInt(), ); ++i) {
       std::string name = buffer->ReadString();
       std::string value = buffer->ReadString();
       if (buffer->ReadBoolean()) {
