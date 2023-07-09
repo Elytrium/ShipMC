@@ -1,14 +1,15 @@
 #pragma once
 
-#include "../../packets/prepared/PreparedPacket.hpp"
-#include "../nbt/NBT.hpp"
+#include "../../packet/prepared/PreparedPacket.hpp"
 #include "../client/Player.hpp"
+#include "../nbt/NBT.hpp"
 #include <functional>
 #include <map>
 #include <optional>
 #include <set>
 #include <string>
 #include <utility>
+
 namespace Ship {
   class BiomeParticleOptions {
    private:

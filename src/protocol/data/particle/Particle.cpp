@@ -1,20 +1,21 @@
 #include "Particle.hpp"
+#include "../../MinecraftProtocol.hpp"
 
 namespace Ship {
 
   ConstructorRegistry<AbstractParticle> GetParticleRegistry() {
-    ConstructorRegistry<AbstractParticle> particleRegistry({
-      ProtocolVersion::MINECRAFT_1_12_2,
-      ProtocolVersion::MINECRAFT_1_13,
-      ProtocolVersion::MINECRAFT_1_14,
-      ProtocolVersion::MINECRAFT_1_15,
-      ProtocolVersion::MINECRAFT_1_16_2,
-      ProtocolVersion::MINECRAFT_1_17,
-      ProtocolVersion::MINECRAFT_1_18,
-      ProtocolVersion::MINECRAFT_1_19,
+    ConstructorRegistry<AbstractParticle> particleRegistry(MinecraftProtocolVersion::VERSIONS, {
+      MinecraftProtocolVersion::MINECRAFT_1_12_2,
+      MinecraftProtocolVersion::MINECRAFT_1_13,
+      MinecraftProtocolVersion::MINECRAFT_1_14,
+      MinecraftProtocolVersion::MINECRAFT_1_15,
+      MinecraftProtocolVersion::MINECRAFT_1_16_2,
+      MinecraftProtocolVersion::MINECRAFT_1_17,
+      MinecraftProtocolVersion::MINECRAFT_1_18,
+      MinecraftProtocolVersion::MINECRAFT_1_19,
     });
 
-    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
+    particleRegistry.RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_12_2,
       new VersionRegistry({PoofParticle::ORDINAL, ExplosionParticle::ORDINAL, ExplosionEmitterParticle::ORDINAL, FireworkParticle::ORDINAL,
         BubbleParticle::ORDINAL, SplashParticle::ORDINAL, FishingParticle::ORDINAL, UnderwaterParticle::ORDINAL, UnderwaterParticle::ORDINAL,
         CritParticle::ORDINAL, EnchantedHitParticle::ORDINAL, SmokeParticle::ORDINAL, LargeSmokeParticle::ORDINAL, EffectParticle::ORDINAL,
@@ -26,7 +27,7 @@ namespace Ship {
         BlockParticle::ORDINAL, RainParticle::ORDINAL, TakeParticle::ORDINAL, ElderGuardianParticle::ORDINAL, DragonBreathParticle::ORDINAL,
         EndRodParticle::ORDINAL, SweepAttackParticle::ORDINAL, FallingDustParticle::ORDINAL, TotemOfUndyingParticle::ORDINAL, SpitParticle::ORDINAL}));
 
-    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_13,
+    particleRegistry.RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_13,
       new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, BlockParticle::ORDINAL,
         BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
         DrippingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL, DustParticle::ORDINAL, EffectParticle::ORDINAL, ElderGuardianParticle::ORDINAL,
@@ -38,7 +39,7 @@ namespace Ship {
         SweepAttackParticle::ORDINAL, TotemOfUndyingParticle::ORDINAL, UnderwaterParticle::ORDINAL, SplashParticle::ORDINAL, WitchParticle::ORDINAL,
         BubblePopParticle::ORDINAL, CurrentDownParticle::ORDINAL, BubbleColumnUpParticle::ORDINAL, NautilusParticle::ORDINAL, DolphinParticle::ORDINAL}));
 
-    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_14,
+    particleRegistry.RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_14,
       new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, BlockParticle::ORDINAL,
         BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
         DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
@@ -52,7 +53,7 @@ namespace Ship {
         SplashParticle::ORDINAL, WitchParticle::ORDINAL, BubblePopParticle::ORDINAL, CurrentDownParticle::ORDINAL, BubbleColumnUpParticle::ORDINAL,
         NautilusParticle::ORDINAL, DolphinParticle::ORDINAL, CampfireCosySmokeParticle::ORDINAL, CampfireSignalSmokeParticle::ORDINAL}));
 
-    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_15,
+    particleRegistry.RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_15,
       new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, BlockParticle::ORDINAL,
         BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
         DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
@@ -67,7 +68,7 @@ namespace Ship {
         NautilusParticle::ORDINAL, DolphinParticle::ORDINAL, CampfireCosySmokeParticle::ORDINAL, CampfireSignalSmokeParticle::ORDINAL,
         DrippingHoneyParticle::ORDINAL, FallingHoneyParticle::ORDINAL, LandingHoneyParticle::ORDINAL, FallingNectarParticle::ORDINAL}));
 
-    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_16_2,
+    particleRegistry.RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_16_2,
       new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, BlockParticle::ORDINAL,
         BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
         DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
@@ -85,7 +86,7 @@ namespace Ship {
         DrippingObsidianTearParticle::ORDINAL, FallingObsidianTearParticle::ORDINAL, LandingObsidianTearParticle::ORDINAL, ReversePortalParticle::ORDINAL,
         WhiteAshParticle::ORDINAL}));
 
-    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_17,
+    particleRegistry.RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_17,
       new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BarrierParticle::ORDINAL, LightParticle::ORDINAL,
         BlockParticle::ORDINAL, BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL,
         DragonBreathParticle::ORDINAL, DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL,
@@ -107,7 +108,7 @@ namespace Ship {
         DrippingDripstoneWaterParticle::ORDINAL, FallingDripstoneWaterParticle::ORDINAL, GlowSquidInkParticle::ORDINAL, GlowParticle::ORDINAL,
         WaxOnParticle::ORDINAL, WaxOffParticle::ORDINAL, ElectricSparkParticle::ORDINAL, ScrapeParticle::ORDINAL}));
 
-    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_18,
+    particleRegistry.RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_18,
       new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BlockParticle::ORDINAL, BlockMarkerParticle::ORDINAL,
         BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
         DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,
@@ -129,7 +130,7 @@ namespace Ship {
         FallingDripstoneWaterParticle::ORDINAL, GlowSquidInkParticle::ORDINAL, GlowParticle::ORDINAL, WaxOnParticle::ORDINAL, WaxOffParticle::ORDINAL,
         ElectricSparkParticle::ORDINAL, ScrapeParticle::ORDINAL}));
 
-    particleRegistry.RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
+    particleRegistry.RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_19,
       new VersionRegistry({AmbientEntityEffectParticle::ORDINAL, AngryVillagerParticle::ORDINAL, BlockParticle::ORDINAL, BlockMarkerParticle::ORDINAL,
         BubbleParticle::ORDINAL, CloudParticle::ORDINAL, CritParticle::ORDINAL, DamageIndicatorParticle::ORDINAL, DragonBreathParticle::ORDINAL,
         DrippingLavaParticle::ORDINAL, FallingLavaParticle::ORDINAL, LandingLavaParticle::ORDINAL, DrippingWaterParticle::ORDINAL,

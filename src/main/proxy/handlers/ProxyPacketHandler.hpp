@@ -1,11 +1,10 @@
 #pragma once
 #include <utility>
 
-#include "../../../main/proxy/client/Client.hpp"
-#include "../../../network/Connection.hpp"
+#include "../client/Client.hpp"
 #include "../../../protocol/data/client/LoginClient.hpp"
-#include "../../../protocol/packets/status/StatusPing.hpp"
-#include "../../../protocol/packets/status/StatusRequest.hpp"
+#include "../../../protocol/packet/status/StatusPing.hpp"
+#include "../../../protocol/packet/status/StatusRequest.hpp"
 
 namespace Ship {
   class StatusPacketHandler : public PacketHandler {
@@ -53,4 +52,4 @@ namespace Ship {
       ConnectPacketHandler::Init();
     }
   };
-} // Ship
+}

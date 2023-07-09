@@ -1,0 +1,36 @@
+#pragma once
+
+#include <string>
+
+namespace Ship {
+
+  class Disconnect : public Packet {
+   private:
+    std::string reason;
+
+   public:
+    static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
+
+    explicit Disconnect(std::string reason) : reason(std::move(reason)) {
+    }
+
+    ~Disconnect() override = default;
+
+    explicit Disconnect(const PacketHolder& holder) {
+      ByteBuffer* buffer = holder.GetCurrentBuffer();
+      reason = buffer->ReadString();
+    }
+
+    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      buffer->WriteString(reason);
+    }
+
+    uint32_t GetOrdinal() const override {
+      return PACKET_ORDINAL;
+    }
+
+    [[nodiscard]] const std::string& GetReason() const {
+      return reason;
+    }
+  };
+}

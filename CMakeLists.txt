@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(Ship)
+project(ShipMC)
 
-file(GLOB_RECURSE SHIP_SOURCES src/*.[hc]pp)
+file(GLOB_RECURSE SHIP_NET_SOURCES src/*.[hc]pp lib/*.[hc]pp)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_COMPILER "clang")
@@ -29,9 +29,9 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 
-add_executable(Ship ${SHIP_SOURCES})
+add_executable(ShipMC ${SHIP_NET_SOURCES})
 if (APPLE)
-    target_link_libraries(Ship "-ldeflate -lpthread")
+    target_link_libraries(ShipMC "-lpthread -ldeflate")
 else ()
-    target_link_libraries(Ship "-Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,-z,separate-code -ldeflate -lpthread")
+    target_link_libraries(ShipMC "-Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,-z,separate-code -lpthread -ldeflate")
 endif ()

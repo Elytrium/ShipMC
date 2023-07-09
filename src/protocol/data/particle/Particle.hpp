@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../../utils/ordinal/OrdinalRegistry.hpp"
-#include "../../Protocol.hpp"
-#include "../../registry/ConstructorRegistry.hpp"
+#include "../../../../lib/ShipNet/src/protocol/registry/ConstructorRegistry.hpp"
+#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
+#include "../../../utils/ordinal/MinecraftOrdinalRegistry.hpp"
 #include "../ItemStack.hpp"
 
 namespace Ship {
@@ -18,7 +18,7 @@ namespace Ship {
 #define DefineSimpleParticle(ParticleName, Identifier)                                          \
   class ParticleName : public AbstractParticle {                                                \
    public:                                                                                      \
-    static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal(); \
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal(); \
                                                                                                 \
     ParticleName(const ProtocolVersion* version, ByteBuffer* buffer) {}                         \
                                                                                                 \
@@ -125,7 +125,7 @@ namespace Ship {
     uint32_t blockState;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit BlockParticle(uint32_t blockState);
     BlockParticle(const ProtocolVersion* version, ByteBuffer* buffer);
@@ -143,7 +143,7 @@ namespace Ship {
     uint32_t blockState;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit BlockMarkerParticle(uint32_t blockState);
     BlockMarkerParticle(const ProtocolVersion* version, ByteBuffer* buffer);
@@ -164,7 +164,7 @@ namespace Ship {
     float scale;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit DustParticle(float red, float green, float blue, float scale);
     DustParticle(const ProtocolVersion* version, ByteBuffer* buffer);
@@ -194,7 +194,7 @@ namespace Ship {
     float toBlue;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit DustColorTransitionParticle(float fromRed, float fromGreen, float fromBlue, float scale, float toRed, float toGreen, float toBlue);
     DustColorTransitionParticle(const ProtocolVersion* version, ByteBuffer* buffer);
@@ -224,7 +224,7 @@ namespace Ship {
     uint32_t blockState;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit FallingDustParticle(uint32_t blockState);
     FallingDustParticle(const ProtocolVersion* version, ByteBuffer* buffer);
@@ -242,7 +242,7 @@ namespace Ship {
     ItemStack item;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     explicit ItemParticle(const ItemStack& item);
     ItemParticle(const ProtocolVersion* version, ByteBuffer* buffer);
@@ -266,7 +266,7 @@ namespace Ship {
     uint32_t ticks;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::ParticleRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
     VibrationParticle(std::string sourceType, int blockX, int blockY, int blockZ, uint32_t entityId, float entityEyeHeight, uint32_t ticks);
     VibrationParticle(int blockX, int blockY, int blockZ, uint32_t ticks);

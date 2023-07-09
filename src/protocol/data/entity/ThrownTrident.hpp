@@ -14,7 +14,7 @@ namespace Ship {
     ~ThrownTridentMetadata() override = default;
 
     [[nodiscard]] static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_15) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
         return AbstractArrowMetadata::MaximumEntries(version) + 2;
       }
       return AbstractArrowMetadata::MaximumEntries(version) + 1;
@@ -25,7 +25,7 @@ namespace Ship {
       uint8_t currentIndex = AbstractArrowMetadata::MaximumEntries(version);
 
       loyaltyLevel = metadata->GetVarInt(currentIndex).value_or(0);
-      if (version >= &ProtocolVersion::MINECRAFT_1_15) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
         hasEnchantmentGlint = metadata->GetBoolean(currentIndex + 1).value_or(false);
       }
     }
@@ -38,7 +38,7 @@ namespace Ship {
         metadata->Set(currentIndex, new VarIntMetadataEntry(loyaltyLevel));
       }
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_15) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
         if (hasEnchantmentGlint) {
           metadata->Set(currentIndex + 1, new BooleanMetadataEntry(hasEnchantmentGlint));
         }

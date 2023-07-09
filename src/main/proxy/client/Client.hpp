@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../../../network/Connection.hpp"
-#include "../../../network/SocketAddress.hpp"
-#include "../../../network/pipe/minecraft/MinecraftPipe.hpp"
+#include "../../../../lib/ShipNet/src/network/Connection.hpp"
+#include "../../../../lib/ShipNet/src/network/SocketAddress.hpp"
+#include "../../../network/pipe/MinecraftPipe.hpp"
 #include "../../../protocol/data/client/LoginClient.hpp"
-#include "../../../protocol/packets/play/Disconnect.hpp"
+#include "../../../protocol/packet/play/Disconnect.hpp"
 #include <utility>
 
 namespace Ship {
@@ -23,21 +23,21 @@ namespace Ship {
       });
     }
 
-    Client(LoginClient client) : connection(client.GetConnection()), minecraftPipe(client.GetMinecraftPipe()), address(client.GetAddress()) {}
+    explicit Client(const LoginClient& client) : connection(client.GetConnection()), minecraftPipe(client.GetMinecraftPipe()), address(client.GetAddress()) {}
 
-    Connection* GetConnection() const {
+    [[nodiscard]] Connection* GetConnection() const {
       return connection;
     }
 
-    MinecraftFramedBytePacketPipe* GetMinecraftPipe() const {
+    [[nodiscard]] MinecraftFramedBytePacketPipe* GetMinecraftPipe() const {
       return minecraftPipe;
     }
 
-    const SocketAddress& GetAddress() const {
+    [[nodiscard]] const SocketAddress& GetAddress() const {
       return address;
     }
 
-    bool IsActive() const {
+    [[nodiscard]] bool IsActive() const {
       return active;
     }
 
@@ -45,4 +45,4 @@ namespace Ship {
       connection->WriteAndFlush(Disconnect(std::move(reason)));
     }
   };
-} // Ship
+}

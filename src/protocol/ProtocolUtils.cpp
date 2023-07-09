@@ -59,4 +59,33 @@ namespace Ship {
       return 1;
     }
   }
-} // Ship
+
+  std::vector<GameProfileProperty> ProtocolUtils::ReadProperties(ByteBuffer* buffer) {
+    std::vector<GameProfileProperty> properties;
+    for (uint32_t i = 0; i < buffer->ReadVarInt(); ++i) {
+      std::string name = buffer->ReadString();
+      std::string value = buffer->ReadString();
+      if (buffer->ReadBoolean()) {
+        properties.emplace_back(name, value, buffer->ReadString());
+      } else {
+        properties.emplace_back(name, value, "");
+      }
+    }
+
+    return properties;
+  }
+
+  void ProtocolUtils::WriteProperties(ByteBuffer* buffer, const std::vector<GameProfileProperty>& properties) {
+    buffer->WriteVarInt(properties.size());
+    for (const GameProfileProperty& property : properties) {
+      buffer->WriteString(property.GetName());
+      buffer->WriteString(property.GetValue());
+      if (property.GetSignature().empty()) {
+        buffer->WriteBoolean(false);
+      } else {
+        buffer->WriteBoolean(true);
+        buffer->WriteString(property.GetSignature());
+      }
+    }
+  }
+}

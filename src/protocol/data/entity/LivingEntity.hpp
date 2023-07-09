@@ -30,8 +30,8 @@ namespace Ship {
     ~LivingEntityMetadata() override = default;
 
     static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
-        if (version >= &ProtocolVersion::MINECRAFT_1_15) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
           return EntityMetadata::MaximumEntries(version) + 7;
         }
         return EntityMetadata::MaximumEntries(version) + 6;
@@ -48,8 +48,8 @@ namespace Ship {
       potionEffectColor = metadata->GetVarInt(currentIndex + 2).value_or(0);
       ambientPotionEffect = metadata->GetBoolean(currentIndex + 3).value_or(false);
       arrowsCount = metadata->GetVarInt(currentIndex + 4).value_or(0);
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
-        if (version >= &ProtocolVersion::MINECRAFT_1_15) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
           beeStingersCount = metadata->GetVarInt(currentIndex + 5).value_or(0);
           if (!metadata->GetOptPosition(currentIndex + 6, bedLocationPresent, bedLocationX, bedLocationY, bedLocationZ)) {
             bedLocationPresent = false;
@@ -89,8 +89,8 @@ namespace Ship {
         metadata->Set(currentIndex + 4, new VarIntMetadataEntry(arrowsCount));
       }
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
-        if (version >= &ProtocolVersion::MINECRAFT_1_15) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
           if (beeStingersCount) {
             metadata->Set(currentIndex + 5, new VarIntMetadataEntry(beeStingersCount));
           }

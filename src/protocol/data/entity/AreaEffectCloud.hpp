@@ -18,7 +18,7 @@ namespace Ship {
     }
 
     [[nodiscard]] static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
         return EntityMetadata::MaximumEntries(version) + 4;
       }
       return EntityMetadata::MaximumEntries(version) + 6;

@@ -1,19 +1,20 @@
 #include "PacketRegistry.hpp"
+#include "../MinecraftProtocol.hpp"
 
 namespace Ship {
   DirectionRegistry::DirectionRegistry()
-    : VersionedRegistry({
-      ProtocolVersion::MINECRAFT_1_12_2,
-      ProtocolVersion::MINECRAFT_1_13,
-      ProtocolVersion::MINECRAFT_1_14,
-      ProtocolVersion::MINECRAFT_1_15,
-      ProtocolVersion::MINECRAFT_1_16_2,
-      ProtocolVersion::MINECRAFT_1_17,
-      ProtocolVersion::MINECRAFT_1_18,
-      ProtocolVersion::MINECRAFT_1_18_2,
-      ProtocolVersion::MINECRAFT_1_19,
-      ProtocolVersion::MINECRAFT_1_19_1,
-      ProtocolVersion::MINECRAFT_1_19_3,
+    : VersionedRegistry(MinecraftProtocolVersion::VERSIONS, {
+      MinecraftProtocolVersion::MINECRAFT_1_12_2,
+      MinecraftProtocolVersion::MINECRAFT_1_13,
+      MinecraftProtocolVersion::MINECRAFT_1_14,
+      MinecraftProtocolVersion::MINECRAFT_1_15,
+      MinecraftProtocolVersion::MINECRAFT_1_16_2,
+      MinecraftProtocolVersion::MINECRAFT_1_17,
+      MinecraftProtocolVersion::MINECRAFT_1_18,
+      MinecraftProtocolVersion::MINECRAFT_1_18_2,
+      MinecraftProtocolVersion::MINECRAFT_1_19,
+      MinecraftProtocolVersion::MINECRAFT_1_19_1,
+      MinecraftProtocolVersion::MINECRAFT_1_19_3,
     }) {
   }
 

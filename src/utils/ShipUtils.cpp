@@ -1,3 +1,3 @@
 #include "ShipUtils.hpp"
 
-namespace Ship {} // Ship
+namespace Ship {}

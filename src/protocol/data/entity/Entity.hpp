@@ -33,8 +33,8 @@ namespace Ship {
     ~EntityMetadata() override = default;
 
     static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
-        if (version >= &ProtocolVersion::MINECRAFT_1_17) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
           return 8;
         }
         return 7;
@@ -49,9 +49,9 @@ namespace Ship {
       customNameVisible = metadata->GetBoolean(3).value_or(false);
       silent = metadata->GetBoolean(4).value_or(false);
       hasNoGravity = metadata->GetBoolean(5).value_or(false);
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
         pose = metadata->GetPose(6).value_or(Pose::STANDING);
-        if (version >= &ProtocolVersion::MINECRAFT_1_17) {
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
           frozenTicks = metadata->GetVarInt(7).value_or(0);
         }
       }
@@ -82,12 +82,12 @@ namespace Ship {
         metadata->Set(5, new BooleanMetadataEntry(hasNoGravity));
       }
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
         if (pose != Pose::STANDING) {
           metadata->Set(6, new PoseMetadataEntry(pose));
         }
 
-        if (version >= &ProtocolVersion::MINECRAFT_1_17) {
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
           if (frozenTicks) {
             metadata->Set(7, new VarIntMetadataEntry(frozenTicks));
           }

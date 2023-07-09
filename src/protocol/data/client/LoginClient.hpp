@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../../network/Connection.hpp"
-#include "../../../network/SocketAddress.hpp"
-#include "../../../network/pipe/minecraft/MinecraftPipe.hpp"
-#include "../../packets/login/LoginDisconnect.hpp"
+#include "../../../../lib/ShipNet/src/network/Connection.hpp"
+#include "../../../../lib/ShipNet/src/network/SocketAddress.hpp"
+#include "../../../network/pipe/MinecraftPipe.hpp"
+#include "../../packet/login/LoginDisconnect.hpp"
 
 namespace Ship {
   class LoginClient {
@@ -46,4 +46,4 @@ namespace Ship {
         connection->WriteAndFlush(LoginDisconnect(std::move(reason)));
       }
     };
-} // Ship
+}

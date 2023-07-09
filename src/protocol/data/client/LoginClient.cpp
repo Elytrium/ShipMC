@@ -1,3 +1,3 @@
 #include "LoginClient.hpp"
 
-namespace Ship {} // Ship
+namespace Ship {}

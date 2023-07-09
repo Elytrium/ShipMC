@@ -28,7 +28,7 @@ namespace Ship {
     ~BoatMetadata() override = default;
 
     [[nodiscard]] static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
         return EntityMetadata::MaximumEntries(version) + 7;
       }
       return EntityMetadata::MaximumEntries(version) + 6;
@@ -45,7 +45,7 @@ namespace Ship {
       leftPaddleTurning = metadata->GetBoolean(currentIndex + 4).value_or(false);
       rightPaddleTurning = metadata->GetBoolean(currentIndex + 5).value_or(false);
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
         splashTimer = metadata->GetVarInt(currentIndex + 6).value_or(0);
       }
     }
@@ -79,7 +79,7 @@ namespace Ship {
         metadata->Set(currentIndex + 5, new BooleanMetadataEntry(rightPaddleTurning));
       }
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_13) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
         if (splashTimer) {
           metadata->Set(currentIndex + 6, new VarIntMetadataEntry(splashTimer));
         }

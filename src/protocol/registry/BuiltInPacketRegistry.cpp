@@ -1,185 +1,186 @@
 #include "BuiltInPacketRegistry.hpp"
-#include "../packets/handshake/Handshake.hpp"
-#include "../packets/login/EncryptionRequest.hpp"
-#include "../packets/login/EncryptionResponse.hpp"
-#include "../packets/login/LoginPluginMessage.hpp"
-#include "../packets/login/LoginPluginResponse.hpp"
-#include "../packets/login/LoginStart.hpp"
-#include "../packets/login/LoginSuccess.hpp"
-#include "../packets/login/SetCompression.hpp"
-#include "../packets/play/AcknowledgeBlockChange.hpp"
-#include "../packets/play/AcknowledgePlayerDigging.hpp"
-#include "../packets/play/ActionBar.hpp"
-#include "../packets/play/Advancements.hpp"
-#include "../packets/play/AwardStatistics.hpp"
-#include "../packets/play/BeaconEffect.hpp"
-#include "../packets/play/BlockAction.hpp"
-#include "../packets/play/BlockDestroyStage.hpp"
-#include "../packets/play/BlockEntityData.hpp"
-#include "../packets/play/BlockTagQueryRequest.hpp"
-#include "../packets/play/BlockUpdate.hpp"
-#include "../packets/play/BoatPaddle.hpp"
-#include "../packets/play/BorderCenter.hpp"
-#include "../packets/play/BorderRadius.hpp"
-#include "../packets/play/BorderRadiusSpeed.hpp"
-#include "../packets/play/BorderWarningRadius.hpp"
-#include "../packets/play/BorderWarningTime.hpp"
-#include "../packets/play/BossBar.hpp"
-#include "../packets/play/Camera.hpp"
-#include "../packets/play/ChangeRecipeBookSettings.hpp"
-#include "../packets/play/ChatSuggestions.hpp"
-#include "../packets/play/ChunkData.hpp"
-#include "../packets/play/ChunkLight.hpp"
-#include "../packets/play/ClearTitle.hpp"
-#include "../packets/play/ClickInventoryButton.hpp"
-#include "../packets/play/ClickSlot.hpp"
-#include "../packets/play/ClientAction.hpp"
-#include "../packets/play/ClientChangeDifficulty.hpp"
-#include "../packets/play/ClientChatPreview.hpp"
-#include "../packets/play/ClientPlayerAbilities.hpp"
-#include "../packets/play/ClientPlayerChat.hpp"
-#include "../packets/play/ClientSettings.hpp"
-#include "../packets/play/CloseInventory.hpp"
-#include "../packets/play/CombatEvent.hpp"
-#include "../packets/play/Command.hpp"
-#include "../packets/play/CommandSuggestionRequest.hpp"
-#include "../packets/play/CommandSuggestionResponse.hpp"
-#include "../packets/play/ConfirmTeleport.hpp"
-#include "../packets/play/ConfirmTransaction.hpp"
-#include "../packets/play/Cooldown.hpp"
-#include "../packets/play/CraftRecipeRequest.hpp"
-#include "../packets/play/CraftRecipeResponse.hpp"
-#include "../packets/play/CreativeSlot.hpp"
-#include "../packets/play/CustomSoundEffect.hpp"
-#include "../packets/play/DeathCombatEvent.hpp"
-#include "../packets/play/DeclareCommands.hpp"
-#include "../packets/play/DefaultSpawnPosition.hpp"
-#include "../packets/play/Digging.hpp"
-#include "../packets/play/Disconnect.hpp"
-#include "../packets/play/DisguisedChatMessage.hpp"
-#include "../packets/play/DisplayObjective.hpp"
-#include "../packets/play/EditBook.hpp"
-#include "../packets/play/EditSign.hpp"
-#include "../packets/play/EndCombatEvent.hpp"
-#include "../packets/play/EnterCombatEvent.hpp"
-#include "../packets/play/EntityAction.hpp"
-#include "../packets/play/EntityAnimation.hpp"
-#include "../packets/play/EntityEffect.hpp"
-#include "../packets/play/EntityEffectRemove.hpp"
-#include "../packets/play/EntityEquipment.hpp"
-#include "../packets/play/EntityEvent.hpp"
-#include "../packets/play/EntityInteract.hpp"
-#include "../packets/play/EntityLookAt.hpp"
-#include "../packets/play/EntityMetadata.hpp"
-#include "../packets/play/EntityNotMoved.hpp"
-#include "../packets/play/EntityPosition.hpp"
-#include "../packets/play/EntityPositionAndRotation.hpp"
-#include "../packets/play/EntityProperties.hpp"
-#include "../packets/play/EntityRemove.hpp"
-#include "../packets/play/EntityRotation.hpp"
-#include "../packets/play/EntitySoundEffect.hpp"
-#include "../packets/play/EntityTeleport.hpp"
-#include "../packets/play/EntityVelocity.hpp"
-#include "../packets/play/Experience.hpp"
-#include "../packets/play/Explosion.hpp"
-#include "../packets/play/FeatureFlags.hpp"
-#include "../packets/play/GameEvent.hpp"
-#include "../packets/play/GenerateStructure.hpp"
-#include "../packets/play/HardcodedSoundEffect.hpp"
-#include "../packets/play/Health.hpp"
-#include "../packets/play/HeldSlot.hpp"
-#include "../packets/play/HideMessage.hpp"
-#include "../packets/play/InitializeWorldBorder.hpp"
-#include "../packets/play/InventoryContent.hpp"
-#include "../packets/play/InventoryProperty.hpp"
-#include "../packets/play/InventorySlot.hpp"
-#include "../packets/play/JoinGame.hpp"
-#include "../packets/play/KeepAlive.hpp"
-#include "../packets/play/LeadEntities.hpp"
-#include "../packets/play/LegacyChat.hpp"
-#include "../packets/play/LegacyCraftRecipeResponse.hpp"
-#include "../packets/play/LegacyEnchant.hpp"
-#include "../packets/play/LegacyRecipeBook.hpp"
-#include "../packets/play/LegacyTitle.hpp"
-#include "../packets/play/LegacyWorldBorder.hpp"
-#include "../packets/play/LockDifficulty.hpp"
-#include "../packets/play/MapData.hpp"
-#include "../packets/play/MessageAcknowledgment.hpp"
-#include "../packets/play/MessageHeader.hpp"
-#include "../packets/play/Move.hpp"
-#include "../packets/play/MoveGroundOnly.hpp"
-#include "../packets/play/MovePositionOnly.hpp"
-#include "../packets/play/MoveRotationOnly.hpp"
-#include "../packets/play/MoveVehicle.hpp"
-#include "../packets/play/Objectives.hpp"
-#include "../packets/play/OpenBook.hpp"
-#include "../packets/play/OpenHorseInventory.hpp"
-#include "../packets/play/OpenInventory.hpp"
-#include "../packets/play/OpenSignEditor.hpp"
-#include "../packets/play/Particle.hpp"
-#include "../packets/play/Passengers.hpp"
-#include "../packets/play/PickItem.hpp"
-#include "../packets/play/PickupItem.hpp"
-#include "../packets/play/Ping.hpp"
-#include "../packets/play/PlaceBlock.hpp"
-#include "../packets/play/PlayerChatSession.hpp"
-#include "../packets/play/PlayerFace.hpp"
-#include "../packets/play/PlayerInput.hpp"
-#include "../packets/play/PlayerListItem.hpp"
-#include "../packets/play/PlayerRemove.hpp"
-#include "../packets/play/PluginMessage.hpp"
-#include "../packets/play/PositionRotation.hpp"
-#include "../packets/play/ProgramCommandBlock.hpp"
-#include "../packets/play/ProgramCommandBlockMinecart.hpp"
-#include "../packets/play/ProgramJigsawBlock.hpp"
-#include "../packets/play/ProgramStructureBlock.hpp"
-#include "../packets/play/Recipes.hpp"
-#include "../packets/play/RenameItem.hpp"
-#include "../packets/play/ResourcePackRequest.hpp"
-#include "../packets/play/ResourcePackResponse.hpp"
-#include "../packets/play/Respawn.hpp"
-#include "../packets/play/Score.hpp"
-#include "../packets/play/SculkVibration.hpp"
-#include "../packets/play/SectionBlocks.hpp"
-#include "../packets/play/SeenRecipe.hpp"
-#include "../packets/play/SelectAdvancementsTab.hpp"
-#include "../packets/play/SelectTrade.hpp"
-#include "../packets/play/ServerChangeDifficulty.hpp"
-#include "../packets/play/ServerChatPreview.hpp"
-#include "../packets/play/ServerData.hpp"
-#include "../packets/play/ServerPlayerAbilities.hpp"
-#include "../packets/play/ServerPlayerChat.hpp"
-#include "../packets/play/SetDisplayChatPreview.hpp"
-#include "../packets/play/SimulationDistance.hpp"
-#include "../packets/play/SpawnEntity.hpp"
-#include "../packets/play/SpawnExperienceOrb.hpp"
-#include "../packets/play/SpawnPainting.hpp"
-#include "../packets/play/SpawnPlayer.hpp"
-#include "../packets/play/SpawnThunderbolt.hpp"
-#include "../packets/play/Spectate.hpp"
-#include "../packets/play/StopSound.hpp"
-#include "../packets/play/Subtitle.hpp"
-#include "../packets/play/SwingArm.hpp"
-#include "../packets/play/SystemChat.hpp"
-#include "../packets/play/TabHeaderFooter.hpp"
-#include "../packets/play/TagQueryRequest.hpp"
-#include "../packets/play/TagQueryResponse.hpp"
-#include "../packets/play/Tags.hpp"
-#include "../packets/play/Teams.hpp"
-#include "../packets/play/Title.hpp"
-#include "../packets/play/TitleTimes.hpp"
-#include "../packets/play/TradeList.hpp"
-#include "../packets/play/UnloadChunk.hpp"
-#include "../packets/play/UnlockRecipes.hpp"
-#include "../packets/play/UseBed.hpp"
-#include "../packets/play/UseItem.hpp"
-#include "../packets/play/ViewDistance.hpp"
-#include "../packets/play/ViewPosition.hpp"
-#include "../packets/play/WorldEvent.hpp"
-#include "../packets/play/WorldTime.hpp"
-#include "../packets/status/StatusPing.hpp"
-#include "../packets/status/StatusRequest.hpp"
-#include "../packets/status/StatusResponse.hpp"
+#include "../packet/handshake/Handshake.hpp"
+#include "../packet/login/EncryptionRequest.hpp"
+#include "../packet/login/EncryptionResponse.hpp"
+#include "../packet/login/LoginPluginMessage.hpp"
+#include "../packet/login/LoginPluginResponse.hpp"
+#include "../packet/login/LoginStart.hpp"
+#include "../packet/login/LoginSuccess.hpp"
+#include "../packet/login/SetCompression.hpp"
+#include "../packet/play/AcknowledgeBlockChange.hpp"
+#include "../packet/play/AcknowledgePlayerDigging.hpp"
+#include "../packet/play/ActionBar.hpp"
+#include "../packet/play/Advancements.hpp"
+#include "../packet/play/AwardStatistics.hpp"
+#include "../packet/play/BeaconEffect.hpp"
+#include "../packet/play/BlockAction.hpp"
+#include "../packet/play/BlockDestroyStage.hpp"
+#include "../packet/play/BlockEntityData.hpp"
+#include "../packet/play/BlockTagQueryRequest.hpp"
+#include "../packet/play/BlockUpdate.hpp"
+#include "../packet/play/BoatPaddle.hpp"
+#include "../packet/play/BorderCenter.hpp"
+#include "../packet/play/BorderRadius.hpp"
+#include "../packet/play/BorderRadiusSpeed.hpp"
+#include "../packet/play/BorderWarningRadius.hpp"
+#include "../packet/play/BorderWarningTime.hpp"
+#include "../packet/play/BossBar.hpp"
+#include "../packet/play/Camera.hpp"
+#include "../packet/play/ChangeRecipeBookSettings.hpp"
+#include "../packet/play/ChatSuggestions.hpp"
+#include "../packet/play/ChunkData.hpp"
+#include "../packet/play/ChunkLight.hpp"
+#include "../packet/play/ClearTitle.hpp"
+#include "../packet/play/ClickInventoryButton.hpp"
+#include "../packet/play/ClickSlot.hpp"
+#include "../packet/play/ClientAction.hpp"
+#include "../packet/play/ClientChangeDifficulty.hpp"
+#include "../packet/play/ClientChatPreview.hpp"
+#include "../packet/play/ClientPlayerAbilities.hpp"
+#include "../packet/play/ClientPlayerChat.hpp"
+#include "../packet/play/ClientSettings.hpp"
+#include "../packet/play/CloseInventory.hpp"
+#include "../packet/play/CombatEvent.hpp"
+#include "../packet/play/Command.hpp"
+#include "../packet/play/CommandSuggestionRequest.hpp"
+#include "../packet/play/CommandSuggestionResponse.hpp"
+#include "../packet/play/ConfirmTeleport.hpp"
+#include "../packet/play/ConfirmTransaction.hpp"
+#include "../packet/play/Cooldown.hpp"
+#include "../packet/play/CraftRecipeRequest.hpp"
+#include "../packet/play/CraftRecipeResponse.hpp"
+#include "../packet/play/CreativeSlot.hpp"
+#include "../packet/play/CustomSoundEffect.hpp"
+#include "../packet/play/DeathCombatEvent.hpp"
+#include "../packet/play/DeclareCommands.hpp"
+#include "../packet/play/DefaultSpawnPosition.hpp"
+#include "../packet/play/Digging.hpp"
+#include "../packet/play/Disconnect.hpp"
+#include "../packet/play/DisguisedChatMessage.hpp"
+#include "../packet/play/DisplayObjective.hpp"
+#include "../packet/play/EditBook.hpp"
+#include "../packet/play/EditSign.hpp"
+#include "../packet/play/EndCombatEvent.hpp"
+#include "../packet/play/EnterCombatEvent.hpp"
+#include "../packet/play/EntityAction.hpp"
+#include "../packet/play/EntityAnimation.hpp"
+#include "../packet/play/EntityEffect.hpp"
+#include "../packet/play/EntityEffectRemove.hpp"
+#include "../packet/play/EntityEquipment.hpp"
+#include "../packet/play/EntityEvent.hpp"
+#include "../packet/play/EntityInteract.hpp"
+#include "../packet/play/EntityLookAt.hpp"
+#include "../packet/play/EntityMetadata.hpp"
+#include "../packet/play/EntityNotMoved.hpp"
+#include "../packet/play/EntityPosition.hpp"
+#include "../packet/play/EntityPositionAndRotation.hpp"
+#include "../packet/play/EntityProperties.hpp"
+#include "../packet/play/EntityRemove.hpp"
+#include "../packet/play/EntityRotation.hpp"
+#include "../packet/play/EntitySoundEffect.hpp"
+#include "../packet/play/EntityTeleport.hpp"
+#include "../packet/play/EntityVelocity.hpp"
+#include "../packet/play/Experience.hpp"
+#include "../packet/play/Explosion.hpp"
+#include "../packet/play/FeatureFlags.hpp"
+#include "../packet/play/GameEvent.hpp"
+#include "../packet/play/GenerateStructure.hpp"
+#include "../packet/play/HardcodedSoundEffect.hpp"
+#include "../packet/play/Health.hpp"
+#include "../packet/play/HeldSlot.hpp"
+#include "../packet/play/HideMessage.hpp"
+#include "../packet/play/InitializeWorldBorder.hpp"
+#include "../packet/play/InventoryContent.hpp"
+#include "../packet/play/InventoryProperty.hpp"
+#include "../packet/play/InventorySlot.hpp"
+#include "../packet/play/JoinGame.hpp"
+#include "../packet/play/KeepAlive.hpp"
+#include "../packet/play/LeadEntities.hpp"
+#include "../packet/play/LegacyChat.hpp"
+#include "../packet/play/LegacyCraftRecipeResponse.hpp"
+#include "../packet/play/LegacyEnchant.hpp"
+#include "../packet/play/LegacyRecipeBook.hpp"
+#include "../packet/play/LegacyTitle.hpp"
+#include "../packet/play/LegacyWorldBorder.hpp"
+#include "../packet/play/LockDifficulty.hpp"
+#include "../packet/play/MapData.hpp"
+#include "../packet/play/MessageAcknowledgment.hpp"
+#include "../packet/play/MessageHeader.hpp"
+#include "../packet/play/Move.hpp"
+#include "../packet/play/MoveGroundOnly.hpp"
+#include "../packet/play/MovePositionOnly.hpp"
+#include "../packet/play/MoveRotationOnly.hpp"
+#include "../packet/play/MoveVehicle.hpp"
+#include "../packet/play/Objectives.hpp"
+#include "../packet/play/OpenBook.hpp"
+#include "../packet/play/OpenHorseInventory.hpp"
+#include "../packet/play/OpenInventory.hpp"
+#include "../packet/play/OpenSignEditor.hpp"
+#include "../packet/play/Particle.hpp"
+#include "../packet/play/Passengers.hpp"
+#include "../packet/play/PickItem.hpp"
+#include "../packet/play/PickupItem.hpp"
+#include "../packet/play/Ping.hpp"
+#include "../packet/play/PlaceBlock.hpp"
+#include "../packet/play/PlayerChatSession.hpp"
+#include "../packet/play/PlayerFace.hpp"
+#include "../packet/play/PlayerInput.hpp"
+#include "../packet/play/PlayerListItem.hpp"
+#include "../packet/play/PlayerRemove.hpp"
+#include "../packet/play/PluginMessage.hpp"
+#include "../packet/play/PositionRotation.hpp"
+#include "../packet/play/ProgramCommandBlock.hpp"
+#include "../packet/play/ProgramCommandBlockMinecart.hpp"
+#include "../packet/play/ProgramJigsawBlock.hpp"
+#include "../packet/play/ProgramStructureBlock.hpp"
+#include "../packet/play/Recipes.hpp"
+#include "../packet/play/RenameItem.hpp"
+#include "../packet/play/ResourcePackRequest.hpp"
+#include "../packet/play/ResourcePackResponse.hpp"
+#include "../packet/play/Respawn.hpp"
+#include "../packet/play/Score.hpp"
+#include "../packet/play/SculkVibration.hpp"
+#include "../packet/play/SectionBlocks.hpp"
+#include "../packet/play/SeenRecipe.hpp"
+#include "../packet/play/SelectAdvancementsTab.hpp"
+#include "../packet/play/SelectTrade.hpp"
+#include "../packet/play/ServerChangeDifficulty.hpp"
+#include "../packet/play/ServerChatPreview.hpp"
+#include "../packet/play/ServerData.hpp"
+#include "../packet/play/ServerPlayerAbilities.hpp"
+#include "../packet/play/ServerPlayerChat.hpp"
+#include "../packet/play/SetDisplayChatPreview.hpp"
+#include "../packet/play/SimulationDistance.hpp"
+#include "../packet/play/SpawnEntity.hpp"
+#include "../packet/play/SpawnExperienceOrb.hpp"
+#include "../packet/play/SpawnPainting.hpp"
+#include "../packet/play/SpawnPlayer.hpp"
+#include "../packet/play/SpawnThunderbolt.hpp"
+#include "../packet/play/Spectate.hpp"
+#include "../packet/play/StopSound.hpp"
+#include "../packet/play/Subtitle.hpp"
+#include "../packet/play/SwingArm.hpp"
+#include "../packet/play/SystemChat.hpp"
+#include "../packet/play/TabHeaderFooter.hpp"
+#include "../packet/play/TagQueryRequest.hpp"
+#include "../packet/play/TagQueryResponse.hpp"
+#include "../packet/play/Tags.hpp"
+#include "../packet/play/Teams.hpp"
+#include "../packet/play/Title.hpp"
+#include "../packet/play/TitleTimes.hpp"
+#include "../packet/play/TradeList.hpp"
+#include "../packet/play/UnloadChunk.hpp"
+#include "../packet/play/UnlockRecipes.hpp"
+#include "../packet/play/UseBed.hpp"
+#include "../packet/play/UseItem.hpp"
+#include "../packet/play/ViewDistance.hpp"
+#include "../packet/play/ViewPosition.hpp"
+#include "../packet/play/WorldEvent.hpp"
+#include "../packet/play/WorldTime.hpp"
+#include "../packet/status/StatusPing.hpp"
+#include "../packet/status/StatusRequest.hpp"
+#include "../packet/status/StatusResponse.hpp"
+#include "PacketRegistry.hpp"
 
 namespace Ship {
 
@@ -215,7 +216,7 @@ namespace Ship {
   PacketRegistry GetPlayRegistry() {
     auto* clientbound = new DirectionRegistry();
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_12_2,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
         SpawnPainting::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL,
@@ -236,7 +237,7 @@ namespace Ship {
         LegacyTitle::PACKET_ORDINAL, HardcodedSoundEffect::PACKET_ORDINAL, TabHeaderFooter::PACKET_ORDINAL, PickupItem::PACKET_ORDINAL,
         EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL, EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL}));
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_13,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_13,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
         SpawnPainting::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL,
@@ -259,7 +260,7 @@ namespace Ship {
         EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL, EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL,
         Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_14,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_14,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
         SpawnPainting::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL,
@@ -284,7 +285,7 @@ namespace Ship {
         EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL,
         AcknowledgePlayerDigging::PACKET_ORDINAL}));
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_15,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_15,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnThunderbolt::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL,
         SpawnPainting::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         AcknowledgePlayerDigging::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL,
@@ -308,7 +309,7 @@ namespace Ship {
         TagQueryResponse::PACKET_ORDINAL, PickupItem::PACKET_ORDINAL, EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL,
         EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_16_2,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_16_2,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnPainting::PACKET_ORDINAL,
         SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL, AcknowledgePlayerDigging::PACKET_ORDINAL,
         BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL,
@@ -332,7 +333,7 @@ namespace Ship {
         TagQueryResponse::PACKET_ORDINAL, PickupItem::PACKET_ORDINAL, EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL,
         EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_17,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_17,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnPainting::PACKET_ORDINAL,
         SpawnPlayer::PACKET_ORDINAL, SkulkVibration::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         AcknowledgePlayerDigging::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL,
@@ -359,7 +360,7 @@ namespace Ship {
         EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL, EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL,
         Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_18,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_18,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnPainting::PACKET_ORDINAL,
         SpawnPlayer::PACKET_ORDINAL, SkulkVibration::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL,
         AcknowledgePlayerDigging::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL,
@@ -386,7 +387,7 @@ namespace Ship {
         PickupItem::PACKET_ORDINAL, EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL, EntityProperties::PACKET_ORDINAL,
         EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_19,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL,
         AwardStatistics::PACKET_ORDINAL, AcknowledgeBlockChange::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL,
         BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL,
@@ -413,7 +414,7 @@ namespace Ship {
         PickupItem::PACKET_ORDINAL, EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL, EntityProperties::PACKET_ORDINAL,
         EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_1,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_19_1,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL,
         AwardStatistics::PACKET_ORDINAL, AcknowledgeBlockChange::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL,
         BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL,
@@ -441,7 +442,7 @@ namespace Ship {
         TagQueryResponse::PACKET_ORDINAL, PickupItem::PACKET_ORDINAL, EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL,
         EntityProperties::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
-    clientbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_3,
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_19_3,
       new VersionRegistry({SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL, EntityAnimation::PACKET_ORDINAL,
         AwardStatistics::PACKET_ORDINAL, AcknowledgeBlockChange::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL, BlockEntityData::PACKET_ORDINAL,
         BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL, ServerChangeDifficulty::PACKET_ORDINAL,
@@ -470,7 +471,7 @@ namespace Ship {
         FeatureFlags::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
     auto* serverbound = new DirectionRegistry();
-    serverbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_12_2,
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_12_2,
       new VersionRegistry(
         {ConfirmTeleport::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
           ClientSettings::PACKET_ORDINAL, ConfirmTransaction::PACKET_ORDINAL, LegacyEnchant::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL,
@@ -481,7 +482,7 @@ namespace Ship {
           ResourcePackResponse::PACKET_ORDINAL, SelectAdvancementsTab::PACKET_ORDINAL, HeldSlot::PACKET_ORDINAL, EditSign::PACKET_ORDINAL,
           SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, Camera::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
-    serverbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_13,
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_13,
       new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
         ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ConfirmTransaction::PACKET_ORDINAL, LegacyEnchant::PACKET_ORDINAL,
         ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL,
@@ -494,7 +495,7 @@ namespace Ship {
         ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL, SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL,
         UseItem::PACKET_ORDINAL}));
 
-    serverbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_14,
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_14,
       new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
         LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL,
         ConfirmTransaction::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL,
@@ -521,7 +522,7 @@ namespace Ship {
       ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL, SwingArm::PACKET_ORDINAL,
       Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL});
 
-    serverbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_16_2,
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_16_2,
       new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
         LegacyChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL,
         ConfirmTransaction::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL,
@@ -535,7 +536,7 @@ namespace Ship {
         CreativeSlot::PACKET_ORDINAL, ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL,
         SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
-    serverbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_17,
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_17,
       new VersionRegistry(
         {ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL,
           ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL,
@@ -550,7 +551,7 @@ namespace Ship {
           CreativeSlot::PACKET_ORDINAL, ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL,
           SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
-    serverbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_18,
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_18,
       new VersionRegistry(
         {ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL, LegacyChat::PACKET_ORDINAL,
           ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL,
@@ -565,7 +566,7 @@ namespace Ship {
           CreativeSlot::PACKET_ORDINAL, ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL,
           SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
-    serverbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19,
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_19,
       new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
         Command::PACKET_ORDINAL, ClientPlayerChat::PACKET_ORDINAL, ClientChatPreview::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
         ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL,
@@ -580,7 +581,7 @@ namespace Ship {
         ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL, SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL,
         UseItem::PACKET_ORDINAL}));
 
-    serverbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_1,
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_19_1,
       new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
         MessageAcknowledgment::PACKET_ORDINAL, Command::PACKET_ORDINAL, ClientPlayerChat::PACKET_ORDINAL, ClientChatPreview::PACKET_ORDINAL,
         ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL,
@@ -595,7 +596,7 @@ namespace Ship {
         CreativeSlot::PACKET_ORDINAL, ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL,
         SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
-    serverbound->RegisterVersion(&ProtocolVersion::MINECRAFT_1_19_3,
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_19_3,
       new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
         MessageAcknowledgment::PACKET_ORDINAL, Command::PACKET_ORDINAL, ClientPlayerChat::PACKET_ORDINAL, ClientAction::PACKET_ORDINAL,
         ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL, ClickSlot::PACKET_ORDINAL,

@@ -16,7 +16,7 @@ namespace Ship {
     ~WolfMetadata() override = default;
 
     static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_15 && version <= &ProtocolVersion::MINECRAFT_1_15_2) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15 && version <= &MinecraftProtocolVersion::MINECRAFT_1_15_2) {
         return TameableAnimalMetadata::MaximumEntries(version) + 2;
       }
       return TameableAnimalMetadata::MaximumEntries(version) + 3;
@@ -26,7 +26,7 @@ namespace Ship {
       TameableAnimalMetadata::Read(metadata, version);
       uint8_t currentIndex = TameableAnimalMetadata::MaximumEntries(version);
 
-      if (version <= &ProtocolVersion::MINECRAFT_1_12_2) {
+      if (version <= &MinecraftProtocolVersion::MINECRAFT_1_12_2) {
         damageTaken = metadata->GetFloat(currentIndex).value_or(1);
         begging = metadata->GetBoolean(currentIndex + 1).value_or(false);
         collarColor = metadata->GetVarInt(currentIndex + 2).value_or(14);
@@ -34,7 +34,7 @@ namespace Ship {
       } else {
         begging = metadata->GetBoolean(currentIndex).value_or(false);
         collarColor = metadata->GetVarInt(currentIndex + 1).value_or(14);
-        if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
           angerTime = metadata->GetVarInt(currentIndex + 2).value_or(0);
         }
         damageTaken = 1;
@@ -45,7 +45,7 @@ namespace Ship {
       TameableAnimalMetadata::Write(metadata, version);
       uint8_t currentIndex = TameableAnimalMetadata::MaximumEntries(version);
 
-      if (version <= &ProtocolVersion::MINECRAFT_1_12_2) {
+      if (version <= &MinecraftProtocolVersion::MINECRAFT_1_12_2) {
         if (damageTaken != 1) {
           metadata->Set(currentIndex, new FloatMetadataEntry(damageTaken));
         }
@@ -66,7 +66,7 @@ namespace Ship {
           metadata->Set(currentIndex + 1, new VarIntMetadataEntry(collarColor));
         }
 
-        if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
           if (angerTime) {
             metadata->Set(currentIndex + 2, new VarIntMetadataEntry(angerTime));
           }

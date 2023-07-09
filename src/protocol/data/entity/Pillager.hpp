@@ -13,7 +13,7 @@ namespace Ship {
     ~PillagerMetadata() override = default;
 
     [[nodiscard]] static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_17) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
         return AbstractIllagerMetadata::MaximumEntries(version) + 1;
       }
       return AbstractIllagerMetadata::MaximumEntries(version);
@@ -22,7 +22,7 @@ namespace Ship {
     void Read(Metadata* metadata, const ProtocolVersion* version) override {
       AbstractIllagerMetadata::Read(metadata, version);
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_17) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
         charging = metadata->GetBoolean(AbstractIllagerMetadata::MaximumEntries(version)).value_or(false);
       }
     }
@@ -30,7 +30,7 @@ namespace Ship {
     void Write(Metadata* metadata, const ProtocolVersion* version) override {
       AbstractIllagerMetadata::Write(metadata, version);
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_17) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
         if (charging) {
           metadata->Set(AbstractIllagerMetadata::MaximumEntries(version), new BooleanMetadataEntry(charging));
         }

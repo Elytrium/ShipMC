@@ -15,7 +15,7 @@ namespace Ship {
     ~EndermanMetadata() override = default;
 
     static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_15) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
         return MobMetadata::MaximumEntries(version) + 3;
       }
       return MobMetadata::MaximumEntries(version) + 2;
@@ -28,7 +28,7 @@ namespace Ship {
       carriedBlock = metadata->GetBlockID(currentIndex).value_or(0);
       screaming = metadata->GetBoolean(currentIndex + 1).value_or(false);
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_15) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
         staring = metadata->GetBoolean(currentIndex + 2).value_or(false);
       }
     }
@@ -45,7 +45,7 @@ namespace Ship {
         metadata->Set(currentIndex + 1, new BooleanMetadataEntry(screaming));
       }
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_15) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
         if (staring) {
           metadata->Set(currentIndex + 2, new BooleanMetadataEntry(staring));
         }

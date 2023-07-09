@@ -14,7 +14,7 @@ namespace Ship {
     ~FishingHookMetadata() override = default;
 
     [[nodiscard]] static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
         return EntityMetadata::MaximumEntries(version) + 2;
       }
       return EntityMetadata::MaximumEntries(version) + 1;
@@ -32,7 +32,7 @@ namespace Ship {
         }
       }
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
         catchable = metadata->GetBoolean(EntityMetadata::MaximumEntries(version) + 1).value_or(false);
       }
     }
@@ -44,7 +44,7 @@ namespace Ship {
         metadata->Set(EntityMetadata::MaximumEntries(version), new VarIntMetadataEntry(*hookedEntity + 1));
       }
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
         if (catchable) {
           metadata->Set(EntityMetadata::MaximumEntries(version) + 1, new BooleanMetadataEntry(catchable));
         }

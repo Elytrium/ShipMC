@@ -13,7 +13,7 @@ namespace Ship {
     ~SnowballMetadata() override = default;
 
     [[nodiscard]] static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
         return EntityMetadata::MaximumEntries(version) + 1;
       }
       return EntityMetadata::MaximumEntries(version);
@@ -22,7 +22,7 @@ namespace Ship {
     void Read(Metadata* metadata, const ProtocolVersion* version) override {
       EntityMetadata::Read(metadata, version);
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
         item = metadata->GetItemStack(EntityMetadata::MaximumEntries(version)).value_or(ItemStack {});
       }
     }
@@ -30,7 +30,7 @@ namespace Ship {
     void Write(Metadata* metadata, const ProtocolVersion* version) override {
       EntityMetadata::Write(metadata, version);
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
         if (item.IsPresent()) {
           metadata->Set(EntityMetadata::MaximumEntries(version), new ItemStackMetadataEntry(item));
         }

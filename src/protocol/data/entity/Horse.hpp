@@ -14,7 +14,7 @@ namespace Ship {
     ~HorseMetadata() override = default;
 
     [[nodiscard]] static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version <= &ProtocolVersion::MINECRAFT_1_12_2) {
+      if (version <= &MinecraftProtocolVersion::MINECRAFT_1_12_2) {
         return AbstractHorseMetadata::MaximumEntries(version) + 2;
       }
       return AbstractHorseMetadata::MaximumEntries(version) + 1;
@@ -25,7 +25,7 @@ namespace Ship {
       uint8_t currentIndex = AbstractHorseMetadata::MaximumEntries(version);
 
       variant = metadata->GetVarInt(currentIndex).value_or(0);
-      if (version <= &ProtocolVersion::MINECRAFT_1_12_2) {
+      if (version <= &MinecraftProtocolVersion::MINECRAFT_1_12_2) {
         armor = metadata->GetVarInt(currentIndex + 1).value_or(0);
       }
     }
@@ -38,7 +38,7 @@ namespace Ship {
         metadata->Set(currentIndex, new VarIntMetadataEntry(variant));
       }
 
-      if (version <= &ProtocolVersion::MINECRAFT_1_12_2) {
+      if (version <= &MinecraftProtocolVersion::MINECRAFT_1_12_2) {
         if (armor) {
           metadata->Set(currentIndex + 1, new VarIntMetadataEntry(armor));
         }

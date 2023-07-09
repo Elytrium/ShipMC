@@ -1,0 +1,3 @@
+[submodule "lib/ShipNet"]
+	path = lib/ShipNet
+	url = https://github.com/Elytrium/ShipNet

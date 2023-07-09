@@ -1,8 +1,8 @@
 #include "Proxy.hpp"
-#include "../../Ship.hpp"
-#include "../../network/listener/Listener.hpp"
-#include "../../network/pipe/minecraft/MinecraftPipe.hpp"
-#include "../../protocol/handlers/server/ServerPacketHandler.hpp"
+#include "../../../lib/ShipNet/src/Ship.hpp"
+#include "../../../lib/ShipNet/src/network/listener/Listener.hpp"
+#include "../../network/pipe/MinecraftPipe.hpp"
+#include "../../protocol/handler/server/ServerPacketHandler.hpp"
 #include "../../protocol/registry/BuiltInPacketRegistry.hpp"
 #include "handlers/ProxyPacketHandler.hpp"
 #include <thread>
@@ -16,7 +16,7 @@ namespace Ship {
     auto* eventLoop = new SystemEventLoop(
       [](EventLoop* eventLoop, ReadWriteCloser* writer) {
         auto pipe = new MinecraftFramedBytePacketPipe(
-          &BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, MAX_PACKET_SIZE, SERVERBOUND, CLIENTBOUND, LONG_PACKET_BUFFER_CAPACITY);
+          &BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, MAX_PACKET_SIZE, SERVERBOUND, CLIENTBOUND, 1024);
         auto* connection = new Connection(pipe,
           new ServerHandshakePacketHandler(
             [](LoginClient client) {
@@ -25,7 +25,7 @@ namespace Ship {
             [](LoginClient client) {
               return new ConnectPacketHandler(client);
             }),
-          LONG_PACKET_BUFFER_CAPACITY, LONG_PACKET_BUFFER_CAPACITY, writer, eventLoop);
+          1024, 1024, writer, eventLoop);
 
         return connection;
       },

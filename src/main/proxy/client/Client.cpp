@@ -1,3 +1,3 @@
 #include "Client.hpp"
 
-namespace Ship {} // Ship
+namespace Ship {}

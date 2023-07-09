@@ -1,4 +1,3 @@
-#include "../../../utils/exceptions/Exception.hpp"
 #include "World.hpp"
 #include <string>
 

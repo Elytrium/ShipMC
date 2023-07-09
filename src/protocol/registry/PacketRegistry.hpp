@@ -1,9 +1,7 @@
 #pragma once
 
-#include "../packets/Packet.hpp"
-#include "ConstructorRegistry.hpp"
-#include "VersionRegistry.hpp"
-#include "VersionedRegistry.hpp"
+#include "../../../lib/ShipNet/src/protocol/packet/Packet.hpp"
+#include "../../../lib/ShipNet/src/protocol/registry/VersionedRegistry.hpp"
 #include <functional>
 #include <vector>
 

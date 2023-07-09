@@ -1,4 +1,5 @@
 #include "ItemStack.hpp"
+#include "../MinecraftProtocol.hpp"
 #include "../ProtocolUtils.hpp"
 
 namespace Ship {
@@ -17,7 +18,7 @@ namespace Ship {
   }
 
   ItemStack::ItemStack(const ProtocolVersion* version, ByteBuffer* buffer) : ItemStack() {
-    if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
+    if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
       present = buffer->ReadBoolean();
     } else {
       present = buffer->ReadShort() != (uint16_t) -1;
@@ -25,7 +26,7 @@ namespace Ship {
 
     delete nbt;
     if (present) {
-      if (version < &ProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
+      if (version < &MinecraftProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
         itemID = buffer->ReadShort();
       } else {
         itemID = buffer->ReadVarInt();
@@ -33,7 +34,7 @@ namespace Ship {
 
       itemCount = buffer->ReadByte();
 
-      if (version < &ProtocolVersion::MINECRAFT_1_13) {
+      if (version < &MinecraftProtocolVersion::MINECRAFT_1_13) {
         data = buffer->ReadShort();
       }
 
@@ -49,16 +50,16 @@ namespace Ship {
   }
 
   void ItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
-    if (version >= &ProtocolVersion::MINECRAFT_1_13_2) {
+    if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
       buffer->WriteBoolean(present);
     }
 
-    if (!present && version < &ProtocolVersion::MINECRAFT_1_13_2) {
+    if (!present && version < &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
       buffer->WriteShort(-1);
     }
 
     if (present) {
-      if (version < &ProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
+      if (version < &MinecraftProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
         buffer->WriteShort(itemID);
       } else {
         buffer->WriteVarInt(itemID);
@@ -66,7 +67,7 @@ namespace Ship {
 
       buffer->WriteByte(itemCount);
 
-      if (version < &ProtocolVersion::MINECRAFT_1_13) {
+      if (version < &MinecraftProtocolVersion::MINECRAFT_1_13) {
         buffer->WriteShort(data);
       }
 

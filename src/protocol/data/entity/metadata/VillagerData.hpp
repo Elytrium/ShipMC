@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../registry/EnumRegistry.hpp"
+#include "../../../../../lib/ShipNet/src/protocol/registry/EnumRegistry.hpp"
 
 namespace Ship {
 

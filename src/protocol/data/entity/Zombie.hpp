@@ -16,7 +16,7 @@ namespace Ship {
     ~ZombieMetadata() override = default;
 
     static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_13 && version <= &ProtocolVersion::MINECRAFT_1_13_2) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13 && version <= &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
         return MonsterMetadata::MaximumEntries(version) + 4;
       }
       return MonsterMetadata::MaximumEntries(version) + 3;
@@ -28,9 +28,9 @@ namespace Ship {
 
       baby = metadata->GetBoolean(currentIndex).value_or(false);
       type = metadata->GetVarInt(currentIndex + 1).value_or(0);
-      if (version <= &ProtocolVersion::MINECRAFT_1_12_2) {
+      if (version <= &MinecraftProtocolVersion::MINECRAFT_1_12_2) {
         handsHeldUp = metadata->GetBoolean(currentIndex + 2).value_or(false);
-      } else if (version <= &ProtocolVersion::MINECRAFT_1_13_2) {
+      } else if (version <= &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
         handsHeldUp = metadata->GetBoolean(currentIndex + 2).value_or(false);
         becomingDrowned = metadata->GetBoolean(currentIndex + 3).value_or(false);
       } else {
@@ -50,11 +50,11 @@ namespace Ship {
         metadata->Set(currentIndex + 1, new VarIntMetadataEntry(type));
       }
 
-      if (version <= &ProtocolVersion::MINECRAFT_1_12_2) {
+      if (version <= &MinecraftProtocolVersion::MINECRAFT_1_12_2) {
         if (handsHeldUp) {
           metadata->Set(currentIndex + 2, new BooleanMetadataEntry(handsHeldUp));
         }
-      } else if (version <= &ProtocolVersion::MINECRAFT_1_13_2) {
+      } else if (version <= &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
         if (handsHeldUp) {
           metadata->Set(currentIndex + 2, new BooleanMetadataEntry(handsHeldUp));
         }

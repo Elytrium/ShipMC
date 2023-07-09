@@ -29,7 +29,7 @@ namespace Ship {
         treasureX = treasureY = treasureZ = 0;
       }
 
-      if (version <= &ProtocolVersion::MINECRAFT_1_16_4) {
+      if (version <= &MinecraftProtocolVersion::MINECRAFT_1_16_4) {
         canFindTreasure = metadata->GetBoolean(currentIndex + 1).value_or(false);
         hasFish = metadata->GetBoolean(currentIndex + 2).value_or(false);
         moistureLevel = 2400;
@@ -48,7 +48,7 @@ namespace Ship {
         metadata->Set(currentIndex, new PositionMetadataEntry(treasureX, treasureY, treasureZ));
       }
 
-      if (version <= &ProtocolVersion::MINECRAFT_1_16_4) {
+      if (version <= &MinecraftProtocolVersion::MINECRAFT_1_16_4) {
         if (canFindTreasure) {
           metadata->Set(currentIndex + 1, new BooleanMetadataEntry(canFindTreasure));
         }

@@ -1,3 +1,3 @@
 #include "Player.hpp"
 
-namespace Ship {} // Ship
+namespace Ship {}

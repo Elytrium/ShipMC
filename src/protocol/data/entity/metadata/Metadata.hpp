@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../../../utils/ordinal/OrdinalRegistry.hpp"
-#include "../../../Protocol.hpp"
-#include "../../../registry/ConstructorRegistry.hpp"
+#include "../../../../../lib/ShipNet/src/protocol/Protocol.hpp"
+#include "../../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
+#include "../../../MinecraftProtocol.hpp"
 #include "../../ItemStack.hpp"
 #include "../../particle/Particle.hpp"
 #include "VillagerData.hpp"
@@ -121,7 +121,7 @@ namespace Ship {
     uint8_t value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit ByteMetadataEntry(uint8_t value);
 
@@ -139,7 +139,7 @@ namespace Ship {
     uint32_t value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit VarIntMetadataEntry(uint32_t value);
 
@@ -157,7 +157,7 @@ namespace Ship {
     uint32_t value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit LongMetadataEntry(uint64_t value);
 
@@ -175,7 +175,7 @@ namespace Ship {
     float value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit FloatMetadataEntry(float value);
 
@@ -193,7 +193,7 @@ namespace Ship {
     std::string value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit StringMetadataEntry(std::string value);
 
@@ -211,7 +211,7 @@ namespace Ship {
     std::string value; // TODO: Chat components
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit ChatMetadataEntry(std::string value);
 
@@ -229,7 +229,7 @@ namespace Ship {
     std::optional<std::string> optValue; // TODO: Chat components
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     OptChatMetadataEntry();
     explicit OptChatMetadataEntry(std::optional<std::string> optValue);
@@ -248,7 +248,7 @@ namespace Ship {
     ItemStack value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit ItemStackMetadataEntry(const ItemStack& value);
 
@@ -266,7 +266,7 @@ namespace Ship {
     bool value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit BooleanMetadataEntry(bool value);
 
@@ -286,7 +286,7 @@ namespace Ship {
     float z;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit RotationMetadataEntry(float x, float y, float z);
 
@@ -313,7 +313,7 @@ namespace Ship {
     int z;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit PositionMetadataEntry(int x, int y, int z);
 
@@ -341,7 +341,7 @@ namespace Ship {
     int z;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     OptPositionMetadataEntry();
     explicit OptPositionMetadataEntry(int x, int y, int z);
@@ -370,7 +370,7 @@ namespace Ship {
     Direction value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit DirectionMetadataEntry(const Direction& value);
 
@@ -388,7 +388,7 @@ namespace Ship {
     std::optional<UUID> optValue;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     OptUUIDMetadataEntry();
     explicit OptUUIDMetadataEntry(const std::optional<UUID>& optValue);
@@ -407,7 +407,7 @@ namespace Ship {
     uint32_t value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     BlockIDMetadataEntry();
     explicit BlockIDMetadataEntry(uint32_t value);
@@ -426,7 +426,7 @@ namespace Ship {
     NBT* value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit NBTMetadataEntry(NBT* value);
     NBTMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
@@ -446,7 +446,7 @@ namespace Ship {
     AbstractParticle* value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit ParticleMetadataEntry(AbstractParticle* value);
     ParticleMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
@@ -468,7 +468,7 @@ namespace Ship {
     uint32_t level;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     VillagerDataMetadataEntry(const VillagerType& type, const VillagerProfession& profession, uint32_t level);
 
@@ -490,7 +490,7 @@ namespace Ship {
     std::optional<uint32_t> optValue;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     OptVarIntMetadataEntry();
     explicit OptVarIntMetadataEntry(const std::optional<uint32_t>& optValue);
@@ -509,7 +509,7 @@ namespace Ship {
     Pose value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit PoseMetadataEntry(const Pose& value);
 
@@ -527,7 +527,7 @@ namespace Ship {
     CatVariant value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit CatVariantMetadataEntry(const CatVariant& value);
 
@@ -545,7 +545,7 @@ namespace Ship {
     FrogVariant value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit FrogVariantMetadataEntry(const FrogVariant& value);
 
@@ -566,7 +566,7 @@ namespace Ship {
     int z;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit GlobalPosMetadataEntry(std::string dimension, int x, int y, int z);
 
@@ -593,7 +593,7 @@ namespace Ship {
     PaintingVariant value;
 
    public:
-    static inline const uint32_t ORDINAL = OrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     explicit PaintingVariantMetadataEntry(const PaintingVariant& value);
 

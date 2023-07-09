@@ -15,7 +15,7 @@ namespace Ship {
     ~FireworkRocketMetadata() override = default;
 
     static uint8_t MaximumEntries(const ProtocolVersion* version) {
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
         return EntityMetadata::MaximumEntries(version) + 3;
       }
       return EntityMetadata::MaximumEntries(version) + 2;
@@ -27,12 +27,12 @@ namespace Ship {
       uint8_t currentIndex = EntityMetadata::MaximumEntries(version);
 
       firework = metadata->GetItemStack(currentIndex).value_or(ItemStack {});
-      if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
         entity = metadata->GetOptVarInt(currentIndex + 1).value_or(std::nullopt);
       } else {
         entity = metadata->GetVarInt(currentIndex + 1).value_or(0);
       }
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
         shotAtAngle = metadata->GetBoolean(currentIndex + 2).value_or(false);
       }
     }
@@ -47,14 +47,14 @@ namespace Ship {
       }
 
       if (entity) {
-        if (version >= &ProtocolVersion::MINECRAFT_1_16_2) {
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
           metadata->Set(currentIndex + 1, new OptVarIntMetadataEntry(entity));
         } else {
           metadata->Set(currentIndex + 1, new VarIntMetadataEntry(entity.value()));
         }
       }
 
-      if (version >= &ProtocolVersion::MINECRAFT_1_14) {
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
         if (shotAtAngle) {
           metadata->Set(currentIndex + 2, new BooleanMetadataEntry(shotAtAngle));
         }

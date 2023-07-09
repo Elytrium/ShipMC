@@ -20,6 +20,9 @@ namespace Ship {
     static uint32_t NBTSize(NBT* nbt);
     static uint32_t ParticleSize(const ProtocolVersion* version, AbstractParticle* particle);
     static uint32_t MetadataSize(const ProtocolVersion* version, Metadata* metadata);
+
+    static std::vector<GameProfileProperty> ReadProperties(ByteBuffer* buffer);
+    static void WriteProperties(ByteBuffer* buffer, const std::vector<GameProfileProperty>& properties);
   };
 
-} // Ship
+}

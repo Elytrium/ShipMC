@@ -1,6 +1,5 @@
-#include "../../../network/Connection.hpp"
-#include "../../../protocol/handlers/server/ServerPacketHandler.hpp"
-#include "../../../protocol/packets/status/StatusResponse.hpp"
+#include "../../../protocol/handler/server/ServerPacketHandler.hpp"
+#include "../../../protocol/packet/status/StatusResponse.hpp"
 #include "ProxyPacketHandler.hpp"
 
 namespace Ship {
@@ -19,4 +18,4 @@ namespace Ship {
     connection->GetReadWriteCloser()->Close();
     return true;
   }
-} // Ship
+}
