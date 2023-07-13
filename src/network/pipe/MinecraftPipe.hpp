@@ -34,13 +34,12 @@ namespace Ship {
     const DirectionRegistry* writerRegistry;
     const PacketDirection readerDirection;
     const PacketDirection writerDirection;
-    const int longPacketBufferCapacity;
 
    public:
     ~MinecraftFramedBytePacketPipe() override = default;
 
     MinecraftFramedBytePacketPipe(const PacketRegistry* initial_registry, const ProtocolVersion* version, uint32_t max_read_size,
-      PacketDirection reader_direction, PacketDirection writer_direction, int long_packet_buffer_capacity);
+      PacketDirection reader_direction, PacketDirection writer_direction);
 
     const PacketRegistry* GetRegistry();
     void SetRegistry(const PacketRegistry* new_registry);
@@ -48,7 +47,7 @@ namespace Ship {
     const ProtocolVersion* GetProtocolVersion();
     void SetProtocolVersion(const ProtocolVersion* new_protocol_version);
 
-    ByteBuffer* Write(const Packet& in) override;
+    Errorable<bool> Write(ByteBuffer* out, const Packet& in) override;
     Errorable<PacketHolder> ReadPacket(ByteBuffer* in, uint32_t frame_size) override;
   };
 }

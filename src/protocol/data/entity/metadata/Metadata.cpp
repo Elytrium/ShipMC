@@ -2,31 +2,39 @@
 
 namespace Ship {
 
-  Metadata::Metadata(const ProtocolVersion* version, ByteBuffer* buffer) {
+  Metadata::Metadata(std::map<uint8_t, MetadataEntry*> entries) : entries(std::move(entries)) {
+  }
+
+  Errorable<Metadata> Metadata::Instantiate(const Ship::ProtocolVersion* version, Ship::ByteBuffer* buffer) {
+    Metadata metadata;
     while (true) {
-      uint8_t index = buffer->ReadByte();
+      ProceedErrorable(index, uint8_t, buffer->ReadByte(), InvalidMetadataErrorable(buffer->GetReadableBytes()))
       if (index == 0xFF) {
         break;
       }
 
-      ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), );
-      MetadataEntry* entry = METADATA_ENTRY_REGISTRY.GetObjectByID(version, type, buffer);
-      Set(index, entry);
+      ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidMetadataErrorable(buffer->GetReadableBytes()))
+      ProceedErrorable(entry, MetadataEntry*, METADATA_ENTRY_REGISTRY.GetObjectByID(version, type, buffer), InvalidMetadataErrorable(buffer->GetReadableBytes()))
+      metadata.Set(index, entry);
     }
+
+    return SuccessErrorable<Metadata>(metadata);
   }
 
-  void Metadata::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> Metadata::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     for (auto& pair : entries) {
       uint8_t index = pair.first;
       MetadataEntry* entry = pair.second;
 
       if (entry) {
         buffer->WriteByte(index);
-        buffer->WriteVarInt(METADATA_ENTRY_REGISTRY.GetIDByOrdinal(version, entry->GetOrdinal()));
+        ProceedErrorable(id, uint32_t, METADATA_ENTRY_REGISTRY.GetIDByOrdinal(version, entry->GetOrdinal()), InvalidSerializableWriteErrorable(buffer->GetReadableBytes()))
+        buffer->WriteVarInt(id);
         entry->Write(version, buffer);
       }
     }
     buffer->WriteByte(0xFF);
+    return SuccessErrorable<bool>(true);
   }
 
   uint32_t Metadata::Size(const ProtocolVersion* version) const {

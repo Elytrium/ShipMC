@@ -30,12 +30,13 @@ namespace Ship {
       ProceedErrorable(count, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
       buffer->WriteDouble(x);
       buffer->WriteDouble(y);
       buffer->WriteDouble(z);
       buffer->WriteShort(count);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

@@ -15,6 +15,41 @@ namespace Ship {
     EAST = 5,
   };
 
+  class Position {
+   private:
+    int x, y, z;
+
+   public:
+    Position() : x(0), y(0), z(0) {
+    }
+
+    Position(int x, int y, int z) : x(x), y(y), z(z) {
+    }
+
+    [[nodiscard]] int GetX() const {
+      return x;
+    }
+    [[nodiscard]] int GetY() const {
+      return y;
+    }
+    [[nodiscard]] int GetZ() const {
+      return z;
+    }
+
+    void SetX(int _x) {
+      this->x = _x;
+    }
+
+    void SetY(int _y) {
+      this->y = _y;
+    }
+
+    void SetZ(int _z) {
+      this->z = _z;
+    }
+  };
+  CreateInvalidArgumentErrorable(InvalidPositionErrorable, Position, "Invalid position read");
+
   class MinecraftProtocolVersion {
    public:
     static const ProtocolVersion MINECRAFT_1_12_2;

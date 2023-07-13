@@ -5,12 +5,14 @@ namespace Ship {
   ByteMetadataEntry::ByteMetadataEntry(uint8_t value) : value(value) {
   }
 
-  void ByteMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> ByteMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteByte(value);
+    return SuccessErrorable<bool>(true);
   }
 
-  ByteMetadataEntry::ByteMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadByte();
+  Errorable<ByteMetadataEntry> ByteMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(value, uint8_t, buffer->ReadByte(), InvalidByteMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<ByteMetadataEntry>(ByteMetadataEntry(value));
   }
 
   MetadataEntryType ByteMetadataEntry::GetType() const {

@@ -5,12 +5,16 @@ namespace Ship {
   CatVariantMetadataEntry::CatVariantMetadataEntry(const CatVariant& value) : value(value) {
   }
 
-  void CatVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
-    buffer->WriteVarInt(CAT_VARIANT_REGISTRY.GetID(version, value));
+  Errorable<bool> CatVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+    ProceedErrorable(id, uint32_t, CAT_VARIANT_REGISTRY.GetID(version, value), InvalidSerializableWriteErrorable(buffer->GetReadableBytes()))
+    buffer->WriteVarInt(id);
+    return SuccessErrorable<bool>(true);
   }
 
-  CatVariantMetadataEntry::CatVariantMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = CAT_VARIANT_REGISTRY.GetValue(version, buffer->ReadVarInt());
+  Errorable<CatVariantMetadataEntry> CatVariantMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidCatVariantMetadataEntryErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(value, CatVariant, CAT_VARIANT_REGISTRY.GetValue(version, id), InvalidCatVariantMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<CatVariantMetadataEntry>(CatVariantMetadataEntry(value));
   }
 
   MetadataEntryType CatVariantMetadataEntry::GetType() const {

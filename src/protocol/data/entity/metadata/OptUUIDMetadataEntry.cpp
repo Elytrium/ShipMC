@@ -7,16 +7,18 @@ namespace Ship {
   OptUUIDMetadataEntry::OptUUIDMetadataEntry(const std::optional<UUID>& optValue) : optValue(optValue) {
   }
 
-  void OptUUIDMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> OptUUIDMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteBoolean(optValue.has_value());
     if (optValue) {
       buffer->WriteUUID(optValue.value());
     }
+    return SuccessErrorable<bool>(true);
   }
 
-  OptUUIDMetadataEntry::OptUUIDMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    if (buffer->ReadBoolean()) {
-      optValue = buffer->ReadUUID();
+  Errorable<OptUUIDMetadataEntry> OptUUIDMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(present, bool, buffer->ReadBoolean(), InvalidOptChatMetadataEntryErrorable(buffer->GetReadableBytes()))
+    if (present) {
+      optProceedErrorable(value, ss, buffer->ReadUUID, ss)
     } else {
       optValue.reset();
     }

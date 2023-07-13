@@ -142,7 +142,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(mapId);
       buffer->WriteByte(scale);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
@@ -179,6 +179,7 @@ namespace Ship {
         buffer->WriteVarInt(length);
         buffer->WriteBytes(data, length);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

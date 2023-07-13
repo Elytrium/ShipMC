@@ -7,21 +7,25 @@
 
 namespace Ship {
 
+  CreateInvalidArgumentErrorable(InvalidGameProdilePropertiesErrorable, std::vector<GameProfileProperty>, "Invalid GameProfile properties read");
+
   class ProtocolUtils {
    public:
     static void WriteNBT(ByteBuffer* buffer, NBT* nbt);
-    static void WriteParticle(const ProtocolVersion* version, ByteBuffer* buffer, AbstractParticle* particle);
+    static Errorable<bool> WriteParticle(const ProtocolVersion* version, ByteBuffer* buffer, AbstractParticle* particle);
     static void WriteMetadata(const ProtocolVersion* version, ByteBuffer* buffer, Metadata* metadata);
+    static void WritePosition(const ProtocolVersion* version, ByteBuffer* buffer, Position position);
 
-    static NBT* ReadNBT(ByteBuffer* buffer);
-    static AbstractParticle* ReadParticle(const ProtocolVersion* version, ByteBuffer* buffer);
-    static Metadata* ReadMetadata(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<NBT*> ReadNBT(ByteBuffer* buffer);
+    static Errorable<AbstractParticle*> ReadParticle(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<Metadata> ReadMetadata(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<Position> ReadPosition(const ProtocolVersion* version, ByteBuffer* buffer);
 
     static uint32_t NBTSize(NBT* nbt);
-    static uint32_t ParticleSize(const ProtocolVersion* version, AbstractParticle* particle);
+    static Errorable<uint32_t> ParticleSize(const ProtocolVersion* version, AbstractParticle* particle);
     static uint32_t MetadataSize(const ProtocolVersion* version, Metadata* metadata);
 
-    static std::vector<GameProfileProperty> ReadProperties(ByteBuffer* buffer);
+    static Errorable<std::vector<GameProfileProperty>> ReadProperties(ByteBuffer* buffer);
     static void WriteProperties(ByteBuffer* buffer, const std::vector<GameProfileProperty>& properties);
   };
 

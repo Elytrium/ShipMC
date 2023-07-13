@@ -43,7 +43,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(soundName);
       buffer->WriteVarInt(soundCategory);
       buffer->WriteInt(effectPositionX);
@@ -54,6 +54,7 @@ namespace Ship {
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteLong(seed);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

@@ -5,12 +5,16 @@ namespace Ship {
   FrogVariantMetadataEntry::FrogVariantMetadataEntry(const FrogVariant& value) : value(value) {
   }
 
-  void FrogVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
-    buffer->WriteVarInt(FROG_VARIANT_REGISTRY.GetID(version, value));
+  Errorable<bool> FrogVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+    ProceedErrorable(id, uint32_t, FROG_VARIANT_REGISTRY.GetID(version, value), InvalidSerializableWriteErrorable(buffer->GetReadableBytes()))
+    buffer->WriteVarInt(id);
+    return SuccessErrorable<bool>(true);
   }
 
-  FrogVariantMetadataEntry::FrogVariantMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = FROG_VARIANT_REGISTRY.GetValue(version, buffer->ReadVarInt());
+  Errorable<FrogVariantMetadataEntry> FrogVariantMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidFrogVariantMetadataEntryErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(value, FrogVariant, FROG_VARIANT_REGISTRY.GetValue(version, id), InvalidFrogVariantMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<FrogVariantMetadataEntry>(FrogVariantMetadataEntry(value));
   }
 
   MetadataEntryType FrogVariantMetadataEntry::GetType() const {

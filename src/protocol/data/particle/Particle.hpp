@@ -14,6 +14,7 @@ namespace Ship {
     [[nodiscard]] virtual std::string GetIdentifier() const = 0;
     [[nodiscard]] virtual uint32_t GetOrdinal() const = 0;
   };
+  CreateInvalidArgumentErrorable(InvalidParticleErrorable, AbstractParticle*, "Invalid Particle read");
 
 #define DefineSimpleParticle(ParticleName, Identifier)                                          \
   class ParticleName : public AbstractParticle {                                                \
@@ -22,7 +23,9 @@ namespace Ship {
                                                                                                 \
     ParticleName(const ProtocolVersion* version, ByteBuffer* buffer) {}                         \
                                                                                                 \
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {}            \
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {  \
+      return SuccessErrorable<bool>(true);                                                      \
+    }                                                                                           \
     [[nodiscard]] std::string GetIdentifier() const override { return Identifier; }             \
     [[nodiscard]] uint32_t GetOrdinal() const override { return ORDINAL; }                      \
   }
@@ -130,7 +133,7 @@ namespace Ship {
     explicit BlockParticle(uint32_t blockState);
     BlockParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -148,7 +151,7 @@ namespace Ship {
     explicit BlockMarkerParticle(uint32_t blockState);
     BlockMarkerParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -169,7 +172,7 @@ namespace Ship {
     explicit DustParticle(float red, float green, float blue, float scale);
     DustParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -199,7 +202,7 @@ namespace Ship {
     explicit DustColorTransitionParticle(float fromRed, float fromGreen, float fromBlue, float scale, float toRed, float toGreen, float toBlue);
     DustColorTransitionParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -229,7 +232,7 @@ namespace Ship {
     explicit FallingDustParticle(uint32_t blockState);
     FallingDustParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -247,7 +250,7 @@ namespace Ship {
     explicit ItemParticle(const ItemStack& item);
     ItemParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -274,7 +277,7 @@ namespace Ship {
     VibrationParticle(std::string sourceType, uint32_t ticks);
     VibrationParticle(const ProtocolVersion* version, ByteBuffer* buffer);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 

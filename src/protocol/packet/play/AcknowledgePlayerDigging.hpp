@@ -32,11 +32,12 @@ namespace Ship {
 
     ~AcknowledgePlayerDigging() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WritePosition(location);
       buffer->WriteVarInt(block);
       buffer->WriteVarInt(status);
       buffer->WriteBoolean(successful);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

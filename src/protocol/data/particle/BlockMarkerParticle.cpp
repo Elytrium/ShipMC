@@ -5,8 +5,9 @@ namespace Ship {
   BlockMarkerParticle::BlockMarkerParticle(uint32_t blockState) : blockState(blockState) {
   }
 
-  void BlockMarkerParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> BlockMarkerParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(blockState);
+    return SuccessErrorable<bool>(true);
   }
 
   BlockMarkerParticle::BlockMarkerParticle(const ProtocolVersion* version, ByteBuffer* buffer) {

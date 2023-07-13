@@ -27,11 +27,12 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(difficulty);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
         buffer->WriteBoolean(locked);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

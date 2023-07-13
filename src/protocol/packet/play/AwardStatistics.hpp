@@ -89,7 +89,7 @@ namespace Ship {
 
     ~AwardStatistics() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(statistics.size());
       for (const Statistic& statistic : statistics) {
         if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
@@ -100,6 +100,7 @@ namespace Ship {
         }
         buffer->WriteVarInt(statistic.GetValue());
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

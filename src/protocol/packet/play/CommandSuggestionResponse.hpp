@@ -37,7 +37,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(match);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
         buffer->WriteBoolean(tooltip.has_value());
@@ -45,6 +45,7 @@ namespace Ship {
           buffer->WriteString(tooltip.value());
         }
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] const std::string& GetMatch() const {
@@ -95,7 +96,8 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    return SuccessErrorable<bool>(true);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
         buffer->WriteVarInt(id);
         buffer->WriteVarInt(start);

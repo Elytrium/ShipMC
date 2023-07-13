@@ -11,7 +11,8 @@ namespace Ship {
     ~EntityVelocity() override {
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {

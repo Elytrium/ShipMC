@@ -30,12 +30,13 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteInt(queryId);
       buffer->WriteBoolean(message.has_value());
       if (message) {
         buffer->WriteString(message.value());
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

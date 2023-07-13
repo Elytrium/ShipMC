@@ -5,12 +5,14 @@ namespace Ship {
   ChatMetadataEntry::ChatMetadataEntry(std::string value) : value(std::move(value)) {
   }
 
-  void ChatMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> ChatMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteString(value);
+    return SuccessErrorable<bool>(true);
   }
 
-  ChatMetadataEntry::ChatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadString();
+  Errorable<ChatMetadataEntry> ChatMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(value, std::string, buffer->ReadString(), InvalidChatMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<ChatMetadataEntry>(ChatMetadataEntry(value));
   }
 
   MetadataEntryType ChatMetadataEntry::GetType() const {

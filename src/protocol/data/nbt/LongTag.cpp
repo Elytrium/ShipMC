@@ -8,7 +8,7 @@ namespace Ship {
   }
 
   void LongTag::Read(ByteBuffer* buffer) {
-    value = buffer->ReadLong();
+    ProceedErrorable(value, ss, buffer->ReadLong, ss)
   }
 
   void LongTag::Write(ByteBuffer* buffer) {

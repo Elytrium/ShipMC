@@ -45,7 +45,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
       buffer->WriteUUID(playerUuid);
       buffer->WriteDouble(x);
@@ -56,6 +56,7 @@ namespace Ship {
       if (version <= &MinecraftProtocolVersion::MINECRAFT_1_14_4) {
         ProtocolUtils::WriteMetadata(version, buffer, metadata);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {

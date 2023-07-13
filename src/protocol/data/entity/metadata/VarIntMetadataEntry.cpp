@@ -5,12 +5,14 @@ namespace Ship {
   VarIntMetadataEntry::VarIntMetadataEntry(uint32_t value) : value(value) {
   }
 
-  void VarIntMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> VarIntMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(value);
+    return SuccessErrorable<bool>(true);
   }
 
-  VarIntMetadataEntry::VarIntMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadVarInt();
+  Errorable<VarIntMetadataEntry> VarIntMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), ss)
+    return SuccessErrorable<VarIntMetadataEntry>(VarIntMetadataEntry(value));
   }
 
   MetadataEntryType VarIntMetadataEntry::GetType() const {

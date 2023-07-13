@@ -41,12 +41,13 @@ namespace Ship {
       return SuccessErrorable<BossBarAdd>({title, health, color, division, flags});
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(title);
       buffer->WriteFloat(health);
       buffer->WriteVarInt(color);
       buffer->WriteVarInt(division);
       buffer->WriteByte(flags);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -81,7 +82,8 @@ namespace Ship {
 
     ~BossBarRemove() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
@@ -107,7 +109,8 @@ namespace Ship {
 
     ~BossBarUpdateHealth() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    return SuccessErrorable<bool>(true);
       buffer->WriteFloat(health);
     }
 
@@ -138,7 +141,8 @@ namespace Ship {
 
     ~BossBarUpdateTitle() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    return SuccessErrorable<bool>(true);
       buffer->WriteString(title);
     }
 
@@ -171,7 +175,8 @@ namespace Ship {
 
     ~BossBarUpdateStyle() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    return SuccessErrorable<bool>(true);
       buffer->WriteVarInt(color);
       buffer->WriteVarInt(dividers);
     }
@@ -205,7 +210,8 @@ namespace Ship {
       return SuccessErrorable<BossBarUpdateFlags>(BossBarUpdateFlags(flags));
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    return SuccessErrorable<bool>(true);
       buffer->WriteByte(flags);
     }
 
@@ -266,7 +272,8 @@ namespace Ship {
 
     ~BossBar() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    return SuccessErrorable<bool>(true);
       buffer->WriteUUID(uuid);
       buffer->WriteVarInt(action->GetAction());
       action->Write(version, buffer);

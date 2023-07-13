@@ -8,7 +8,7 @@ namespace Ship {
     SetPacketCallback(ServerHandshakePacketHandler, Handshake, OnHandshake);
   }
 
-  inline bool ServerHandshakePacketHandler::OnHandshake(Connection* connection, const Handshake& handshake) {
+  inline Errorable<bool> ServerHandshakePacketHandler::OnHandshake(Connection* connection, const Handshake& handshake) {
     auto minecraftPipe = (MinecraftFramedBytePacketPipe*) connection->GetBytePacketPipe();
     minecraftPipe->SetProtocolVersion(handshake.GetProtocolVersion());
 
@@ -17,11 +17,11 @@ namespace Ship {
       case HandshakeNextStatus::STATUS:
         minecraftPipe->SetRegistry(&BuiltInPacketRegistry::STATUS);
         connection->ReplaceMainPacketHandler(statusHandler(client));
-        return true;
+        return SuccessErrorable<bool>(true);
       case HandshakeNextStatus::LOGIN:
         minecraftPipe->SetRegistry(&BuiltInPacketRegistry::LOGIN);
         connection->ReplaceMainPacketHandler(new PreAuthPacketHandler(client, std::function<PacketHandler *(const LoginClient &)>()));
-        return true;
+        return SuccessErrorable<bool>(true);
     }
 
     return false;

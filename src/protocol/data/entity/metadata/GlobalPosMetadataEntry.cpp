@@ -1,19 +1,22 @@
+#include "../../../ProtocolUtils.hpp"
 #include "Metadata.hpp"
 #include <utility>
 
 namespace Ship {
 
-  GlobalPosMetadataEntry::GlobalPosMetadataEntry(std::string dimension, int x, int y, int z) : dimension(std::move(dimension)), x(x), y(y), z(z) {
+  GlobalPosMetadataEntry::GlobalPosMetadataEntry(std::string dimension, Position position) : dimension(std::move(dimension)), position(position) {
   }
 
-  void GlobalPosMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> GlobalPosMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteString(dimension);
-    buffer->WritePosition(x, y, z);
+    ProtocolUtils::WritePosition(version, buffer, position);
+    return SuccessErrorable<bool>(true);
   }
 
-  GlobalPosMetadataEntry::GlobalPosMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    dimension = buffer->ReadString();
-    buffer->ReadPosition(x, y, z);
+  Errorable<GlobalPosMetadataEntry> GlobalPosMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(dimension, std::string, buffer->ReadString(), InvalidGlobalPosMetadataEntryErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(position, Position, ProtocolUtils::ReadPosition(version, buffer), InvalidGlobalPosMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<GlobalPosMetadataEntry>(GlobalPosMetadataEntry(dimension, position));
   }
 
   MetadataEntryType GlobalPosMetadataEntry::GetType() const {
@@ -32,41 +35,21 @@ namespace Ship {
     dimension = value;
   }
 
-  int GlobalPosMetadataEntry::GetX() const {
-    return x;
-  }
-
-  void GlobalPosMetadataEntry::SetX(int value) {
-    x = value;
-  }
-
-  int GlobalPosMetadataEntry::GetY() const {
-    return y;
-  }
-
-  void GlobalPosMetadataEntry::SetY(int value) {
-    y = value;
-  }
-
-  int GlobalPosMetadataEntry::GetZ() const {
-    return z;
-  }
-
-  void GlobalPosMetadataEntry::SetZ(int value) {
-    z = value;
-  }
-
-  void GlobalPosMetadataEntry::Get(std::string& outDimension, int& outX, int& outY, int& outZ) const {
+  void GlobalPosMetadataEntry::Get(std::string& outDimension, Position& outPosition) const {
     outDimension = dimension;
-    outX = x;
-    outY = y;
-    outZ = z;
+    outPosition = position;
   }
 
-  void GlobalPosMetadataEntry::Set(const std::string& newDimension, int newX, int newY, int newZ) {
+  void GlobalPosMetadataEntry::Set(const std::string& newDimension, Position newPosition) {
     dimension = newDimension;
-    x = newX;
-    y = newY;
-    z = newZ;
+    position = newPosition;
+  }
+
+  Position GlobalPosMetadataEntry::GetPosition() const {
+    return position;
+  }
+
+  void GlobalPosMetadataEntry::SetPosition(Position value) {
+    position = value;
   }
 }

@@ -5,11 +5,12 @@ namespace Ship {
   DustParticle::DustParticle(float red, float green, float blue, float scale) : red(red), green(green), blue(blue), scale(scale) {
   }
 
-  void DustParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> DustParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteFloat(red);
     buffer->WriteFloat(green);
     buffer->WriteFloat(blue);
     buffer->WriteFloat(scale);
+    return SuccessErrorable<bool>(true);
   }
 
   DustParticle::DustParticle(const ProtocolVersion* version, ByteBuffer* buffer) {

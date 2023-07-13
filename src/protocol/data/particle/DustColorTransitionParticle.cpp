@@ -7,7 +7,7 @@ namespace Ship {
     : fromRed(fromRed), fromGreen(fromGreen), fromBlue(fromBlue), scale(scale), toRed(toRed), toGreen(toGreen), toBlue(toBlue) {
   }
 
-  void DustColorTransitionParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> DustColorTransitionParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteFloat(fromRed);
     buffer->WriteFloat(fromGreen);
     buffer->WriteFloat(fromBlue);
@@ -15,6 +15,7 @@ namespace Ship {
     buffer->WriteFloat(toRed);
     buffer->WriteFloat(toGreen);
     buffer->WriteFloat(toBlue);
+    return SuccessErrorable<bool>(true);
   }
 
   DustColorTransitionParticle::DustColorTransitionParticle(const ProtocolVersion* version, ByteBuffer* buffer) {

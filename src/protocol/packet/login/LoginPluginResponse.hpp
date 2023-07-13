@@ -33,10 +33,11 @@ namespace Ship {
       delete data;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(id);
       buffer->WriteBoolean(success);
       buffer->WriteBytes(data, data->GetReadableBytes());
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {

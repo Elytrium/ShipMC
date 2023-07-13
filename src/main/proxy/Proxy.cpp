@@ -16,7 +16,7 @@ namespace Ship {
     Errorable<SystemEventLoop*> eventLoop = SystemEventLoop::NewEventLoop(
       [](EventLoop* eventLoop, ReadWriteCloser* writer) {
         auto pipe = new MinecraftFramedBytePacketPipe(
-          &BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, MAX_PACKET_SIZE, SERVERBOUND, CLIENTBOUND, 1024);
+          &BuiltInPacketRegistry::HANDSHAKE, &ProtocolVersion::UNKNOWN, MAX_PACKET_SIZE, SERVERBOUND, CLIENTBOUND);
         auto* connection = new Connection(pipe,
           new ServerHandshakePacketHandler(
             [](LoginClient client) {

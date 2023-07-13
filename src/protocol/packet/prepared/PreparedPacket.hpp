@@ -30,9 +30,10 @@ namespace Ship {
       return SuccessErrorable<PreparedPacket>({}); // TODO: should we instantiate prepared packet?
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       auto* temp = new ByteBufferImpl(unknownBytes[version->GetOrdinal()]);
       buffer->WriteBytes(temp, temp->GetReadableBytes());
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t Size(const ProtocolVersion* version) const override {

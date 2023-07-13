@@ -5,11 +5,12 @@ namespace Ship {
   PoseMetadataEntry::PoseMetadataEntry(const Ship::Pose& value) : value(value) {
   }
 
-  void PoseMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> PoseMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt((uint32_t) value);
+    return SuccessErrorable<bool>(true);
   }
 
-  PoseMetadataEntry::PoseMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
+  Errorable<PoseMetadataEntry> PoseMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
     value = (Pose) buffer->ReadVarInt();
   }
 

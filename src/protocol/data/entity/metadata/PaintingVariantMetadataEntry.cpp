@@ -5,12 +5,16 @@ namespace Ship {
   PaintingVariantMetadataEntry::PaintingVariantMetadataEntry(const PaintingVariant& value) : value(value) {
   }
 
-  void PaintingVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
-    buffer->WriteVarInt(PAINTING_VARIANT_REGISTRY.GetID(version, value));
+  Errorable<bool> PaintingVariantMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+    ProceedErrorable(id, uint32_t, PAINTING_VARIANT_REGISTRY.GetID(version, value), InvalidSerializableWriteErrorable(buffer->GetReadableBytes()))
+    buffer->WriteVarInt(id);
+    return SuccessErrorable<bool>(true);
   }
 
-  PaintingVariantMetadataEntry::PaintingVariantMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = PAINTING_VARIANT_REGISTRY.GetValue(version, buffer->ReadVarInt());
+  Errorable<PaintingVariantMetadataEntry> PaintingVariantMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidPaintingVariantMetadataEntryErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(value, PaintingVariant, PAINTING_VARIANT_REGISTRY.GetValue(version, id), InvalidPaintingVariantMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<PaintingVariantMetadataEntry>(PaintingVariantMetadataEntry(value));
   }
 
   MetadataEntryType PaintingVariantMetadataEntry::GetType() const {

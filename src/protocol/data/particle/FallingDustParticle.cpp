@@ -5,8 +5,9 @@ namespace Ship {
   FallingDustParticle::FallingDustParticle(uint32_t blockState) : blockState(blockState) {
   }
 
-  void FallingDustParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> FallingDustParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(blockState);
+    return SuccessErrorable<bool>(true);
   }
 
   FallingDustParticle::FallingDustParticle(const ProtocolVersion* version, ByteBuffer* buffer) {

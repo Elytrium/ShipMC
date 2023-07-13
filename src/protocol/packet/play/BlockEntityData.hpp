@@ -41,7 +41,7 @@ namespace Ship {
       delete data;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WritePosition(location);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_18) {
         buffer->WriteVarInt(type);
@@ -54,6 +54,7 @@ namespace Ship {
       } else {
         buffer->WriteByte(0);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

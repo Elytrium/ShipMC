@@ -28,12 +28,13 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(action);
       buffer->WriteVarInt(entries.size());
       for (const std::string& entry : entries) {
         buffer->WriteString(entry);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {

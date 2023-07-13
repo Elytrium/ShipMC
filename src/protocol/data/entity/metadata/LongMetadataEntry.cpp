@@ -5,12 +5,14 @@ namespace Ship {
   LongMetadataEntry::LongMetadataEntry(uint64_t value) : value(value) {
   }
 
-  void LongMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> LongMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteLong(value);
+    return SuccessErrorable<bool>(true);
   }
 
-  LongMetadataEntry::LongMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadLong();
+  Errorable<LongMetadataEntry> LongMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(value, uint64_t, buffer->ReadLong(), InvalidLongMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<LongMetadataEntry>(LongMetadataEntry(value));
   }
 
   MetadataEntryType LongMetadataEntry::GetType() const {

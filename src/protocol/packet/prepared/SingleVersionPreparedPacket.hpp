@@ -24,8 +24,9 @@ namespace Ship {
       delete unknownBytes;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteBytes(new ByteBufferImpl(unknownBytes), unknownBytes->GetReadableBytes());
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t Size(const ProtocolVersion* version) const override {

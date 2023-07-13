@@ -25,9 +25,10 @@ namespace Ship {
       ProceedErrorable(recipe, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(windowId);
       buffer->WriteString(recipe);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

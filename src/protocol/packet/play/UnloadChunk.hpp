@@ -24,9 +24,10 @@ namespace Ship {
       chunkZ = buffer->ReadInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteInt(chunkX);
       buffer->WriteInt(chunkZ);
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {

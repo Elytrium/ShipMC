@@ -5,8 +5,9 @@ namespace Ship {
   BlockParticle::BlockParticle(uint32_t blockState) : blockState(blockState) {
   }
 
-  void BlockParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> BlockParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(blockState);
+    return SuccessErrorable<bool>(true);
   }
 
   BlockParticle::BlockParticle(const ProtocolVersion* version, ByteBuffer* buffer) {

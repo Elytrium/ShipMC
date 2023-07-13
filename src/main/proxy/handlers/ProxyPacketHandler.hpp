@@ -18,8 +18,8 @@ namespace Ship {
     static void Init();
     static inline const uint32_t HANDLER_ORDINAL = OrdinalRegistry::PacketHandlerRegistry.RegisterOrdinal();
 
-    inline bool OnStatusRequest(Connection* connection, const StatusRequest& statusRequest);
-    inline bool OnStatusPing(Connection* connection, const StatusPing& statusRequest);
+    inline Errorable<bool> OnStatusRequest(Connection* connection, const StatusRequest& statusRequest);
+    inline Errorable<bool> OnStatusPing(Connection* connection, const StatusPing& statusRequest);
 
     uint32_t GetOrdinal() const override {
       return HANDLER_ORDINAL;

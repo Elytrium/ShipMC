@@ -22,8 +22,9 @@ namespace Ship {
       ProceedErrorable(reset, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteBoolean(reset);
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {
