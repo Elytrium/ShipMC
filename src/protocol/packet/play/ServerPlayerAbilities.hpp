@@ -37,10 +37,11 @@ namespace Ship {
       ProceedErrorable(fovModifier, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(flags.value);
       buffer->WriteFloat(flyingSpeed);
       buffer->WriteFloat(fovModifier);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

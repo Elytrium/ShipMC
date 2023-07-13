@@ -57,7 +57,7 @@ namespace Ship {
       ProceedErrorable(playerMotionZ, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       if (version == &MinecraftProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteFloat((float) x);
         buffer->WriteFloat((float) y);
@@ -81,6 +81,7 @@ namespace Ship {
       buffer->WriteFloat(playerMotionX);
       buffer->WriteFloat(playerMotionY);
       buffer->WriteFloat(playerMotionZ);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

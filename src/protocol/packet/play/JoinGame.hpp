@@ -172,7 +172,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteInt(entityId);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
         buffer->WriteBoolean(isHardcore);
@@ -267,6 +267,7 @@ namespace Ship {
           buffer->WriteBoolean(showRespawnScreen);
         }
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

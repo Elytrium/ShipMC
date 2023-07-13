@@ -58,7 +58,7 @@ namespace Ship {
       velocityZ = (float) buffer->ReadShort() / 8000.0F;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
       buffer->WriteUUID(entityUuid);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
@@ -80,6 +80,7 @@ namespace Ship {
       buffer->WriteShort((uint16_t) (velocityX * 8000.0F));
       buffer->WriteShort((uint16_t) (velocityY * 8000.0F));
       buffer->WriteShort((uint16_t) (velocityZ * 8000.0F));
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

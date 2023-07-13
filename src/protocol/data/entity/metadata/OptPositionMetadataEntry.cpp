@@ -1,26 +1,28 @@
+#include "../../../ProtocolUtils.hpp"
 #include "Metadata.hpp"
 
 namespace Ship {
 
-  OptPositionMetadataEntry::OptPositionMetadataEntry() : present(false), x(0), y(0), z(0) {
+  OptPositionMetadataEntry::OptPositionMetadataEntry() : present(false), position() {
   }
 
-  OptPositionMetadataEntry::OptPositionMetadataEntry(int x, int y, int z) : present(true), x(x), y(y), z(z) {
+  OptPositionMetadataEntry::OptPositionMetadataEntry(Position position) : present(true), position(position) {
   }
 
-  void OptPositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> OptPositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteBoolean(present);
     if (present) {
-      buffer->WritePosition(x, y, z);
     }
+    return SuccessErrorable<bool>(true);
   }
 
-  OptPositionMetadataEntry::OptPositionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    present = buffer->ReadBoolean();
+  Errorable<OptPositionMetadataEntry> OptPositionMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(present, bool, buffer->ReadBoolean(), InvalidOptPositionMetadataEntryErrorable(buffer->GetReadableBytes()))
     if (present) {
-      buffer->ReadPosition(x, y, z);
+      ProceedErrorable(position, Position, ProtocolUtils::ReadPosition(version, buffer), InvalidOptPositionMetadataEntryErrorable(buffer->GetReadableBytes()))
+      return SuccessErrorable<OptPositionMetadataEntry>(OptPositionMetadataEntry(position));
     } else {
-      x = y = z = 0;
+      return SuccessErrorable<OptPositionMetadataEntry>({});
     }
   }
 
@@ -40,46 +42,26 @@ namespace Ship {
     present = value;
   }
 
-  int OptPositionMetadataEntry::GetX() const {
-    return x;
+  Position OptPositionMetadataEntry::GetPosition() const {
+    return position;
   }
 
-  void OptPositionMetadataEntry::SetX(int value) {
-    x = value;
+  void OptPositionMetadataEntry::SetPosition(Position value) {
+    position = value;
   }
 
-  int OptPositionMetadataEntry::GetY() const {
-    return y;
-  }
-
-  void OptPositionMetadataEntry::SetY(int value) {
-    y = value;
-  }
-
-  int OptPositionMetadataEntry::GetZ() const {
-    return z;
-  }
-
-  void OptPositionMetadataEntry::SetZ(int value) {
-    z = value;
-  }
-
-  void OptPositionMetadataEntry::Get(bool& outPresent, int& outX, int& outY, int& outZ) const {
+  void OptPositionMetadataEntry::Get(bool& outPresent, Position& out) const {
     outPresent = present;
-    outX = x;
-    outY = y;
-    outZ = z;
+    out = position;
   }
 
-  void OptPositionMetadataEntry::Set(int newX, int newY, int newZ) {
+  void OptPositionMetadataEntry::Set(Position newPosition) {
     present = true;
-    x = newX;
-    y = newY;
-    z = newZ;
+    position = newPosition;
   }
 
   void OptPositionMetadataEntry::Reset() {
     present = false;
-    x = y = z = 0;
+    position = {};
   }
 }

@@ -5,12 +5,14 @@ namespace Ship {
   DirectionMetadataEntry::DirectionMetadataEntry(const Direction& value) : value(value) {
   }
 
-  DirectionMetadataEntry::DirectionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = (Direction) buffer->ReadVarInt();
+  Errorable<DirectionMetadataEntry> DirectionMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), InvalidDirectionMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<DirectionMetadataEntry>(DirectionMetadataEntry((Direction) value));
   }
 
-  void DirectionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> DirectionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt((uint32_t) value);
+    return SuccessErrorable<bool>(true);
   }
 
   MetadataEntryType DirectionMetadataEntry::GetType() const {

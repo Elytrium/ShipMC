@@ -34,7 +34,7 @@ namespace Ship {
       delete signature;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteUUID(gameProfile.GetUuid());
       buffer->WriteString(gameProfile.GetName());
       buffer->WriteProperties(gameProfile.GetProperties());
@@ -59,6 +59,7 @@ namespace Ship {
           buffer->WriteByte(0);
         }
       }
+      return SuccessErrorable<bool>(true);
     }
 
     explicit PlayerListAddPlayer(const PacketHolder& holder)
@@ -125,9 +126,10 @@ namespace Ship {
       gamemode = (Gamemode) buffer->ReadVarInt();
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteUUID(uuid);
       buffer->WriteVarInt(gamemode);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] const UUID& GetUuid() const {
@@ -154,9 +156,10 @@ namespace Ship {
       ProceedErrorable(ping, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteUUID(uuid);
       buffer->WriteVarInt(ping);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] const UUID& GetUuid() const {
@@ -187,12 +190,13 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteUUID(uuid);
       buffer->WriteBoolean(displayName.has_value());
       if (displayName) {
         buffer->WriteString(*displayName);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] const UUID& GetUuid() const {
@@ -217,8 +221,9 @@ namespace Ship {
       ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteUUID(uuid);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] const UUID& GetUuid() const {
@@ -271,8 +276,9 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       // TODO: Write PlayerListItem
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

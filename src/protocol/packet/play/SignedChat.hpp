@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../lib/ShipNet/src/protocol/packet/Packet.hpp"
 #include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 
@@ -11,7 +12,8 @@ namespace Ship {
     ~SignedChat() override {
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {

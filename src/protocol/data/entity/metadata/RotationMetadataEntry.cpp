@@ -5,16 +5,18 @@ namespace Ship {
   RotationMetadataEntry::RotationMetadataEntry(float x, float y, float z) : x(x), y(y), z(z) {
   }
 
-  void RotationMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> RotationMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteFloat(x);
     buffer->WriteFloat(y);
     buffer->WriteFloat(z);
+    return SuccessErrorable<bool>(true);
   }
 
-  RotationMetadataEntry::RotationMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    x = buffer->ReadFloat();
-    y = buffer->ReadFloat();
-    z = buffer->ReadFloat();
+  Errorable<RotationMetadataEntry> RotationMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(x, float, buffer->ReadFloat(), InvalidRotationMetadataEntryErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(y, float, buffer->ReadFloat(), InvalidRotationMetadataEntryErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(z, float, buffer->ReadFloat(), InvalidRotationMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<RotationMetadataEntry>(RotationMetadataEntry(x, y, z));
   }
 
   MetadataEntryType RotationMetadataEntry::GetType() const {

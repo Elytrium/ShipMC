@@ -2,18 +2,17 @@
 
 namespace Ship {
 
-  BlockIDMetadataEntry::BlockIDMetadataEntry() : value(0) {
-  }
-
   BlockIDMetadataEntry::BlockIDMetadataEntry(uint32_t value) : value(value) {
   }
 
-  BlockIDMetadataEntry::BlockIDMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadVarInt();
+  Errorable<BlockIDMetadataEntry> BlockIDMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), InvalidBlockIDMetadataEntryErrorableErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<BlockIDMetadataEntry>(BlockIDMetadataEntry(value));
   }
 
-  void BlockIDMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> BlockIDMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(value);
+    return SuccessErrorable<bool>(true);
   }
 
   MetadataEntryType BlockIDMetadataEntry::GetType() const {

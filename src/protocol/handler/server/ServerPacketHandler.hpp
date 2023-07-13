@@ -31,7 +31,7 @@ namespace Ship {
     static void Init();
     static inline const uint32_t HANDLER_ORDINAL = OrdinalRegistry::PacketHandlerRegistry.RegisterOrdinal();
 
-    inline bool OnHandshake(Connection* connection, const Handshake& handshake);
+    inline Errorable<bool> OnHandshake(Connection* connection, const Handshake& handshake);
 
     uint32_t GetOrdinal() const override {
       return HANDLER_ORDINAL;
@@ -53,9 +53,9 @@ namespace Ship {
     static void Init();
     static inline const uint32_t HANDLER_ORDINAL = OrdinalRegistry::PacketHandlerRegistry.RegisterOrdinal();
 
-    inline bool OnLoginStart(Connection* connection, const LoginStart& serverLogin);
-    inline bool OnEncryptionResponse(Connection* connection, const EncryptionResponse& serverLogin);
-    inline bool OnLoginPluginResponse(Connection* connection, const LoginPluginResponse& serverLogin);
+    inline Errorable<bool> OnLoginStart(Connection* connection, const LoginStart& serverLogin);
+    inline Errorable<bool> OnEncryptionResponse(Connection* connection, const EncryptionResponse& serverLogin);
+    inline Errorable<bool> OnLoginPluginResponse(Connection* connection, const LoginPluginResponse& serverLogin);
     inline void AssertState(LoginState expected);
 
     uint32_t GetOrdinal() const override {

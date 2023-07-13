@@ -27,9 +27,10 @@ namespace Ship {
 
     ~BlockUpdate() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WritePosition(location);
       buffer->WriteVarInt(blockId);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

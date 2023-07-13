@@ -8,7 +8,7 @@ namespace Ship {
   }
 
   void IntTag::Read(ByteBuffer* buffer) {
-    value = buffer->ReadInt();
+    ProceedErrorable(value, ss, buffer->ReadInt, ss)
   }
 
   void IntTag::Write(ByteBuffer* buffer) {

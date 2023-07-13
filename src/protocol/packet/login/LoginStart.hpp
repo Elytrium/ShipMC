@@ -40,7 +40,7 @@ namespace Ship {
       }
     };
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(username);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteBoolean(hasSigData);
@@ -52,6 +52,7 @@ namespace Ship {
           buffer->WriteBytes(signature, signatureLength);
         }
       }
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {

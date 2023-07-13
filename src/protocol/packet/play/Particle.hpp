@@ -59,7 +59,7 @@ namespace Ship {
       particle = PARTICLE_REGISTRY.GetObjectByID(version, particleId, buffer);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       uint32_t particleId = PARTICLE_REGISTRY.GetIDByOrdinal(version, particle->GetOrdinal());
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteVarInt(particleId);
@@ -82,6 +82,7 @@ namespace Ship {
       buffer->WriteFloat(maxSpeed);
       buffer->WriteInt(particleCount);
       particle->Write(version, buffer);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

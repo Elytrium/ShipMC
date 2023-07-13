@@ -5,10 +5,10 @@
 
 namespace Ship {
   MinecraftFramedBytePacketPipe::MinecraftFramedBytePacketPipe(const PacketRegistry* initial_registry, const ProtocolVersion* version,
-    uint32_t max_read_size, const PacketDirection reader_direction, const PacketDirection writer_direction, int long_packet_buffer_capacity)
+    uint32_t max_read_size, const PacketDirection reader_direction, const PacketDirection writer_direction)
     : FramedBytePacketPipe(max_read_size), version(version), directionRegistry(initial_registry),
       readerRegistry(initial_registry->GetRegistry(reader_direction)), writerRegistry(initial_registry->GetRegistry(writer_direction)),
-      readerDirection(reader_direction), writerDirection(writer_direction), longPacketBufferCapacity(long_packet_buffer_capacity) {
+      readerDirection(reader_direction), writerDirection(writer_direction) {
   }
 
   const PacketRegistry* MinecraftFramedBytePacketPipe::GetRegistry() {
@@ -29,37 +29,26 @@ namespace Ship {
     version = new_protocol_version;
   }
 
-  ByteBuffer* MinecraftFramedBytePacketPipe::Write(const Packet& packet) {
+  Errorable<bool> MinecraftFramedBytePacketPipe::Write(ByteBuffer* out, const Packet& packet) {
     if (packet.GetOrdinal() == PreparedPacket::PACKET_ORDINAL) {
-      return ((PreparedPacket&) packet).GetBytes(version);
+      ByteBuffer* buffer = ((PreparedPacket&) packet).GetBytes(version);
+      out->WriteBytes(buffer, buffer->GetReadableBytes());
+      return SuccessErrorable<bool>(true);
     }
 
     if (packet.GetOrdinal() == SingleVersionPreparedPacket::PACKET_ORDINAL) {
-      return ((SingleVersionPreparedPacket&) packet).GetBytes();
+      ByteBuffer* buffer = ((SingleVersionPreparedPacket&) packet).GetBytes();
+      out->WriteBytes(buffer, buffer->GetReadableBytes());
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t packetSize = packet.Size(version);
-    if (packetSize != -1) {
-      uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
-      uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetID);
-      auto* buffer = new ByteBufferImpl(packetSizeWithID + ByteBuffer::VarIntBytes(packetSizeWithID));
-      buffer->WriteVarInt(packetSizeWithID);
-      buffer->WriteVarInt(packetID);
-      packet.Write(version, buffer);
-      return buffer;
-    } else {
-      auto* buffer = new ByteBufferImpl(longPacketBufferCapacity);
-      packet.Write(version, buffer);
-      packetSize = buffer->GetReadableBytes();
-      uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
-      uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetID);
-      auto* prefixedBuffer = new ByteBufferImpl(packetSizeWithID + ByteBuffer::VarIntBytes(packetSizeWithID));
-      prefixedBuffer->WriteVarInt(packetSizeWithID);
-      prefixedBuffer->WriteVarInt(packetID);
-      prefixedBuffer->WriteBytes(buffer, packetSize);
-      delete buffer;
-      return prefixedBuffer;
-    }
+    uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
+    uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetID);
+    out->WriteVarInt(packetSizeWithID);
+    out->WriteVarInt(packetID);
+    packet.Write(version, out);
+    return SuccessErrorable<bool>(true);
   }
 
   Errorable<PacketHolder> MinecraftFramedBytePacketPipe::ReadPacket(ByteBuffer* in, uint32_t frame_size) {

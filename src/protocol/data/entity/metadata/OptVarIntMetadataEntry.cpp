@@ -7,11 +7,12 @@ namespace Ship {
   OptVarIntMetadataEntry::OptVarIntMetadataEntry(const std::optional<uint32_t>& optValue) : optValue(optValue) {
   }
 
-  void OptVarIntMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> OptVarIntMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteVarInt(optValue.value_or(-1) + 1);
+    return SuccessErrorable<bool>(true);
   }
 
-  OptVarIntMetadataEntry::OptVarIntMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
+  Errorable<OptVarIntMetadataEntry> OptVarIntMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
     ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), );
     if (value) {
       optValue = value - 1;

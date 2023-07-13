@@ -41,7 +41,7 @@ namespace Ship {
 
     ~LoginSuccess() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteUUID(uuid);
       } else if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
@@ -54,6 +54,7 @@ namespace Ship {
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteProperties(properties);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

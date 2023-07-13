@@ -55,6 +55,7 @@ namespace Ship {
       name = std::move(new_name);
     }
   };
+  CreateInvalidArgumentErrorable(InvalidNBTErrorable, NBT*, "Invalid NBT read");
 
   class EndTag : public NBT {
    public:

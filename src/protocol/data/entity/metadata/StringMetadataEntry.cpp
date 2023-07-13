@@ -6,12 +6,13 @@ namespace Ship {
   StringMetadataEntry::StringMetadataEntry(std::string value) : value(std::move(value)) {
   }
 
-  void StringMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> StringMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteString(value);
+    return SuccessErrorable<bool>(true);
   }
 
-  StringMetadataEntry::StringMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = buffer->ReadString();
+  Errorable<StringMetadataEntry> StringMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(value, ss, buffer->ReadString, ss)
   }
 
   MetadataEntryType StringMetadataEntry::GetType() const {

@@ -19,34 +19,34 @@ namespace Ship {
 
   Errorable<ItemStack> ItemStack::Instantiate(const Ship::ProtocolVersion* version, Ship::ByteBuffer* buffer) {
     bool present;
+    uint16_t itemID;
+
     if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
-      SetFromErrorable(present, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      SetFromErrorable(present, bool, buffer->ReadBoolean(), InvalidItemStack(buffer->GetReadableBytes()))
     } else {
-      ProceedErrorable(presentShort, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      present = presentShort != (uint16_t) -1;
+      SetFromErrorable(itemID, uint16_t, buffer->ReadShort(), InvalidItemStack(buffer->GetReadableBytes()))
+      present = itemID != (uint16_t) -1;
     }
 
-    uint16_t itemID;
-    uint8_t itemCount;
-    uint16_t data;
-    NBT* nbt;
     if (present) {
-      if (version < &MinecraftProtocolVersion::MINECRAFT_1_13_2) { // TODO: Mappings
-        SetFromErrorable(itemID, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      } else {
-        SetFromErrorable(itemID, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      uint8_t itemCount;
+      uint16_t data = 0;
+
+      // TODO: ItemID Mappings
+      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13_2) { 
+        SetFromErrorable(itemID, uint32_t, buffer->ReadVarInt(), InvalidItemStack(buffer->GetReadableBytes()))
       }
 
-      SetFromErrorable(itemCount, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      SetFromErrorable(itemCount, uint8_t, buffer->ReadByte(), InvalidItemStack(buffer->GetReadableBytes()))
 
       if (version < &MinecraftProtocolVersion::MINECRAFT_1_13) {
-          SetFromErrorable(data, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(data, uint16_t, buffer->ReadShort(), InvalidItemStack(buffer->GetReadableBytes()))
       }
 
-      nbt = ProtocolUtils::ReadNBT(buffer);
+      ProceedErrorable(nbt, NBT*, ProtocolUtils::ReadNBT(buffer), InvalidItemStack(buffer->GetReadableBytes()))
+      return SuccessErrorable<ItemStack>({itemID, itemCount, data, nbt});
     } else {
-      itemID = itemCount = data = 0;
-      nbt = nullptr;
+      return SuccessErrorable<ItemStack>({});
     }
   }
 
@@ -54,7 +54,7 @@ namespace Ship {
     delete nbt;
   }
 
-  void ItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> ItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
       buffer->WriteBoolean(present);
     }
@@ -82,6 +82,7 @@ namespace Ship {
         buffer->WriteByte(0);
       }
     }
+    return SuccessErrorable<bool>(true);
   }
 
   bool ItemStack::IsPresent() const {
@@ -126,18 +127,22 @@ namespace Ship {
   }
 
   Errorable<OptionalItemStack> OptionalItemStack::Instantiate(const Ship::ProtocolVersion* version, Ship::ByteBuffer* buffer) {
-    ProceedErrorable(hasItemStack, bool, buffer->ReadBoolean(), ss)
+    ProceedErrorable(hasItemStack, bool, buffer->ReadBoolean(), InvalidOptionalItemStack(buffer->GetReadableBytes()))
     if (hasItemStack) {
-      itemStack = ItemStack(version, buffer);
+      ProceedErrorable(itemStack, ItemStack, ItemStack::Instantiate(version, buffer), InvalidOptionalItemStack(buffer->GetReadableBytes()))
+      return SuccessErrorable<OptionalItemStack>(OptionalItemStack(itemStack));
     } else {
-      return SuccessErrorable<OptionalItemStack>({std::nullopt});
+      return SuccessErrorable<OptionalItemStack>(OptionalItemStack(std::nullopt));
     }
   }
 
-  void OptionalItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> OptionalItemStack::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteBoolean(itemStack.has_value());
     if (itemStack.has_value()) {
       itemStack->Write(version, buffer);
     }
+    return SuccessErrorable<bool>(true);
   }
+
+  OptionalItemStack::OptionalItemStack(std::optional<ItemStack> itemStack) : itemStack(std::move(itemStack)) {}
 }

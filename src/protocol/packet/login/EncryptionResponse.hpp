@@ -43,7 +43,7 @@ namespace Ship {
 
     ~EncryptionResponse() override = default;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByteArray(sharedSecret);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19 && version < &MinecraftProtocolVersion::MINECRAFT_1_19_3) {
         if (salt.has_value()) {
@@ -55,6 +55,7 @@ namespace Ship {
       }
 
       buffer->WriteByteArray(verifyToken);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

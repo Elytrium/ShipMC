@@ -8,17 +8,15 @@ namespace Ship {
   class WorldEvent : public Packet {
    private:
     uint32_t event;
-    int locationX;
-    int locationY;
-    int locationZ;
+    Position location;
     uint32_t data;
     bool disableRelativeVolume;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    WorldEvent(uint32_t event, int locationX, int locationY, int locationZ, uint32_t data, bool disableRelativeVolume)
-      : event(event), locationX(locationX), locationY(locationY), locationZ(locationZ), data(data), disableRelativeVolume(disableRelativeVolume) {
+    WorldEvent(uint32_t event, Position location, uint32_t data, bool disableRelativeVolume)
+      : event(event), location(location), data(data), disableRelativeVolume(disableRelativeVolume) {
     }
 
     ~WorldEvent() override = default;
@@ -26,16 +24,17 @@ namespace Ship {
     static Errorable<WorldEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       event = buffer->ReadInt();
-      buffer->ReadPosition(locationX, locationY, locationZ);
+      ProceedErrorable(location, Position, ProtocolUtils::ReadPosition(holder.GetVersion(), buffer), InvalidPacketErrorable<>(PACKET_ORDINAL));
       data = buffer->ReadInt();
       ProceedErrorable(disableRelativeVolume, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteInt(event);
-      buffer->WritePosition(locationX, locationY, locationZ);
+      ProtocolUtils::WritePosition(version, buffer, location);
       buffer->WriteInt(data);
       buffer->WriteBoolean(disableRelativeVolume);
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {
@@ -46,16 +45,8 @@ namespace Ship {
       return event;
     }
 
-    [[nodiscard]] int GetLocationX() const {
-      return locationX;
-    }
-
-    [[nodiscard]] int GetLocationY() const {
-      return locationY;
-    }
-
-    [[nodiscard]] int GetLocationZ() const {
-      return locationZ;
+    [[nodiscard]] Position GetLocation() const {
+      return location;
     }
 
     [[nodiscard]] uint32_t GetData() const {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "nbt/NBT.hpp"
+#include <utility>
 
 namespace Ship {
 
@@ -21,7 +22,7 @@ namespace Ship {
 
     ~ItemStack() override;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
 
     [[nodiscard]] bool IsPresent() const;
     void SetPresent(bool value);
@@ -38,9 +39,14 @@ namespace Ship {
   class OptionalItemStack : public Serializable {
    private:
     std::optional<ItemStack> itemStack;
+
    public:
     OptionalItemStack() = default;
+    explicit OptionalItemStack(std::optional<ItemStack> itemStack);
     static Errorable<OptionalItemStack> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
   };
+
+  CreateInvalidArgumentErrorable(InvalidItemStack, ItemStack, "Invalid ItemStack read");
+  CreateInvalidArgumentErrorable(InvalidOptionalItemStack, OptionalItemStack, "Invalid OptionalItemStack read");
 }

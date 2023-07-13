@@ -118,75 +118,83 @@ namespace Ship {
 
   class ByteMetadataEntry : public MetadataEntry {
    private:
-    uint8_t value;
+    uint8_t value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    ByteMetadataEntry() = default;
     explicit ByteMetadataEntry(uint8_t value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    ByteMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<ByteMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] uint8_t GetValue() const;
     void SetValue(uint8_t newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidByteMetadataEntryErrorable, ByteMetadataEntry, "Invalid ByteMetadataEntry read");
 
   class VarIntMetadataEntry : public MetadataEntry {
    private:
-    uint32_t value;
+    uint32_t value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    VarIntMetadataEntry() = default;
     explicit VarIntMetadataEntry(uint32_t value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    VarIntMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<VarIntMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] uint32_t GetValue() const;
     void SetValue(uint32_t newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidVarIntMetadataEntryErrorable, VarIntMetadataEntry, "Invalid VarIntMetadataEntry read");
 
   class LongMetadataEntry : public MetadataEntry {
    private:
-    uint32_t value;
+    uint32_t value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    LongMetadataEntry() = default;
     explicit LongMetadataEntry(uint64_t value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    LongMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<LongMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] uint64_t GetValue() const;
     void SetValue(uint64_t newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidLongMetadataEntryErrorable, LongMetadataEntry, "Invalid LongMetadataEntry read");
 
   class FloatMetadataEntry : public MetadataEntry {
    private:
-    float value;
+    float value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    FloatMetadataEntry() = default;
     explicit FloatMetadataEntry(float value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    FloatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<FloatMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] float GetValue() const;
     void SetValue(float newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidFloatMetadataEntryErrorable, FloatMetadataEntry, "Invalid FloatMetadataEntry read");
 
   class StringMetadataEntry : public MetadataEntry {
    private:
@@ -195,16 +203,18 @@ namespace Ship {
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    StringMetadataEntry() = default;
     explicit StringMetadataEntry(std::string value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    StringMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<StringMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] std::string GetValue() const;
     void SetValue(std::string newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidStringMetadataEntryErrorable, StringMetadataEntry, "Invalid StringMetadataEntry read");
 
   class ChatMetadataEntry : public MetadataEntry {
    private:
@@ -213,16 +223,18 @@ namespace Ship {
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    ChatMetadataEntry() = default;
     explicit ChatMetadataEntry(std::string value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    ChatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<ChatMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] std::string GetValue() const;
     void SetValue(std::string newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidChatMetadataEntryErrorable, ChatMetadataEntry, "Invalid ChatMetadataEntry read");
 
   class OptChatMetadataEntry : public MetadataEntry {
    private:
@@ -234,64 +246,70 @@ namespace Ship {
     OptChatMetadataEntry();
     explicit OptChatMetadataEntry(std::optional<std::string> optValue);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    OptChatMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<OptChatMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] std::optional<std::string> GetValue() const;
     void SetValue(const std::optional<std::string>& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidOptChatMetadataEntryErrorable, OptChatMetadataEntry, "Invalid OptChatMetadataEntry read");
 
   class ItemStackMetadataEntry : public MetadataEntry {
    private:
-    ItemStack value;
+    ItemStack value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    ItemStackMetadataEntry() = default;
     explicit ItemStackMetadataEntry(const ItemStack& value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    ItemStackMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<ItemStackMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] ItemStack GetValue() const;
     void SetValue(const ItemStack& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidItemStackMetadataEntryErrorable, ItemStackMetadataEntry, "Invalid ItemStackMetadataEntry read");
 
   class BooleanMetadataEntry : public MetadataEntry {
    private:
-    bool value;
+    bool value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    BooleanMetadataEntry() = default;
     explicit BooleanMetadataEntry(bool value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    BooleanMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<BooleanMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] bool GetValue() const;
     void SetValue(bool newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidBooleanMetadataEntryErrorable, BooleanMetadataEntry, "Invalid BooleanMetadataEntry read");
 
   class RotationMetadataEntry : public MetadataEntry {
    private:
-    float x;
-    float y;
-    float z;
+    float x{};
+    float y{};
+    float z{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    RotationMetadataEntry() = default;
     explicit RotationMetadataEntry(float x, float y, float z);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    RotationMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<RotationMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -305,83 +323,77 @@ namespace Ship {
     void Get(float& outX, float& outY, float& outZ) const;
     void Set(float newX, float newY, float newZ);
   };
+  CreateInvalidArgumentErrorable(InvalidRotationMetadataEntryErrorable, RotationMetadataEntry, "Invalid RotationMetadataEntry read");
 
   class PositionMetadataEntry : public MetadataEntry {
    private:
-    int x;
-    int y;
-    int z;
+    Position position{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
-    explicit PositionMetadataEntry(int x, int y, int z);
+    PositionMetadataEntry() = default;
+    explicit PositionMetadataEntry(Position position);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    PositionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<PositionMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
-    [[nodiscard]] int GetX() const;
-    void SetX(int value);
-    [[nodiscard]] int GetY() const;
-    void SetY(int value);
-    [[nodiscard]] int GetZ() const;
-    void SetZ(int value);
+    [[nodiscard]] Position GetPosition() const;
+    void SetPosition(Position value);
 
-    void Get(int& outX, int& outY, int& outZ) const;
-    void Set(int newX, int newY, int newZ);
+    void Get(Position& position) const;
+    void Set(Position position);
   };
+  CreateInvalidArgumentErrorable(InvalidPositionMetadataEntryErrorable, PositionMetadataEntry, "Invalid PositionMetadataEntry read");
 
   class OptPositionMetadataEntry : public MetadataEntry {
    private:
     bool present;
-    int x;
-    int y;
-    int z;
+    Position position;
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
     OptPositionMetadataEntry();
-    explicit OptPositionMetadataEntry(int x, int y, int z);
+    explicit OptPositionMetadataEntry(Position position);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    OptPositionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<OptPositionMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] bool IsPresent() const;
     void SetPresent(bool value);
-    [[nodiscard]] int GetX() const;
-    void SetX(int value);
-    [[nodiscard]] int GetY() const;
-    void SetY(int value);
-    [[nodiscard]] int GetZ() const;
-    void SetZ(int value);
+    [[nodiscard]] Position GetPosition() const;
+    void SetPosition(Position value);
 
-    void Get(bool& outPresent, int& outX, int& outY, int& outZ) const;
-    void Set(int newX, int newY, int newZ);
+    void Get(bool& outPresent, Position& out) const;
+    void Set(Position position);
     void Reset();
   };
+  CreateInvalidArgumentErrorable(InvalidOptPositionMetadataEntryErrorable, OptPositionMetadataEntry, "Invalid OptPositionMetadataEntry read");
 
   class DirectionMetadataEntry : public MetadataEntry {
    private:
-    Direction value;
+    Direction value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    DirectionMetadataEntry() = default;
     explicit DirectionMetadataEntry(const Direction& value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    DirectionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<DirectionMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] Direction GetValue() const;
     void SetValue(const Direction& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidDirectionMetadataEntryErrorable, DirectionMetadataEntry, "Invalid DirectionMetadataEntry read");
 
   class OptUUIDMetadataEntry : public MetadataEntry {
    private:
@@ -393,87 +405,94 @@ namespace Ship {
     OptUUIDMetadataEntry();
     explicit OptUUIDMetadataEntry(const std::optional<UUID>& optValue);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    OptUUIDMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<OptUUIDMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] std::optional<UUID> GetValue() const;
     void SetValue(const std::optional<UUID>& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidOptUUIDMetadataEntryErrorable, OptUUIDMetadataEntry, "Invalid OptUUIDMetadataEntry read");
 
   class BlockIDMetadataEntry : public MetadataEntry {
    private:
-    uint32_t value;
+    uint32_t value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
-    BlockIDMetadataEntry();
+    BlockIDMetadataEntry() = default;
     explicit BlockIDMetadataEntry(uint32_t value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    BlockIDMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<BlockIDMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] uint32_t GetValue() const;
     void SetValue(uint32_t newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidBlockIDMetadataEntryErrorableErrorable, BlockIDMetadataEntry, "Invalid BlockIDMetadataEntry read");
 
   class NBTMetadataEntry : public MetadataEntry {
    private:
-    NBT* value;
+    NBT* value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    NBTMetadataEntry() = default;
     explicit NBTMetadataEntry(NBT* value);
-    NBTMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<NBTMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     ~NBTMetadataEntry() override;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] NBT* GetValue() const;
     void SetValue(NBT* newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidNBTMetadataEntryErrorable, NBTMetadataEntry, "Invalid NBTMetadataEntry read");
 
   class ParticleMetadataEntry : public MetadataEntry {
    private:
-    AbstractParticle* value;
+    AbstractParticle* value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    ParticleMetadataEntry() = default;
     explicit ParticleMetadataEntry(AbstractParticle* value);
-    ParticleMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<ParticleMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     ~ParticleMetadataEntry() override;
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] AbstractParticle* GetValue() const;
     void SetValue(AbstractParticle* newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidParticleMetadataEntryErrorable, ParticleMetadataEntry, "Invalid ParticleMetadataEntry read");
 
   class VillagerDataMetadataEntry : public MetadataEntry {
    private:
-    VillagerType type;
-    VillagerProfession profession;
-    uint32_t level;
+    VillagerType type{};
+    VillagerProfession profession{};
+    uint32_t level{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    VillagerDataMetadataEntry() = default;
     VillagerDataMetadataEntry(const VillagerType& type, const VillagerProfession& profession, uint32_t level);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    VillagerDataMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<VillagerDataMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
@@ -484,6 +503,7 @@ namespace Ship {
     [[nodiscard]] uint32_t GetLevel() const;
     void SetLevel(uint32_t newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidVillagerDataMetadataEntryErrorable, VillagerDataMetadataEntry, "Invalid VillagerDataMetadataEntry read");
 
   class OptVarIntMetadataEntry : public MetadataEntry {
    private:
@@ -495,130 +515,138 @@ namespace Ship {
     OptVarIntMetadataEntry();
     explicit OptVarIntMetadataEntry(const std::optional<uint32_t>& optValue);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    OptVarIntMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<OptVarIntMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] std::optional<uint32_t> GetValue() const;
     void SetValue(const std::optional<uint32_t>& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidOptVarIntMetadataEntryErrorable, OptVarIntMetadataEntry, "Invalid OptVarIntMetadataEntry read");
 
   class PoseMetadataEntry : public MetadataEntry {
    private:
-    Pose value;
+    Pose value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    PoseMetadataEntry() = default;
     explicit PoseMetadataEntry(const Pose& value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    PoseMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<PoseMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] Pose GetValue() const;
     void SetValue(const Pose& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidPoseMetadataEntryErrorable, PoseMetadataEntry, "Invalid PoseMetadataEntry read");
 
   class CatVariantMetadataEntry : public MetadataEntry {
    private:
-    CatVariant value;
+    CatVariant value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    CatVariantMetadataEntry() = default;
     explicit CatVariantMetadataEntry(const CatVariant& value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    CatVariantMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<CatVariantMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] CatVariant GetValue() const;
     void SetValue(const CatVariant& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidCatVariantMetadataEntryErrorable, CatVariantMetadataEntry, "Invalid CatVariantMetadataEntry read");
 
   class FrogVariantMetadataEntry : public MetadataEntry {
    private:
-    FrogVariant value;
+    FrogVariant value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    FrogVariantMetadataEntry() = default;
     explicit FrogVariantMetadataEntry(const FrogVariant& value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    FrogVariantMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<FrogVariantMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] FrogVariant GetValue() const;
     void SetValue(const FrogVariant& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidFrogVariantMetadataEntryErrorable, FrogVariantMetadataEntry, "Invalid FrogVariantMetadataEntry read");
 
   class GlobalPosMetadataEntry : public MetadataEntry {
    private:
     std::string dimension;
-    int x;
-    int y;
-    int z;
+    Position position;
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
-    explicit GlobalPosMetadataEntry(std::string dimension, int x, int y, int z);
+    GlobalPosMetadataEntry() = default;
+    explicit GlobalPosMetadataEntry(std::string dimension, Position position);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    GlobalPosMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<GlobalPosMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] std::string GetDimension() const;
     void SetDimension(const std::string& value);
-    [[nodiscard]] int GetX() const;
-    void SetX(int value);
-    [[nodiscard]] int GetY() const;
-    void SetY(int value);
-    [[nodiscard]] int GetZ() const;
-    void SetZ(int value);
+    [[nodiscard]] Position GetPosition() const;
+    void SetPosition(Position value);
 
-    void Get(std::string& outDimension, int& outX, int& outY, int& outZ) const;
-    void Set(const std::string& newDimension, int newX, int newY, int newZ);
+    void Get(std::string& outDimension, Position& position) const;
+    void Set(const std::string& newDimension, Position position);
   };
+  CreateInvalidArgumentErrorable(InvalidGlobalPosMetadataEntryErrorable, GlobalPosMetadataEntry, "Invalid GlobalPosMetadataEntry read");
 
   class PaintingVariantMetadataEntry : public MetadataEntry {
    private:
-    PaintingVariant value;
+    PaintingVariant value{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::MetadataEntryRegistry.RegisterOrdinal();
 
+    PaintingVariantMetadataEntry() = default;
     explicit PaintingVariantMetadataEntry(const PaintingVariant& value);
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
-    PaintingVariantMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer);
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
+    static Errorable<PaintingVariantMetadataEntry> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
     [[nodiscard]] MetadataEntryType GetType() const override;
     [[nodiscard]] uint32_t GetOrdinal() const override;
 
     [[nodiscard]] PaintingVariant GetValue() const;
     void SetValue(const PaintingVariant& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidPaintingVariantMetadataEntryErrorable, PaintingVariantMetadataEntry, "Invalid PaintingVariantMetadataEntry read");
 
   class Metadata {
    private:
     std::map<uint8_t, MetadataEntry*> entries;
 
    public:
-    Metadata(const ProtocolVersion* version, ByteBuffer* buffer);
+    Metadata() = default;
+    Metadata(std::map<uint8_t, MetadataEntry*> entries);
+    static Errorable<Metadata> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
+
     virtual ~Metadata() {
       for (auto& entry : entries) {
         delete entry.second;
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const;
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const;
     [[nodiscard]] uint32_t Size(const ProtocolVersion* version) const;
 
     void Set(uint8_t index, MetadataEntry* value);
@@ -658,6 +686,7 @@ namespace Ship {
     bool GetGlobalPos(uint8_t index, std::string& dimension, int& x, int& y, int& z) const;
     [[nodiscard]] std::optional<PaintingVariant> GetPaintingVariant(uint8_t index) const;
   };
+  CreateInvalidArgumentErrorable(InvalidMetadataErrorable, Metadata, "Invalid Metadata read");
 
   extern const ConstructorRegistry<MetadataEntry> METADATA_ENTRY_REGISTRY;
 

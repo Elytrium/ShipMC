@@ -10,25 +10,25 @@ namespace Ship {
     SetPacketCallback(PreAuthPacketHandler, LoginPluginResponse, OnLoginPluginResponse);
   }
 
-  inline bool PreAuthPacketHandler::OnLoginStart(Connection* connection, const LoginStart& loginStart) {
+  inline Errorable<bool> PreAuthPacketHandler::OnLoginStart(Connection* connection, const LoginStart& loginStart) {
     AssertState(LoginState::LOGIN_PACKET_EXPECTED);
     currentState = LoginState::LOGIN_PACKET_RECEIVED;
     if (loginStart.HasSigData()) {
       if (loginStart.GetExpiry() > ShipUtils::GetCurrentMillis()) {
         client.DisconnectWithReason("multiplayer.disconnect.invalid_public_key_signature"); // TODO: translatable
-        return true;
+        return SuccessErrorable<bool>(true);
       }
 
       bool isKeyValid = true; // TODO: check if key is valid
 
       if (!isKeyValid) {
         client.DisconnectWithReason("multiplayer.disconnect.invalid_public_key"); // TODO: translatable
-        return true;
+        return SuccessErrorable<bool>(true);
       }
     } else if (client.GetMinecraftPipe()->GetProtocolVersion() >= &MinecraftProtocolVersion::MINECRAFT_1_19
                && client.GetMinecraftPipe()->GetProtocolVersion() < &MinecraftProtocolVersion::MINECRAFT_1_19_3 /*&& forceKeyAuthentication*/) {
       client.DisconnectWithReason("multiplayer.disconnect.missing_public_key"); // TODO: translatable
-      return true;
+      return SuccessErrorable<bool>(true);
     }
 
     client.SetPlayerKey();
@@ -60,21 +60,21 @@ namespace Ship {
       }();
     }();
 
-    return true;
+    return SuccessErrorable<bool>(true);
   }
 
-  inline bool PreAuthPacketHandler::OnEncryptionResponse(Connection* connection, const EncryptionResponse& serverLogin) {
+  inline Errorable<bool> PreAuthPacketHandler::OnEncryptionResponse(Connection* connection, const EncryptionResponse& serverLogin) {
     AssertState(LoginState::ENCRYPTION_REQUEST_SENT);
     currentState = LoginState::ENCRYPTION_RESPONSE_RECEIVED;
 
     // TODO: verify and replace main packet handler
 
-    return true;
+    return SuccessErrorable<bool>(true);
   }
 
-  bool PreAuthPacketHandler::OnLoginPluginResponse(Connection* connection, const LoginPluginResponse& serverLogin) {
+  inline Errorable<bool> PreAuthPacketHandler::OnLoginPluginResponse(Connection* connection, const LoginPluginResponse& serverLogin) {
     // TODO: handle plugin messages in loginClient
-    return true;
+    return SuccessErrorable<bool>(true);
   }
 
   void PreAuthPacketHandler::AssertState(LoginState expected) {

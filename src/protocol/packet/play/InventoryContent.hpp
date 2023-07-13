@@ -44,7 +44,7 @@ namespace Ship {
       }
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteByte(windowId);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17_1) {
         buffer->WriteVarInt(stateId);
@@ -60,6 +60,7 @@ namespace Ship {
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17_1) {
         carriedItem.Write(version, buffer);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

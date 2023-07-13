@@ -29,9 +29,10 @@ namespace Ship {
       data = new ByteBufferImpl(buffer->ReadBytes(size), size);
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(channel);
       buffer->WriteBytes(buffer, buffer->GetReadableBytes());
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

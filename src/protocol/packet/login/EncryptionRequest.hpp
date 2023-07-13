@@ -28,7 +28,8 @@ namespace Ship {
       delete verifyToken;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+      return SuccessErrorable<bool>(true);
     }
 
     const std::string& GetServerId() const {

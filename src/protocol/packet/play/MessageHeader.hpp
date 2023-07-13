@@ -19,7 +19,8 @@ namespace Ship {
     static Errorable<MessageHeader> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       delete precedingSignature;
-      if (buffer->ReadBoolean()) {
+      ProceedErrorable(hasSignature, bool, buffer->ReadBoolean(), ss)
+      if (hasSignature) {
         uint32_t size = buffer->GetReadableBytes() - ByteBuffer::UUID_SIZE;
         precedingSignature = new ByteBufferImpl(buffer->ReadBytes(size), size);
       } else {
@@ -32,12 +33,13 @@ namespace Ship {
       delete precedingSignature;
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteBoolean(precedingSignature);
       if (precedingSignature) {
         buffer->WriteBytes(precedingSignature, precedingSignature->GetReadableBytes());
       }
       buffer->WriteUUID(sender);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

@@ -5,8 +5,9 @@ namespace Ship {
   ItemParticle::ItemParticle(const ItemStack& item) : item(item) {
   }
 
-  void ItemParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> ItemParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     item.Write(version, buffer);
+    return SuccessErrorable<bool>(true);
   }
 
   ItemParticle::ItemParticle(const ProtocolVersion* version, ByteBuffer* buffer) {

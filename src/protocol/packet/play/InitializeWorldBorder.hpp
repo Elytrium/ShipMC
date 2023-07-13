@@ -39,7 +39,7 @@ namespace Ship {
       ProceedErrorable(warningTime, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
     }
 
-    void Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteDouble(x);
       buffer->WriteDouble(z);
       buffer->WriteDouble(oldDiameter);
@@ -48,6 +48,7 @@ namespace Ship {
       buffer->WriteVarInt(portalTeleportBoundary);
       buffer->WriteVarInt(warningBlocks);
       buffer->WriteVarInt(warningTime);
+      return SuccessErrorable<bool>(true);
     }
 
     uint32_t GetOrdinal() const override {

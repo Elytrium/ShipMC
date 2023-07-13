@@ -1,16 +1,19 @@
+#include "../../../ProtocolUtils.hpp"
 #include "Metadata.hpp"
 
 namespace Ship {
 
-  PositionMetadataEntry::PositionMetadataEntry(int x, int y, int z) : x(x), y(y), z(z) {
+  PositionMetadataEntry::PositionMetadataEntry(Position position) : position(position) {
   }
 
-  void PositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
-    buffer->WritePosition(x, y, z);
+  Errorable<bool> PositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+    ProtocolUtils::WritePosition(version, buffer, position);
+    return SuccessErrorable<bool>(true);
   }
 
-  PositionMetadataEntry::PositionMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    buffer->ReadPosition(x, y, z);
+  Errorable<PositionMetadataEntry> PositionMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(position, Position, ProtocolUtils::ReadPosition(version, buffer), InvalidPositionMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<PositionMetadataEntry>(PositionMetadataEntry(position));
   }
 
   MetadataEntryType PositionMetadataEntry::GetType() const {
@@ -21,39 +24,19 @@ namespace Ship {
     return ORDINAL;
   }
 
-  int PositionMetadataEntry::GetX() const {
-    return x;
+  Position PositionMetadataEntry::GetPosition() const {
+    return position;
   }
 
-  void PositionMetadataEntry::SetX(int value) {
-    x = value;
+  void PositionMetadataEntry::SetPosition(Position value) {
+    position = value;
   }
 
-  int PositionMetadataEntry::GetY() const {
-    return y;
+  void PositionMetadataEntry::Get(Position& out) const {
+    out = position;
   }
 
-  void PositionMetadataEntry::SetY(int value) {
-    y = value;
-  }
-
-  int PositionMetadataEntry::GetZ() const {
-    return z;
-  }
-
-  void PositionMetadataEntry::SetZ(int value) {
-    z = value;
-  }
-
-  void PositionMetadataEntry::Get(int& outX, int& outY, int& outZ) const {
-    outX = x;
-    outY = y;
-    outZ = z;
-  }
-
-  void PositionMetadataEntry::Set(int newX, int newY, int newZ) {
-    x = newX;
-    y = newY;
-    z = newZ;
+  void PositionMetadataEntry::Set(Position newPosition) {
+    position = newPosition;
   }
 }

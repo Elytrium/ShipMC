@@ -7,7 +7,7 @@ file(GLOB_RECURSE SHIP_NET_SOURCES src/*.[hc]pp lib/*.[hc]pp)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
-set(CMAKE_CXX_FLAGS "-O2 -fPIC -fomit-frame-pointer -funroll-loops -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fstack-clash-protection -fPIE -Wall -Werror -Wno-unused-command-line-argument")
+set(CMAKE_CXX_FLAGS "-O2 -fPIC -fomit-frame-pointer -funroll-loops -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fstack-clash-protection -fPIE -Wall -Werror -Wno-unused-command-line-argument -fno-exceptions")
 set(LDFLAGS "-fuse-ld=lld")
 
 set(LIB_OUTPUT_DIR ${CMAKE_BINARY_DIR}/bin)

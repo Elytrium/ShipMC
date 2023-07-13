@@ -6,20 +6,22 @@ namespace Ship {
   ParticleMetadataEntry::ParticleMetadataEntry(Ship::AbstractParticle* value) : value(value) {
   }
 
-  ParticleMetadataEntry::ParticleMetadataEntry(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = ProtocolUtils::ReadParticle(version, buffer);
+  Errorable<ParticleMetadataEntry> ParticleMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(value, AbstractParticle*, ProtocolUtils::ReadParticle(version, buffer), InvalidParticleMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<ParticleMetadataEntry>(ParticleMetadataEntry(value));
   }
 
   ParticleMetadataEntry::~ParticleMetadataEntry() {
     delete value;
   }
 
-  void ParticleMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
+  Errorable<bool> ParticleMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     if (value) {
       ProtocolUtils::WriteParticle(version, buffer, value);
     } else {
       buffer->WriteByte(0xFF);
     }
+    return SuccessErrorable<bool>(true);
   }
 
   MetadataEntryType ParticleMetadataEntry::GetType() const {
