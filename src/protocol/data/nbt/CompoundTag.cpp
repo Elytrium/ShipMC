@@ -19,19 +19,20 @@ namespace Ship {
     delete end;
   }
 
-  void CompoundTag::Read(ByteBuffer* buffer) {
+  Errorable<bool> CompoundTag::Read(ByteBuffer* buffer) {
     for (const auto& item : map) {
       delete item.second;
     }
 
     map.clear();
-    NBT* nbt = ProtocolUtils::ReadNBT(buffer);
+    ProceedErrorable(nbt, NBT*, ProtocolUtils::ReadNBT(buffer), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
     while (nbt->GetType() != TagType::END) {
       map.emplace(nbt->GetName(), nbt);
-      nbt = ProtocolUtils::ReadNBT(buffer);
+      SetFromErrorable(nbt, NBT*, ProtocolUtils::ReadNBT(buffer), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
     }
 
     delete nbt;
+    return SuccessErrorable<bool>(true);
   }
 
   uint32_t CompoundTag::GetSize() {

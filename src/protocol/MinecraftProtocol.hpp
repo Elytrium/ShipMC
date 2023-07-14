@@ -48,7 +48,58 @@ namespace Ship {
       this->z = _z;
     }
   };
-  CreateInvalidArgumentErrorable(InvalidPositionErrorable, Position, "Invalid position read");
+  CreateInvalidArgumentErrorable(InvalidPositionErrorable, Position, "Invalid Position value read");
+
+  class Rotation {
+   private:
+    float x, y, z;
+
+   public:
+    Rotation() : x(0), y(0), z(0) {
+    }
+
+    Rotation(float x, float y, float z) : x(x), y(y), z(z) {
+    }
+
+    [[nodiscard]] float GetX() const {
+      return x;
+    }
+    [[nodiscard]] float GetY() const {
+      return y;
+    }
+    [[nodiscard]] float GetZ() const {
+      return z;
+    }
+
+    void SetX(float _x) {
+      this->x = _x;
+    }
+
+    void SetY(float _y) {
+      this->y = _y;
+    }
+
+    void SetZ(float _z) {
+      this->z = _z;
+    }
+  };
+  CreateInvalidArgumentErrorable(InvalidRotationErrorable, Rotation, "Invalid Rotation value read");
+
+  class GlobalPos {
+   private:
+    std::string dimension;
+    Position position{};
+   public:
+    GlobalPos() = default;
+
+    GlobalPos(std::string dimension, const Position& position);
+
+    [[nodiscard]] const std::string& GetDimension() const;
+    void SetDimension(const std::string& dimension);
+    const Position& GetPosition() const;
+    void SetPosition(const Position& position);
+  };
+  CreateInvalidArgumentErrorable(InvalidGlobalPosErrorable, GlobalPos, "Invalid GlobalPos value read");
 
   class MinecraftProtocolVersion {
    public:

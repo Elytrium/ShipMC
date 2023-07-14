@@ -10,8 +10,9 @@ namespace Ship {
     return SuccessErrorable<bool>(true);
   }
 
-  BlockMarkerParticle::BlockMarkerParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    blockState = buffer->ReadVarInt();
+  Errorable<BlockMarkerParticle> BlockMarkerParticle::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(blockState, uint32_t, buffer->ReadVarInt(), InvalidBlockMarkerParticleErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<BlockMarkerParticle>(BlockMarkerParticle(blockState));
   }
 
   std::string BlockMarkerParticle::GetIdentifier() const {

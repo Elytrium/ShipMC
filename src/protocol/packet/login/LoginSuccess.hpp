@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../ProtocolUtils.hpp"
 #include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include "../../data/profile/GameProfile.hpp"
 #include <string>
@@ -18,6 +19,12 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    LoginSuccess() = default;
+
+    LoginSuccess(const UUID& uuid, std::string username)
+      : uuid(uuid), username(std::move(username)) {
+    }
+
     LoginSuccess(const UUID& uuid, std::string username, std::vector<GameProfileProperty> properties)
       : uuid(uuid), username(std::move(username)), properties(std::move(properties)) {
     }
@@ -25,17 +32,23 @@ namespace Ship {
     static Errorable<LoginSuccess> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
+      UUID uuid;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<LoginSuccess>(PACKET_ORDINAL))
       } else if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
-        uuid = buffer->ReadUUIDIntArray();
+        SetFromErrorable(uuid, UUID, buffer->ReadUUIDIntArray(), InvalidPacketErrorable<LoginSuccess>(PACKET_ORDINAL))
       } else {
-        uuid = UUID(buffer->ReadString(36));
+        ProceedErrorable(uuidString, std::string, buffer->ReadString(36), InvalidPacketErrorable<LoginSuccess>(PACKET_ORDINAL))
+        SetFromErrorable(uuid, UUID, UUID::Instantiate(uuidString), InvalidPacketErrorable<LoginSuccess>(PACKET_ORDINAL))
       }
 
-      ProceedErrorable(username, std::string, buffer->ReadString(MAXIMUM_USERNAME_SIZE), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(username, std::string, buffer->ReadString(MAXIMUM_USERNAME_SIZE), InvalidPacketErrorable<LoginSuccess>(PACKET_ORDINAL))
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        properties = buffer->ReadProperties();
+        ProceedErrorable(properties, std::vector<GameProfileProperty>,
+          ProtocolUtils::ReadProperties(buffer), InvalidPacketErrorable<LoginSuccess>(PACKET_ORDINAL))
+        return SuccessErrorable<LoginSuccess>(LoginSuccess(uuid, username, properties));
+      } else {
+        return SuccessErrorable<LoginSuccess>(LoginSuccess(uuid, username));
       }
     }
 
@@ -52,7 +65,7 @@ namespace Ship {
 
       buffer->WriteString(username);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        buffer->WriteProperties(properties);
+        ProtocolUtils::WriteProperties(buffer, properties);
       }
       return SuccessErrorable<bool>(true);
     }

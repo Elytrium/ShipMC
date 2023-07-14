@@ -10,8 +10,9 @@ namespace Ship {
     return SuccessErrorable<bool>(true);
   }
 
-  FallingDustParticle::FallingDustParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    blockState = buffer->ReadVarInt();
+  Errorable<FallingDustParticle> FallingDustParticle::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(blockState, uint32_t, buffer->ReadVarInt(), InvalidFallingDustParticleErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<FallingDustParticle>(FallingDustParticle(blockState));
   }
 
   std::string FallingDustParticle::GetIdentifier() const {

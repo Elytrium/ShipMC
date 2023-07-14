@@ -2,21 +2,28 @@
 
 namespace Ship {
 
-  VillagerDataMetadataEntry::VillagerDataMetadataEntry(const VillagerType& type, const VillagerProfession& profession, uint32_t level)
-    : type(type), profession(profession), level(level) {
+  VillagerDataMetadataEntry::VillagerDataMetadataEntry(VillagerData value) : value(value) {
   }
 
   Errorable<bool> VillagerDataMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
-    buffer->WriteVarInt(VILLAGER_TYPE_REGISTRY.GetID(version, type));
-    buffer->WriteVarInt(VILLAGER_PROFESSION_REGISTRY.GetID(version, profession));
-    buffer->WriteVarInt(level);
+    ProceedErrorable(typeID, uint32_t, VILLAGER_TYPE_REGISTRY.GetID(version, value.GetType()), InvalidSerializableWriteErrorable(buffer->GetReadableBytes()))
+    buffer->WriteVarInt(typeID);
+    ProceedErrorable(professionID, uint32_t, VILLAGER_PROFESSION_REGISTRY.GetID(version, value.GetProfession()), InvalidSerializableWriteErrorable(buffer->GetReadableBytes()))
+    buffer->WriteVarInt(professionID);
+    buffer->WriteVarInt(value.GetLevel());
     return SuccessErrorable<bool>(true);
   }
 
   Errorable<VillagerDataMetadataEntry> VillagerDataMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
-    type = VILLAGER_TYPE_REGISTRY.GetValue(version, buffer->ReadVarInt());
-    profession = VILLAGER_PROFESSION_REGISTRY.GetValue(version, buffer->ReadVarInt());
-    level = buffer->ReadVarInt();
+    ProceedErrorable(typeID, uint32_t, buffer->ReadVarInt(), InvalidVillagerDataMetadataEntryErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(type, VillagerType, VILLAGER_TYPE_REGISTRY.GetValue(version, typeID), InvalidVillagerDataMetadataEntryErrorable(buffer->GetReadableBytes()))
+
+    ProceedErrorable(professionID, uint32_t, buffer->ReadVarInt(), InvalidVillagerDataMetadataEntryErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(profession, VillagerProfession, VILLAGER_PROFESSION_REGISTRY.GetValue(version, professionID), InvalidVillagerDataMetadataEntryErrorable(buffer->GetReadableBytes()))
+
+    ProceedErrorable(level, uint32_t, buffer->ReadVarInt(), InvalidVillagerDataMetadataEntryErrorable(buffer->GetReadableBytes()))
+
+    return SuccessErrorable<VillagerDataMetadataEntry>(VillagerDataMetadataEntry({type, profession, level}));
   }
 
   MetadataEntryType VillagerDataMetadataEntry::GetType() const {
@@ -27,27 +34,11 @@ namespace Ship {
     return ORDINAL;
   }
 
-  VillagerType VillagerDataMetadataEntry::GetVillagerType() const {
-    return type;
+  VillagerData VillagerDataMetadataEntry::GetValue() const {
+    return value;
   }
 
-  void VillagerDataMetadataEntry::SetVillagerType(VillagerType newValue) {
-    type = newValue;
-  }
-
-  VillagerProfession VillagerDataMetadataEntry::GetProfession() const {
-    return profession;
-  }
-
-  void VillagerDataMetadataEntry::SetProfession(VillagerProfession newValue) {
-    profession = newValue;
-  }
-
-  uint32_t VillagerDataMetadataEntry::GetLevel() const {
-    return level;
-  }
-
-  void VillagerDataMetadataEntry::SetLevel(uint32_t newValue) {
-    level = newValue;
+  void VillagerDataMetadataEntry::SetValue(VillagerData newValue) {
+    value = newValue;
   }
 }

@@ -7,14 +7,15 @@ namespace Ship {
 
   class EntityRotation : public Packet {
    private:
-    uint32_t entityId;
-    float yaw;
-    float pitch;
-    bool onGround;
+    uint32_t entityId{};
+    float yaw{};
+    float pitch{};
+    bool onGround{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    EntityRotation() = default;
     EntityRotation(uint32_t entityId, float yaw, float pitch, bool onGround) : entityId(entityId), yaw(yaw), pitch(pitch), onGround(onGround) {
     }
 
@@ -22,10 +23,11 @@ namespace Ship {
 
     static Errorable<EntityRotation> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      yaw = buffer->ReadAngle();
-      pitch = buffer->ReadAngle();
-      ProceedErrorable(onGround, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<EntityRotation>(PACKET_ORDINAL))
+      ProceedErrorable(yaw, float, buffer->ReadAngle(), InvalidPacketErrorable<EntityRotation>(PACKET_ORDINAL));
+      ProceedErrorable(pitch, float, buffer->ReadAngle(), InvalidPacketErrorable<EntityRotation>(PACKET_ORDINAL));
+      ProceedErrorable(onGround, bool, buffer->ReadBoolean(), InvalidPacketErrorable<EntityRotation>(PACKET_ORDINAL))
+      return SuccessErrorable<EntityRotation>(EntityRotation(entityId, yaw, pitch, onGround));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

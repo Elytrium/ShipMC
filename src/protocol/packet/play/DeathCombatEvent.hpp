@@ -8,13 +8,14 @@ namespace Ship {
 
   class DeathCombatEvent : public Packet {
    private:
-    uint32_t playerId;
-    uint32_t entityId;
+    uint32_t playerId{};
+    uint32_t entityId{};
     std::string message;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    DeathCombatEvent() = default;
     DeathCombatEvent(uint32_t playerId, uint32_t entityId, std::string message) : playerId(playerId), entityId(entityId), message(std::move(message)) {
     }
 
@@ -22,9 +23,10 @@ namespace Ship {
 
     static Errorable<DeathCombatEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(playerId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      entityId = buffer->ReadInt();
-      ProceedErrorable(message, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(playerId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<DeathCombatEvent>(PACKET_ORDINAL))
+      ProceedErrorable(entityId, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<DeathCombatEvent>(PACKET_ORDINAL))
+      ProceedErrorable(message, std::string, buffer->ReadString(), InvalidPacketErrorable<DeathCombatEvent>(PACKET_ORDINAL))
+      return SuccessErrorable<DeathCombatEvent>(DeathCombatEvent(playerId, entityId, message));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

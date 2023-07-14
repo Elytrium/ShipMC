@@ -10,8 +10,9 @@ namespace Ship {
     return SuccessErrorable<bool>(true);
   }
 
-  ItemParticle::ItemParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    item = ItemStack(version, buffer);
+  Errorable<ItemParticle> ItemParticle::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(item, ItemStack, ItemStack::Instantiate(version, buffer), InvalidItemParticleErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<ItemParticle>(ItemParticle(item));
   }
 
   std::string ItemParticle::GetIdentifier() const {

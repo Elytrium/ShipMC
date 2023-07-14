@@ -7,11 +7,12 @@ namespace Ship {
 
   class OpenBook : public Packet {
    private:
-    uint32_t hand;
+    uint32_t hand{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    OpenBook() = default;
     explicit OpenBook(uint32_t hand) : hand(hand) {
     }
 
@@ -19,7 +20,8 @@ namespace Ship {
 
     static Errorable<OpenBook> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(hand, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(hand, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<OpenBook>(PACKET_ORDINAL))
+      return SuccessErrorable<OpenBook>(OpenBook(hand));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

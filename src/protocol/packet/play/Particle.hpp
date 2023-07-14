@@ -7,20 +7,21 @@ namespace Ship {
 
   class Particle : public Packet {
    private:
-    AbstractParticle* particle;
-    bool longDistance;
-    double x;
-    double y;
-    double z;
-    float offsetX;
-    float offsetY;
-    float offsetZ;
-    float maxSpeed;
-    uint32_t particleCount;
+    AbstractParticle* particle{};
+    bool longDistance{};
+    double x{};
+    double y{};
+    double z{};
+    float offsetX{};
+    float offsetY{};
+    float offsetZ{};
+    float maxSpeed{};
+    uint32_t particleCount{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    Particle() = default;
     Particle(AbstractParticle* particle, bool longDistance, double x, double y, double z, float offsetX, float offsetY, float offsetZ, float maxSpeed,
       uint32_t particleCount)
       : particle(particle), longDistance(longDistance), x(x), y(y), z(z), offsetX(offsetX), offsetY(offsetY), offsetZ(offsetZ), maxSpeed(maxSpeed),
@@ -36,31 +37,33 @@ namespace Ship {
       const ProtocolVersion* version = holder.GetVersion();
       uint32_t particleId;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        ProceedErrorable(particleId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(particleId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
       } else {
-        particleId = buffer->ReadInt();
+        SetFromErrorable(particleId, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
       }
-      delete particle;
-      ProceedErrorable(longDistance, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(longDistance, bool, buffer->ReadBoolean(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+
+      double x, y, z;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
-        ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+        SetFromErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+        SetFromErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
       } else {
-        ProceedErrorable(x, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(y, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(z, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(x, float, buffer->ReadFloat(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+        SetFromErrorable(y, float, buffer->ReadFloat(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+        SetFromErrorable(z, float, buffer->ReadFloat(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
       }
-      ProceedErrorable(offsetX, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(offsetY, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(offsetZ, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(maxSpeed, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      particleCount = buffer->ReadInt();
-      particle = PARTICLE_REGISTRY.GetObjectByID(version, particleId, buffer);
+      ProceedErrorable(offsetX, float, buffer->ReadFloat(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+      ProceedErrorable(offsetY, float, buffer->ReadFloat(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+      ProceedErrorable(offsetZ, float, buffer->ReadFloat(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+      ProceedErrorable(maxSpeed, float, buffer->ReadFloat(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+      ProceedErrorable(particleCount, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+      ProceedErrorable(particle, AbstractParticle*, PARTICLE_REGISTRY.GetObjectByID(version, particleId, buffer), InvalidPacketErrorable<Particle>(PACKET_ORDINAL))
+      return SuccessErrorable<Particle>(Particle(particle, longDistance, x, y, z, offsetX, offsetY, offsetZ, maxSpeed, particleCount));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      uint32_t particleId = PARTICLE_REGISTRY.GetIDByOrdinal(version, particle->GetOrdinal());
+      ProceedErrorable(particleId, uint32_t, PARTICLE_REGISTRY.GetIDByOrdinal(version, particle->GetOrdinal()), InvalidSerializableWriteErrorable(buffer->GetReadableBytes()))
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteVarInt(particleId);
       } else {

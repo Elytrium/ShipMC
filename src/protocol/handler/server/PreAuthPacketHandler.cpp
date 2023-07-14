@@ -49,7 +49,12 @@ namespace Ship {
         client.GetConnection()->GetEventLoop()->Execute([&]() {
           if (/*!event.IsForceOfflineMode() && (isOnlineMode || event.IsOnlineModeAllowed())*/ false) {
             EncryptionRequest request = EncryptionRequest("", {}, {}); // TODO: public key / rnd verify token
-            verifyToken = request.GetVerifyToken()->ReadInt(); // TODO: check buffer size
+            Errorable<uint32_t> verifyTokenErrorable = request.GetVerifyToken()->ReadInt();
+            if (!verifyTokenErrorable.IsSuccess()) {
+              client.GetConnection()->GetReadWriteCloser()->Close();
+              return;
+            }
+            verifyToken = verifyTokenErrorable.GetValue(); // TODO: check buffer size
             client.GetConnection()->Write(request);
             currentState = LoginState::ENCRYPTION_REQUEST_SENT;
           } else {

@@ -3,17 +3,17 @@
 
 namespace Ship {
 
-  PositionMetadataEntry::PositionMetadataEntry(Position position) : position(position) {
+  PositionMetadataEntry::PositionMetadataEntry(Position position) : value(position) {
   }
 
   Errorable<bool> PositionMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
-    ProtocolUtils::WritePosition(version, buffer, position);
+    ProtocolUtils::WritePosition(version, buffer, value);
     return SuccessErrorable<bool>(true);
   }
 
   Errorable<PositionMetadataEntry> PositionMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
-    ProceedErrorable(position, Position, ProtocolUtils::ReadPosition(version, buffer), InvalidPositionMetadataEntryErrorable(buffer->GetReadableBytes()))
-    return SuccessErrorable<PositionMetadataEntry>(PositionMetadataEntry(position));
+    ProceedErrorable(value, Position, ProtocolUtils::ReadPosition(version, buffer), InvalidPositionMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<PositionMetadataEntry>(PositionMetadataEntry(value));
   }
 
   MetadataEntryType PositionMetadataEntry::GetType() const {
@@ -24,19 +24,11 @@ namespace Ship {
     return ORDINAL;
   }
 
-  Position PositionMetadataEntry::GetPosition() const {
-    return position;
+  Position PositionMetadataEntry::GetValue() const {
+    return value;
   }
 
-  void PositionMetadataEntry::SetPosition(Position value) {
-    position = value;
-  }
-
-  void PositionMetadataEntry::Get(Position& out) const {
-    out = position;
-  }
-
-  void PositionMetadataEntry::Set(Position newPosition) {
-    position = newPosition;
+  void PositionMetadataEntry::SetValue(Position newValue) {
+    value = newValue;
   }
 }

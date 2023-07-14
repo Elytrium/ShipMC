@@ -7,19 +7,21 @@ namespace Ship {
 
   class HideMessage : public Packet {
    private:
-    ByteBuffer* signature;
+    ByteBuffer* signature{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    HideMessage() = default;
     explicit HideMessage(ByteBuffer* signature) : signature(signature) {
     }
 
     static Errorable<HideMessage> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       uint32_t size = buffer->GetReadableBytes();
-      delete signature;
-      signature = new ByteBufferImpl(buffer->ReadBytes(size), size);
+      ProceedErrorable(bytes, uint8_t*, buffer->ReadBytes(size), InvalidPacketErrorable<HideMessage>(PACKET_ORDINAL))
+      ByteBuffer* signature = new ByteBufferImpl(bytes, size);
+      return SuccessErrorable<HideMessage>(HideMessage(signature));
     }
 
     ~HideMessage() override {

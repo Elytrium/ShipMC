@@ -9,17 +9,18 @@ namespace Ship {
   class CustomSoundEffect : public Packet {
    private:
     std::string soundName;
-    uint32_t soundCategory;
-    uint32_t effectPositionX;
-    uint32_t effectPositionY;
-    uint32_t effectPositionZ;
-    float volume;
-    float pitch;
-    uint64_t seed;
+    uint32_t soundCategory{};
+    uint32_t effectPositionX{};
+    uint32_t effectPositionY{};
+    uint32_t effectPositionZ{};
+    float volume{};
+    float pitch{};
+    uint64_t seed{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    CustomSoundEffect() = default;
     CustomSoundEffect(std::string soundName, uint32_t soundCategory, uint32_t effectPositionX, uint32_t effectPositionY, uint32_t effectPositionZ,
       float volume, float pitch, uint64_t seed)
       : soundName(std::move(soundName)), soundCategory(soundCategory), effectPositionX(effectPositionX), effectPositionY(effectPositionY),
@@ -31,16 +32,20 @@ namespace Ship {
     static Errorable<CustomSoundEffect> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      ProceedErrorable(soundName, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(soundCategory, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      effectPositionX = buffer->ReadInt();
-      effectPositionY = buffer->ReadInt();
-      effectPositionZ = buffer->ReadInt();
-      ProceedErrorable(volume, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(pitch, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(soundName, std::string, buffer->ReadString(), InvalidPacketErrorable<CustomSoundEffect>(PACKET_ORDINAL))
+      ProceedErrorable(soundCategory, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<CustomSoundEffect>(PACKET_ORDINAL))
+      ProceedErrorable(effectPositionX, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<CustomSoundEffect>(PACKET_ORDINAL))
+      ProceedErrorable(effectPositionY, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<CustomSoundEffect>(PACKET_ORDINAL))
+      ProceedErrorable(effectPositionZ, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<CustomSoundEffect>(PACKET_ORDINAL))
+      ProceedErrorable(volume, float, buffer->ReadFloat(), InvalidPacketErrorable<CustomSoundEffect>(PACKET_ORDINAL))
+      ProceedErrorable(pitch, float, buffer->ReadFloat(), InvalidPacketErrorable<CustomSoundEffect>(PACKET_ORDINAL))
+
+      uint64_t seed = 0;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        ProceedErrorable(seed, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(seed, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<CustomSoundEffect>(PACKET_ORDINAL))
       }
+
+      return SuccessErrorable<CustomSoundEffect>(CustomSoundEffect(soundName, soundCategory, effectPositionX, effectPositionY, effectPositionZ, volume, pitch, seed));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

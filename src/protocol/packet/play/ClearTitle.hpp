@@ -12,6 +12,7 @@ namespace Ship {
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    ClearTitle() = default;
     explicit ClearTitle(bool reset) : reset(reset) {
     }
 
@@ -19,7 +20,8 @@ namespace Ship {
 
     static Errorable<ClearTitle> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(reset, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(reset, bool, buffer->ReadBoolean(), InvalidPacketErrorable<ClearTitle>(PACKET_ORDINAL))
+      return SuccessErrorable<ClearTitle>(ClearTitle(reset));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -27,7 +29,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

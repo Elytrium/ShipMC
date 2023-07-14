@@ -43,7 +43,15 @@ namespace Ship {
   }
 
   void ChunkSection::SetBlock(int32_t posX, int32_t posY, int32_t posZ, Block block) {
-    blocks[GetBlockIndex(posX, posY, posZ)] = block;
+    uint32_t blockIndex = GetBlockIndex(posX, posY, posZ);
+
+    if (blocks[blockIndex].GetId() && !block.GetId()) {
+      blockIndex--;
+    } else if (!blocks[blockIndex].GetId() && block.GetId()) {
+      blockIndex++;
+    }
+
+    blocks[blockIndex] = block;
   }
 
   void ChunkSection::SetBiome(int32_t posX, int32_t posY, int32_t posZ, Biome* biome) {
@@ -127,12 +135,12 @@ namespace Ship {
     return sections[GetSectionIndex(posY)].GetBiome(posX, posY & 15, posZ);
   }
 
-  ChunkSection& Chunk::GetSection(uint32_t index) {
+  Errorable<ChunkSection*> Chunk::GetSection(uint32_t index) {
     if (index > sectionsAmount) {
-      throw InvalidArgumentException("Invalid section index: ", index);
+      return InvalidChunkSectionIndexErrorable(index);
     }
 
-    return sections[index];
+    return SuccessErrorable<ChunkSection*>(&sections[index]);
   }
   uint32_t Chunk::GetChunkPosX() const {
     return chunkPosX;

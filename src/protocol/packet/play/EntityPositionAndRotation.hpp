@@ -7,18 +7,19 @@ namespace Ship {
 
   class EntityPositionAndRotation : public Packet {
    private:
-    uint32_t entityId;
-    uint16_t deltaX;
-    uint16_t deltaY;
-    uint16_t deltaZ;
-    float yaw;
-    float pitch;
-    bool onGround;
+    uint32_t entityId{};
+    uint16_t deltaX{};
+    uint16_t deltaY{};
+    uint16_t deltaZ{};
+    float yaw{};
+    float pitch{};
+    bool onGround{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    EntityPositionAndRotation(uint32_t entityId, short deltaX, short deltaY, short deltaZ, float yaw, float pitch, bool onGround)
+    EntityPositionAndRotation() = default;
+    EntityPositionAndRotation(uint32_t entityId, uint16_t deltaX, uint16_t deltaY, uint16_t deltaZ, float yaw, float pitch, bool onGround)
       : entityId(entityId), deltaX(deltaX), deltaY(deltaY), deltaZ(deltaZ), yaw(yaw), pitch(pitch), onGround(onGround) {
     }
 
@@ -26,13 +27,14 @@ namespace Ship {
 
     static Errorable<EntityPositionAndRotation> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(deltaX, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(deltaY, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(deltaZ, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      yaw = buffer->ReadAngle();
-      pitch = buffer->ReadAngle();
-      ProceedErrorable(onGround, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<EntityPositionAndRotation>(PACKET_ORDINAL))
+      ProceedErrorable(deltaX, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<EntityPositionAndRotation>(PACKET_ORDINAL))
+      ProceedErrorable(deltaY, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<EntityPositionAndRotation>(PACKET_ORDINAL))
+      ProceedErrorable(deltaZ, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<EntityPositionAndRotation>(PACKET_ORDINAL))
+      ProceedErrorable(yaw, float, buffer->ReadAngle(), InvalidPacketErrorable<EntityPositionAndRotation>(PACKET_ORDINAL));
+      ProceedErrorable(pitch, float, buffer->ReadAngle(), InvalidPacketErrorable<EntityPositionAndRotation>(PACKET_ORDINAL));
+      ProceedErrorable(onGround, bool, buffer->ReadBoolean(), InvalidPacketErrorable<EntityPositionAndRotation>(PACKET_ORDINAL))
+      return SuccessErrorable<EntityPositionAndRotation>(EntityPositionAndRotation(entityId, deltaX, deltaY, deltaZ, yaw, pitch, onGround));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -46,7 +48,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

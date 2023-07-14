@@ -9,11 +9,12 @@ namespace Ship {
   class PluginMessage : public Packet {
    private:
     std::string channel;
-    ByteBuffer* data;
+    ByteBuffer* data{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    PluginMessage() = default;
     PluginMessage(std::string channel, ByteBuffer* data) : channel(std::move(channel)), data(data) {
     }
 
@@ -23,10 +24,11 @@ namespace Ship {
 
     static Errorable<PluginMessage> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(channel, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      delete data;
+      ProceedErrorable(channel, std::string, buffer->ReadString(), InvalidPacketErrorable<PluginMessage>(PACKET_ORDINAL))
       uint32_t size = buffer->GetReadableBytes();
-      data = new ByteBufferImpl(buffer->ReadBytes(size), size);
+      ProceedErrorable(bytes, uint8_t*, buffer->ReadBytes(size), InvalidPacketErrorable<PluginMessage>(PACKET_ORDINAL))
+      ByteBuffer* data = new ByteBufferImpl(bytes, size);
+      return SuccessErrorable<PluginMessage>(PluginMessage(channel, data));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

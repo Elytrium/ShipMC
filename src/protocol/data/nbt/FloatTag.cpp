@@ -7,8 +7,9 @@ namespace Ship {
   FloatTag::FloatTag(const std::string& name, float value) : NBT(name), value(value) {
   }
 
-  void FloatTag::Read(ByteBuffer* buffer) {
-    ProceedErrorable(value, ss, buffer->ReadFloat, ss)
+  Errorable<bool> FloatTag::Read(ByteBuffer* buffer) {
+    SetFromErrorable(value, float, buffer->ReadFloat(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<bool>(true);
   }
 
   void FloatTag::Write(ByteBuffer* buffer) {

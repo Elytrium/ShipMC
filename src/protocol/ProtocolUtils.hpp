@@ -14,12 +14,16 @@ namespace Ship {
     static void WriteNBT(ByteBuffer* buffer, NBT* nbt);
     static Errorable<bool> WriteParticle(const ProtocolVersion* version, ByteBuffer* buffer, AbstractParticle* particle);
     static void WriteMetadata(const ProtocolVersion* version, ByteBuffer* buffer, Metadata* metadata);
+    static void WriteGlobalPos(const ProtocolVersion* version, ByteBuffer* buffer, const GlobalPos& position);
     static void WritePosition(const ProtocolVersion* version, ByteBuffer* buffer, Position position);
+    static void WriteRotation(const ProtocolVersion* version, ByteBuffer* buffer, Rotation rotation);
 
     static Errorable<NBT*> ReadNBT(ByteBuffer* buffer);
     static Errorable<AbstractParticle*> ReadParticle(const ProtocolVersion* version, ByteBuffer* buffer);
-    static Errorable<Metadata> ReadMetadata(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<Metadata*> ReadMetadata(const ProtocolVersion* version, ByteBuffer* buffer);
     static Errorable<Position> ReadPosition(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<GlobalPos> ReadGlobalPos(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<Rotation> ReadRotation(const ProtocolVersion* version, ByteBuffer* buffer);
 
     static uint32_t NBTSize(NBT* nbt);
     static Errorable<uint32_t> ParticleSize(const ProtocolVersion* version, AbstractParticle* particle);

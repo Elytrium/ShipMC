@@ -11,7 +11,7 @@ namespace Ship {
    public:
     DirectionRegistry();
 
-    uint32_t GetIDByPacket(const ProtocolVersion* version, const Packet& packet) const;
+    Errorable<uint32_t> GetIDByPacket(const ProtocolVersion* version, const Packet& packet) const;
   };
 
   enum PacketDirection {

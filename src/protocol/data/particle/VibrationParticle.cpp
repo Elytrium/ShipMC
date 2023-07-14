@@ -1,29 +1,30 @@
 #include "Particle.hpp"
+#include "../../ProtocolUtils.hpp"
 #include <utility>
 
 namespace Ship {
 
   VibrationParticle::VibrationParticle(
-    std::string sourceType, int blockX, int blockY, int blockZ, uint32_t entityId, float entityEyeHeight, uint32_t ticks)
-    : sourceType(std::move(sourceType)), blockX(blockX), blockY(blockY), blockZ(blockZ), entityId(entityId), entityEyeHeight(entityEyeHeight),
+    std::string sourceType, Position blockPosition, uint32_t entityId, float entityEyeHeight, uint32_t ticks)
+    : sourceType(std::move(sourceType)), blockPosition(blockPosition), entityId(entityId), entityEyeHeight(entityEyeHeight),
       ticks(ticks) {
   }
 
-  VibrationParticle::VibrationParticle(int blockX, int blockY, int blockZ, uint32_t ticks)
-    : VibrationParticle("minecraft:block", blockX, blockY, blockZ, 0, 0, ticks) {
+  VibrationParticle::VibrationParticle(Position blockPosition, uint32_t ticks)
+    : VibrationParticle("minecraft:block", blockPosition, 0, 0, ticks) {
   }
 
   VibrationParticle::VibrationParticle(uint32_t entityId, float entityEyeHeight, uint32_t ticks)
-    : VibrationParticle("minecraft:entity", 0, 0, 0, entityId, entityEyeHeight, ticks) {
+    : VibrationParticle("minecraft:entity", {}, entityId, entityEyeHeight, ticks) {
   }
 
-  VibrationParticle::VibrationParticle(std::string sourceType, uint32_t ticks) : VibrationParticle(std::move(sourceType), 0, 0, 0, 0, 0, ticks) {
+  VibrationParticle::VibrationParticle(const std::string& sourceType, uint32_t ticks) : VibrationParticle(sourceType, {}, 0, 0, ticks) {
   }
 
   Errorable<bool> VibrationParticle::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
     buffer->WriteString(sourceType);
     if (sourceType == "minecraft:block") {
-      buffer->WritePosition(blockX, blockY, blockZ);
+      ProtocolUtils::WritePosition(version, buffer, blockPosition);
     } else if (sourceType == "minecraft:entity") {
       buffer->WriteVarInt(entityId);
       buffer->WriteFloat(entityEyeHeight);
@@ -32,15 +33,20 @@ namespace Ship {
     return SuccessErrorable<bool>(true);
   }
 
-  VibrationParticle::VibrationParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    sourceType = buffer->ReadString();
+  Errorable<VibrationParticle> VibrationParticle::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(sourceType, std::string, buffer->ReadString(), InvalidVibrationParticleErrorable(buffer->GetReadableBytes()))
     if (sourceType == "minecraft:block") {
-      buffer->ReadPosition(blockX, blockY, blockZ);
+      ProceedErrorable(position, Position, ProtocolUtils::ReadPosition(version, buffer), InvalidVibrationParticleErrorable(buffer->GetReadableBytes()))
+      ProceedErrorable(ticks, uint32_t, buffer->ReadVarInt(), InvalidVibrationParticleErrorable(buffer->GetReadableBytes()))
+      return SuccessErrorable<VibrationParticle>(VibrationParticle({position, ticks}));
     } else if (sourceType == "minecraft:entity") {
-      entityId = buffer->ReadVarInt();
-      entityEyeHeight = buffer->ReadFloat();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidVibrationParticleErrorable(buffer->GetReadableBytes()));
+      ProceedErrorable(entityEyeHeight, float, buffer->ReadFloat(), InvalidVibrationParticleErrorable(buffer->GetReadableBytes()));
+      ProceedErrorable(ticks, uint32_t, buffer->ReadVarInt(), InvalidVibrationParticleErrorable(buffer->GetReadableBytes()));
+      return SuccessErrorable<VibrationParticle>(VibrationParticle({entityId, entityEyeHeight, ticks}));
+    } else {
+      return InvalidVibrationParticleErrorable(buffer->GetReadableBytes());
     }
-    ticks = buffer->ReadVarInt();
   }
 
   std::string VibrationParticle::GetIdentifier() const {
@@ -59,28 +65,12 @@ namespace Ship {
     sourceType = newValue;
   }
 
-  int VibrationParticle::GetBlockX() const {
-    return blockX;
+  Position VibrationParticle::GetBlockPosition() const {
+    return blockPosition;
   }
 
-  void VibrationParticle::SetBlockX(int newValue) {
-    blockX = newValue;
-  }
-
-  int VibrationParticle::GetBlockY() const {
-    return blockY;
-  }
-
-  void VibrationParticle::SetBlockY(int newValue) {
-    blockY = newValue;
-  }
-
-  int VibrationParticle::GetBlockZ() const {
-    return blockZ;
-  }
-
-  void VibrationParticle::SetBlockZ(int newValue) {
-    blockZ = newValue;
+  void VibrationParticle::SetBlockPosition(Ship::Position newValue) {
+    blockPosition = newValue;
   }
 
   uint32_t VibrationParticle::GetEntityId() const {

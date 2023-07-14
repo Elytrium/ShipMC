@@ -7,13 +7,14 @@ namespace Ship {
 
   class InventoryProperty : public Packet {
    private:
-    uint8_t windowId;
-    uint16_t property;
-    uint16_t value;
+    uint8_t windowId{};
+    uint16_t property{};
+    uint16_t value{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    InventoryProperty() = default;
     InventoryProperty(uint8_t windowId, uint16_t aProperty, uint16_t value) : windowId(windowId), property(aProperty), value(value) {
     }
 
@@ -21,9 +22,10 @@ namespace Ship {
 
     static Errorable<InventoryProperty> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(property, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(value, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<InventoryProperty>(PACKET_ORDINAL))
+      ProceedErrorable(property, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<InventoryProperty>(PACKET_ORDINAL))
+      ProceedErrorable(value, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<InventoryProperty>(PACKET_ORDINAL))
+      return SuccessErrorable<InventoryProperty>(InventoryProperty(windowId, property, value));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -33,7 +35,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

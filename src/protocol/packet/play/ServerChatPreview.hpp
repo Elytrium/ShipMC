@@ -9,12 +9,13 @@ namespace Ship {
 
   class ServerChatPreview : public Packet {
    private:
-    uint32_t queryId;
+    uint32_t queryId{};
     std::optional<std::string> message; // TODO: Chat components
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    ServerChatPreview() = default;
     ServerChatPreview(uint32_t queryId, std::optional<std::string> message) : queryId(queryId), message(std::move(message)) {
     }
 
@@ -22,12 +23,15 @@ namespace Ship {
 
     static Errorable<ServerChatPreview> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      queryId = buffer->ReadInt();
-      if (buffer->ReadBoolean()) {
-        ProceedErrorable(message, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      } else {
-        message.reset();
+      ProceedErrorable(queryId, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<ServerChatPreview>(PACKET_ORDINAL))
+      ProceedErrorable(hasMessage, bool, buffer->ReadBoolean(), InvalidPacketErrorable<ServerChatPreview>(PACKET_ORDINAL))
+
+      std::optional<std::string> message;
+      if (hasMessage) {
+        SetFromErrorable(message, std::string, buffer->ReadString(), InvalidPacketErrorable<ServerChatPreview>(PACKET_ORDINAL))
       }
+
+      return SuccessErrorable<ServerChatPreview>(ServerChatPreview(queryId, message));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

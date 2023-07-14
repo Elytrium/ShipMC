@@ -25,20 +25,23 @@ namespace Ship {
     }
   }
 
-  void ListTag::Read(ByteBuffer* buffer) {
+  Errorable<bool> ListTag::Read(ByteBuffer* buffer) {
     for (const auto& item : list) {
       delete item;
     }
 
     list.clear();
-    auto type = (TagType) buffer->ReadByte();
-    uint32_t valueLength = buffer->ReadInt();
+    ProceedErrorable(typeByte, uint8_t, buffer->ReadByte(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(valueLength, uint32_t, buffer->ReadInt(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+
+    auto type = (TagType) typeByte;
 
     for (uint32_t i = 0; i < valueLength; ++i) {
       NBT* nbt = NBT::Create(type, "");
       nbt->Read(buffer);
       list.push_back(nbt);
     }
+    return SuccessErrorable<bool>(true);
   }
 
   uint32_t ListTag::GetSize() {

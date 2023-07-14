@@ -23,7 +23,7 @@ namespace Ship {
 
     Errorable<size_t> EncodeFrame(ByteBuffer* in, uint32_t frame_size) override;
     Errorable<size_t> DecodeFrame(ByteBuffer* in, uint32_t frame_size) override;
-    uint32_t GetOrdinal() const override;
+    [[nodiscard]] uint32_t GetOrdinal() const override;
   };
 
   class MinecraftFramedBytePacketPipe : public FramedBytePacketPipe {

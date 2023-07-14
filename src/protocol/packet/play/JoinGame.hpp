@@ -13,38 +13,39 @@ namespace Ship {
 
   class JoinGame : public Packet {
    private:
-    uint32_t entityId;
-    Gamemode gamemode;
-    uint64_t partialHashedSeed;
-    Difficulty difficulty;
-    bool isHardcore;
-    uint32_t maxPlayers;
-    uint32_t viewDistance;
-    bool reducedDebugInfo;
-    bool showRespawnScreen;
+    uint32_t entityId{};
+    Gamemode gamemode{};
+    uint64_t partialHashedSeed{};
+    Difficulty difficulty{};
+    bool isHardcore{};
+    uint32_t maxPlayers{};
+    uint32_t viewDistance{};
+    bool reducedDebugInfo{};
+    bool showRespawnScreen{};
     std::set<std::string> levelNames;
     std::map<std::string, Dimension*> dimensionRegistry;
     std::string registryIdentifier;
     std::string levelName;
-    bool isFlat;
-    bool isDebugType;
-    Dimension* dimension;
-    Gamemode previousGamemode;
-    CompoundTag* biomeRegistry;
-    uint32_t simulationDistance;
-    bool hasLastDeathPosition;
-    std::pair<std::string, uint64_t> lastDeathPosition;
-    CompoundTag* chatTypeRegistry;
-    CompoundTag* registryContainer;
+    bool isFlat{};
+    bool isDebugType{};
+    Dimension* dimension{};
+    Gamemode previousGamemode{};
+    CompoundTag* biomeRegistry{};
+    uint32_t simulationDistance{};
+    bool hasLastDeathPosition{};
+    GlobalPos lastDeathPosition{};
+    CompoundTag* chatTypeRegistry{};
+    CompoundTag* registryContainer{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    JoinGame() = default;
     JoinGame(uint32_t entityId, Gamemode gamemode, uint64_t partialHashedSeed, Difficulty difficulty, bool isHardcore, uint32_t maxPlayers,
       uint32_t viewDistance, bool reducedDebugInfo, bool showRespawnScreen, std::set<std::string> levelNames,
       std::map<std::string, Dimension*> dimensionRegistry, std::string registryIdentifier, std::string levelName, bool isFlat, bool isDebugType,
       Dimension* dimension, Gamemode previousGamemode, CompoundTag* biomeRegistry, uint32_t simulationDistance, bool hasLastDeathPosition,
-      std::pair<std::string, uint64_t> lastDeathPosition, CompoundTag* chatTypeRegistry, CompoundTag* registryContainer)
+      GlobalPos lastDeathPosition, CompoundTag* chatTypeRegistry, CompoundTag* registryContainer)
       : entityId(entityId), gamemode(gamemode), partialHashedSeed(partialHashedSeed), difficulty(difficulty), isHardcore(isHardcore),
         maxPlayers(maxPlayers), viewDistance(viewDistance), reducedDebugInfo(reducedDebugInfo), showRespawnScreen(showRespawnScreen),
         levelNames(std::move(levelNames)), dimensionRegistry(std::move(dimensionRegistry)), registryIdentifier(std::move(registryIdentifier)),
@@ -60,24 +61,52 @@ namespace Ship {
     static Errorable<JoinGame> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      entityId = buffer->ReadInt();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+
+      Gamemode gamemode;
+      uint64_t partialHashedSeed;
+      Difficulty difficulty;
+      bool isHardcore;
+      uint32_t maxPlayers;
+      uint32_t viewDistance;
+      bool reducedDebugInfo;
+      bool showRespawnScreen;
+      std::set<std::string> levelNames;
+      std::map<std::string, Dimension*> dimensionRegistry;
+      std::string registryIdentifier;
+      std::string levelName;
+      bool isFlat;
+      bool isDebugType;
+      Dimension* dimension;
+      Gamemode previousGamemode;
+      CompoundTag* biomeRegistry{};
+      uint32_t simulationDistance;
+      bool hasLastDeathPosition;
+      GlobalPos lastDeathPosition;
+      CompoundTag* chatTypeRegistry{};
+      CompoundTag* registryContainer{};
+
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
-        ProceedErrorable(isHardcore, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        gamemode = (Gamemode) buffer->ReadByte();
+        SetFromErrorable(isHardcore, bool, buffer->ReadBoolean(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        ProceedErrorable(gamemodeByte, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        gamemode = (Gamemode) gamemodeByte;
       } else {
-        uint8_t ProceedErrorable(gamemodeByte, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(gamemodeByte, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         isHardcore = gamemodeByte & 0x08;
         gamemode = (Gamemode) (gamemodeByte & ~0x08);
       }
 
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
-        previousGamemode = (Gamemode) buffer->ReadByte();
-        uint32_t ProceedErrorable(arraySize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(gamemodeByte, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        previousGamemode = (Gamemode) gamemodeByte;
+        ProceedErrorable(arraySize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         for (int i = 0; i < arraySize; ++i) {
-          levelNames.insert(buffer->ReadString());
+          ProceedErrorable(levelNameEntry, std::string, buffer->ReadString(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+          levelNames.insert(levelNameEntry);
         }
 
-        registryContainer = (CompoundTag*) ProtocolUtils::ReadNBT(buffer);
+        ProceedErrorable(registryContainerNBT, NBT*, ProtocolUtils::ReadNBT(buffer), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        registryContainer = (CompoundTag*) registryContainerNBT;
         ListTag* dimensionRegistryContainer;
         dimensionRegistryContainer = (ListTag*) ((CompoundTag*) registryContainer->GetNBT("minecraft:dimension_type").value())->GetNBT("value").value();
         biomeRegistry = (CompoundTag*) registryContainer->GetNBT("minecraft:worldgen/biome").value();
@@ -93,37 +122,40 @@ namespace Ship {
         delete dimensionRegistryContainer;
 
         if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2 && version < &MinecraftProtocolVersion::MINECRAFT_1_19) {
-          auto* currentDimDataTag = (CompoundTag*) (ProtocolUtils::ReadNBT(buffer));
+          ProceedErrorable(currentDimDataTagNBT, NBT*, ProtocolUtils::ReadNBT(buffer), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+          auto* currentDimDataTag = (CompoundTag*) currentDimDataTagNBT;
           dimension = Dimension::FromNBT(currentDimDataTag);
           delete currentDimDataTag;
-          ProceedErrorable(registryIdentifier, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(registryIdentifier, std::string, buffer->ReadString(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
           levelName = "world";
         } else {
-          ProceedErrorable(registryIdentifier, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-          ProceedErrorable(levelName, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(registryIdentifier, std::string, buffer->ReadString(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+            SetFromErrorable(levelName, std::string, buffer->ReadString(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         }
 
-        ProceedErrorable(partialHashedSeed, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(partialHashedSeed, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
-          ProceedErrorable(maxPlayers, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(maxPlayers, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         } else {
-          ProceedErrorable(maxPlayers, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(maxPlayers, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         }
 
-        ProceedErrorable(viewDistance, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(viewDistance, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         if (version >= &MinecraftProtocolVersion::MINECRAFT_1_16_2) {
-          ProceedErrorable(simulationDistance, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(simulationDistance, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         } else {
           simulationDistance = viewDistance;
         }
 
-        ProceedErrorable(reducedDebugInfo, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(showRespawnScreen, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(isDebugType, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(isFlat, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19 && buffer->ReadBoolean()) {
-          hasLastDeathPosition = true;
-          lastDeathPosition = {buffer->ReadString(), buffer->ReadLong()};
+        SetFromErrorable(reducedDebugInfo, bool, buffer->ReadBoolean(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        SetFromErrorable(showRespawnScreen, bool, buffer->ReadBoolean(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        SetFromErrorable(isDebugType, bool, buffer->ReadBoolean(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        SetFromErrorable(isFlat, bool, buffer->ReadBoolean(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
+          SetFromErrorable(hasLastDeathPosition, bool, buffer->ReadBoolean(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+          if (hasLastDeathPosition) {
+            SetFromErrorable(lastDeathPosition, GlobalPos, ProtocolUtils::ReadGlobalPos(version, buffer), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+          }
         } else {
           hasLastDeathPosition = false;
         }
@@ -131,18 +163,19 @@ namespace Ship {
         difficulty = Difficulty::PEACEFUL;
       } else {
         previousGamemode = gamemode == Gamemode::SPECTATOR ? Gamemode::SURVIVAL : Gamemode::SPECTATOR;
-        uint32_t dimensionIndex = buffer->ReadInt();
+        ProceedErrorable(dimensionIndex, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         dimension = Dimension::FromLegacyID(dimensionIndex);
         registryIdentifier = dimension->GetKey();
 
         if (version <= &MinecraftProtocolVersion::MINECRAFT_1_13_2) {
-          difficulty = (Difficulty) buffer->ReadByte();
+          ProceedErrorable(difficultyByte, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+          difficulty = (Difficulty) difficultyByte;
         } else {
           difficulty = Difficulty::PEACEFUL;
         }
 
         if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
-          ProceedErrorable(partialHashedSeed, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(partialHashedSeed, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         } else {
           partialHashedSeed = 0;
         }
@@ -150,26 +183,31 @@ namespace Ship {
         levelName = "world";
         levelNames.insert(levelName);
 
-        ProceedErrorable(maxPlayers, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        isFlat = buffer->ReadString(16) == "flat";
+        SetFromErrorable(maxPlayers, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        ProceedErrorable(worldType, std::string, buffer->ReadString(16), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
+        isFlat = worldType == "flat";
         isDebugType = false;
 
         if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
-          ProceedErrorable(viewDistance, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(viewDistance, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         } else {
           viewDistance = 10;
         }
 
         simulationDistance = viewDistance;
-        ProceedErrorable(reducedDebugInfo, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(reducedDebugInfo, bool, buffer->ReadBoolean(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         if (version >= &MinecraftProtocolVersion::MINECRAFT_1_15) {
-          ProceedErrorable(showRespawnScreen, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(showRespawnScreen, bool, buffer->ReadBoolean(), InvalidPacketErrorable<JoinGame>(PACKET_ORDINAL))
         } else {
           showRespawnScreen = true;
         }
 
         hasLastDeathPosition = false;
       }
+
+      return SuccessErrorable<JoinGame>(JoinGame(entityId, gamemode, partialHashedSeed, difficulty, isHardcore, maxPlayers, viewDistance,
+        reducedDebugInfo, showRespawnScreen, levelNames, dimensionRegistry, registryIdentifier, levelName, isFlat, isDebugType, dimension,
+        previousGamemode, biomeRegistry, simulationDistance, hasLastDeathPosition, lastDeathPosition, chatTypeRegistry, registryContainer));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -240,8 +278,7 @@ namespace Ship {
         if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
           buffer->WriteBoolean(hasLastDeathPosition);
           if (hasLastDeathPosition) {
-            buffer->WriteString(lastDeathPosition.first);
-            buffer->WriteLong(lastDeathPosition.second);
+            ProtocolUtils::WriteGlobalPos(version, buffer, lastDeathPosition);
           }
         }
       } else {
@@ -354,7 +391,7 @@ namespace Ship {
       return hasLastDeathPosition;
     }
 
-    [[nodiscard]] const std::pair<std::string, uint64_t>& GetLastDeathPosition() const {
+    [[nodiscard]] const GlobalPos& GetLastDeathPosition() const {
       return lastDeathPosition;
     }
 

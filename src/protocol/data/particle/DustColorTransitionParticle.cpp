@@ -18,14 +18,15 @@ namespace Ship {
     return SuccessErrorable<bool>(true);
   }
 
-  DustColorTransitionParticle::DustColorTransitionParticle(const ProtocolVersion* version, ByteBuffer* buffer) {
-    fromRed = buffer->ReadFloat();
-    fromGreen = buffer->ReadFloat();
-    fromBlue = buffer->ReadFloat();
-    scale = buffer->ReadFloat();
-    toRed = buffer->ReadFloat();
-    toGreen = buffer->ReadFloat();
-    toBlue = buffer->ReadFloat();
+  Errorable<DustColorTransitionParticle> DustColorTransitionParticle::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(fromRed, float, buffer->ReadFloat(), InvalidDustColorTransitionParticleErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(fromGreen, float, buffer->ReadFloat(), InvalidDustColorTransitionParticleErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(fromBlue, float, buffer->ReadFloat(), InvalidDustColorTransitionParticleErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(scale, float, buffer->ReadFloat(), InvalidDustColorTransitionParticleErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(toRed, float, buffer->ReadFloat(), InvalidDustColorTransitionParticleErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(toGreen, float, buffer->ReadFloat(), InvalidDustColorTransitionParticleErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(toBlue, float, buffer->ReadFloat(), InvalidDustColorTransitionParticleErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<DustColorTransitionParticle>(DustColorTransitionParticle(fromRed, fromGreen, fromBlue, scale, toRed, toGreen, toBlue));
   }
 
   std::string DustColorTransitionParticle::GetIdentifier() const {

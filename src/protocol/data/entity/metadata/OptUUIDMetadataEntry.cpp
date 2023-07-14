@@ -16,11 +16,12 @@ namespace Ship {
   }
 
   Errorable<OptUUIDMetadataEntry> OptUUIDMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
-    ProceedErrorable(present, bool, buffer->ReadBoolean(), InvalidOptChatMetadataEntryErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(present, bool, buffer->ReadBoolean(), InvalidOptUUIDMetadataEntryErrorable(buffer->GetReadableBytes()))
     if (present) {
-      optProceedErrorable(value, ss, buffer->ReadUUID, ss)
+      ProceedErrorable(value, UUID, buffer->ReadUUID(), InvalidOptUUIDMetadataEntryErrorable(buffer->GetReadableBytes()))
+      return SuccessErrorable<OptUUIDMetadataEntry>(OptUUIDMetadataEntry(value));
     } else {
-      optValue.reset();
+      return SuccessErrorable<OptUUIDMetadataEntry>({});
     }
   }
 

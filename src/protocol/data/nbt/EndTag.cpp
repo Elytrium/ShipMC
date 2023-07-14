@@ -4,7 +4,8 @@ namespace Ship {
   EndTag::EndTag(const std::string& name) : NBT(name) {
   }
 
-  void EndTag::Read(ByteBuffer* buffer) {
+  Errorable<bool> EndTag::Read(ByteBuffer* buffer) {
+    return SuccessErrorable<bool>(true);
   }
 
   void EndTag::Write(ByteBuffer* buffer) {
