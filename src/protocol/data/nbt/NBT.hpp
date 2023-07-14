@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../lib/ShipNet/src/protocol/Protocol.hpp"
+#include "ShipNet/protocol/Protocol.hpp"
 #include <list>
 #include <map>
 #include <optional>

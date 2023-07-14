@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../lib/ShipNet/src/protocol/data/uuid/UUID.hpp"
+#include "ShipNet/protocol/data/uuid/UUID.hpp"
 #include <string>
 #include <vector>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../ProtocolUtils.hpp"
-#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
+#include "ShipNet/utils/ordinal/OrdinalRegistry.hpp"
 #include "../../data/profile/GameProfile.hpp"
 #include <string>
 #include <utility>

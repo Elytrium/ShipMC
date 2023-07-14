@@ -1,4 +1,4 @@
-#include "../../../../lib/ShipNet/src/network/Connection.hpp"
+#include "ShipNet/network/Connection.hpp"
 #include "../../../network/pipe/MinecraftPipe.hpp"
 #include "../../registry/BuiltInPacketRegistry.hpp"
 #include "ServerPacketHandler.hpp"

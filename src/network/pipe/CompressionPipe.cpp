@@ -1,5 +1,5 @@
-#include "../../../lib/ShipNet/src/Ship.hpp"
-#include "../../../lib/ShipNet/src/protocol/Protocol.hpp"
+#include "ShipNet/Ship.hpp"
+#include "ShipNet/protocol/Protocol.hpp"
 #include "MinecraftPipe.hpp"
 
 namespace Ship {

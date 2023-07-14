@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../../lib/ShipNet/src/protocol/registry/ConstructorRegistry.hpp"
-#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
+#include "ShipNet/protocol/registry/ConstructorRegistry.hpp"
+#include "ShipNet/utils/ordinal/OrdinalRegistry.hpp"
 #include "../../../utils/ordinal/MinecraftOrdinalRegistry.hpp"
 #include "../../MinecraftProtocol.hpp"
 #include "../ItemStack.hpp"

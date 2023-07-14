@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
+#include "ShipNet/utils/ordinal/OrdinalRegistry.hpp"
 #include "../../ProtocolUtils.hpp"
 #include "../../data/entity/metadata/Metadata.hpp"
 #include <string>

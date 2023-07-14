@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../lib/ShipNet/src/network/pipe/FramedPipe.hpp"
+#include "ShipNet/network/pipe/FramedPipe.hpp"
 #include "../../protocol/registry/PacketRegistry.hpp"
 #include "libdeflate.h"
 

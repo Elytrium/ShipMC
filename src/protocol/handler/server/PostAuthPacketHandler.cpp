@@ -1,4 +1,4 @@
-#include "../../../../lib/ShipNet/src/network/Connection.hpp"
+#include "ShipNet/network/Connection.hpp"
 #include "../../data/client/LoginClient.hpp"
 #include "../../data/profile/GameProfile.hpp"
 #include "ServerPacketHandler.hpp"

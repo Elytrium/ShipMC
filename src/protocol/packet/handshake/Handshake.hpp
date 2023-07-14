@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../../lib/ShipNet/src/network/SocketAddress.hpp"
-#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
+#include "ShipNet/network/SocketAddress.hpp"
+#include "ShipNet/utils/ordinal/OrdinalRegistry.hpp"
 #include "../../MinecraftProtocol.hpp"
 #include <string>
 #include <utility>

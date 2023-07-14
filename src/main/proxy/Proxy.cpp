@@ -1,6 +1,6 @@
 #include "Proxy.hpp"
-#include "../../../lib/ShipNet/src/Ship.hpp"
-#include "../../../lib/ShipNet/src/network/listener/Listener.hpp"
+#include "ShipNet/Ship.hpp"
+#include "ShipNet/network/listener/Listener.hpp"
 #include "../../network/pipe/MinecraftPipe.hpp"
 #include "../../protocol/handler/server/ServerPacketHandler.hpp"
 #include "../../protocol/registry/BuiltInPacketRegistry.hpp"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../lib/ShipNet/src/protocol/Protocol.hpp"
+#include "ShipNet/protocol/Protocol.hpp"
 #include "data/profile/GameProfile.hpp"
 #include <string>
 #include <utility>

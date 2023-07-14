@@ -1,7 +1,7 @@
 #pragma once
-#include "../../../../lib/ShipNet/src/network/Connection.hpp"
-#include "../../../../lib/ShipNet/src/protocol/handler/PacketHandler.hpp"
-#include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
+#include "ShipNet/network/Connection.hpp"
+#include "ShipNet/protocol/handler/PacketHandler.hpp"
+#include "ShipNet/utils/ordinal/OrdinalRegistry.hpp"
 #include "../../../main/proxy/client/Client.hpp"
 #include "../../data/client/LoginClient.hpp"
 #include "../../packet/handshake/Handshake.hpp"

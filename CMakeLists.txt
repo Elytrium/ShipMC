@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 
+add_subdirectory(lib/ShipNet)
+
 project(ShipMC)
 
-file(GLOB_RECURSE SHIP_NET_SOURCES src/*.[hc]pp lib/*.[hc]pp)
+file(GLOB_RECURSE SHIP_NET_SOURCES src/*.[hc]pp)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_COMPILER "clang")
@@ -30,8 +32,9 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 add_executable(ShipMC ${SHIP_NET_SOURCES})
+include_directories(lib/ShipNet)
 if (APPLE)
-    target_link_libraries(ShipMC "-lpthread -ldeflate")
+    target_link_libraries(ShipMC "-lpthread -ldeflate" ShipNet)
 else ()
-    target_link_libraries(ShipMC "-Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,-z,separate-code -lpthread -ldeflate")
+    target_link_libraries(ShipMC "-Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,-z,separate-code -lpthread -ldeflate" ShipNet)
 endif ()

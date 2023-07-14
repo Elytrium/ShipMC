@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../../lib/ShipNet/src/network/Connection.hpp"
-#include "../../../../lib/ShipNet/src/network/SocketAddress.hpp"
+#include "ShipNet/network/Connection.hpp"
+#include "ShipNet/network/SocketAddress.hpp"
 #include "../../../network/pipe/MinecraftPipe.hpp"
 #include "../../../protocol/data/client/LoginClient.hpp"
 #include "../../../protocol/packet/play/Disconnect.hpp"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
+#include "ShipNet/utils/ordinal/OrdinalRegistry.hpp"
 
 namespace Ship {
   class MinecraftOrdinalRegistry {
