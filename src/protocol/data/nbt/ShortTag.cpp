@@ -7,8 +7,9 @@ namespace Ship {
   ShortTag::ShortTag(const std::string& name, uint16_t value) : NBT(name), value(value) {
   }
 
-  void ShortTag::Read(ByteBuffer* buffer) {
-    ProceedErrorable(value, ss, buffer->ReadShort, ss)
+  Errorable<bool> ShortTag::Read(ByteBuffer* buffer) {
+    SetFromErrorable(value, uint16_t, buffer->ReadShort(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<bool>(true);
   }
 
   void ShortTag::Write(ByteBuffer* buffer) {

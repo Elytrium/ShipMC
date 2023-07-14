@@ -13,11 +13,11 @@ namespace Ship {
   }
 
   Errorable<OptVarIntMetadataEntry> OptVarIntMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
-    ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), );
+    ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), InvalidOptVarIntMetadataEntryErrorable(buffer->GetReadableBytes()));
     if (value) {
-      optValue = value - 1;
+      return SuccessErrorable<OptVarIntMetadataEntry>(OptVarIntMetadataEntry(value - 1));
     } else {
-      optValue.reset();
+      return SuccessErrorable<OptVarIntMetadataEntry>({});
     }
   }
 

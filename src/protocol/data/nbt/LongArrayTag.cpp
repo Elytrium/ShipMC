@@ -13,11 +13,13 @@ namespace Ship {
     buffer->WriteBytes((uint8_t*) value, valueLength * sizeof(uint64_t));
   }
 
-  void LongArrayTag::Read(ByteBuffer* buffer) {
+  Errorable<bool> LongArrayTag::Read(ByteBuffer* buffer) {
     delete[] value;
 
-    valueLength = buffer->ReadInt();
-    value = (uint64_t*) buffer->ReadBytes(valueLength * sizeof(uint64_t));
+    SetFromErrorable(valueLength, uint32_t, buffer->ReadInt(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(valueBytes, uint8_t*, buffer->ReadBytes(valueLength * sizeof(uint64_t)), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    value = (uint64_t*) valueBytes;
+    return SuccessErrorable<bool>(true);
   }
 
   uint32_t LongArrayTag::GetSize() {

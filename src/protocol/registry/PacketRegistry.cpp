@@ -18,7 +18,7 @@ namespace Ship {
     }) {
   }
 
-  uint32_t DirectionRegistry::GetIDByPacket(const ProtocolVersion* version, const Packet& packet) const {
+  Errorable<uint32_t> DirectionRegistry::GetIDByPacket(const ProtocolVersion* version, const Packet& packet) const {
     return GetIDByOrdinal(version, packet.GetOrdinal());
   }
 

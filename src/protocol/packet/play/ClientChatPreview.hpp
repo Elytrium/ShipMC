@@ -9,12 +9,13 @@ namespace Ship {
 
   class ClientChatPreview : public Packet {
    private:
-    uint32_t queryId;
+    uint32_t queryId{};
     std::string message;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    ClientChatPreview() = default;
     ClientChatPreview(uint32_t queryId, std::string message) : queryId(queryId), message(std::move(message)) {
     }
 
@@ -22,8 +23,9 @@ namespace Ship {
 
     static Errorable<ClientChatPreview> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      queryId = buffer->ReadInt();
-      ProceedErrorable(message, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(queryId, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<ClientChatPreview>(PACKET_ORDINAL));
+      ProceedErrorable(message, std::string, buffer->ReadString(), InvalidPacketErrorable<ClientChatPreview>(PACKET_ORDINAL))
+      return SuccessErrorable<ClientChatPreview>(ClientChatPreview(queryId, message));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -32,7 +34,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

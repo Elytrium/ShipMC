@@ -9,18 +9,19 @@ namespace Ship {
 
   class SpawnPlayer : public Packet {
    private:
-    uint32_t entityId;
-    UUID playerUuid;
-    double x;
-    double y;
-    double z;
-    float yaw;
-    float pitch;
-    Metadata* metadata;
+    uint32_t entityId{};
+    UUID playerUuid{};
+    double x{};
+    double y{};
+    double z{};
+    float yaw{};
+    float pitch{};
+    Metadata* metadata{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    SpawnPlayer() = default;
     SpawnPlayer(uint32_t entityId, const UUID& playerUuid, double x, double y, double z, float yaw, float pitch, Metadata* metadata)
       : entityId(entityId), playerUuid(playerUuid), x(x), y(y), z(z), yaw(yaw), pitch(pitch), metadata(metadata) {
     }
@@ -32,17 +33,19 @@ namespace Ship {
     static Errorable<SpawnPlayer> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(playerUuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      yaw = buffer->ReadAngle();
-      pitch = buffer->ReadAngle();
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<SpawnPlayer>(PACKET_ORDINAL))
+      ProceedErrorable(playerUuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<SpawnPlayer>(PACKET_ORDINAL))
+      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<SpawnPlayer>(PACKET_ORDINAL))
+      ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<SpawnPlayer>(PACKET_ORDINAL))
+      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<SpawnPlayer>(PACKET_ORDINAL))
+      ProceedErrorable(yaw, float, buffer->ReadAngle(), InvalidPacketErrorable<SpawnPlayer>(PACKET_ORDINAL))
+      ProceedErrorable(pitch, float, buffer->ReadAngle(), InvalidPacketErrorable<SpawnPlayer>(PACKET_ORDINAL))
+      Metadata* metadata{};
       if (version <= &MinecraftProtocolVersion::MINECRAFT_1_14_4) {
-        delete metadata;
-        metadata = ProtocolUtils::ReadMetadata(version, buffer);
+        SetFromErrorable(metadata, Metadata*, ProtocolUtils::ReadMetadata(version, buffer), InvalidPacketErrorable<SpawnPlayer>(PACKET_ORDINAL));
       }
+
+      return SuccessErrorable<SpawnPlayer>(SpawnPlayer(entityId, playerUuid, x, y, z, yaw, pitch, metadata));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -59,7 +62,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

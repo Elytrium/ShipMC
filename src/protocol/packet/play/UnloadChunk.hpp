@@ -7,12 +7,13 @@ namespace Ship {
 
   class UnloadChunk : public Packet {
    private:
-    uint32_t chunkX;
-    uint32_t chunkZ;
+    uint32_t chunkX{};
+    uint32_t chunkZ{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    UnloadChunk() = default;
     UnloadChunk(uint32_t chunkX, uint32_t chunkZ) : chunkX(chunkX), chunkZ(chunkZ) {
     }
 
@@ -20,8 +21,9 @@ namespace Ship {
 
     static Errorable<UnloadChunk> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      chunkX = buffer->ReadInt();
-      chunkZ = buffer->ReadInt();
+      ProceedErrorable(chunkX, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<UnloadChunk>(PACKET_ORDINAL))
+      ProceedErrorable(chunkZ, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<UnloadChunk>(PACKET_ORDINAL))
+      return SuccessErrorable<UnloadChunk>(UnloadChunk(chunkX, chunkZ));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -30,7 +32,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

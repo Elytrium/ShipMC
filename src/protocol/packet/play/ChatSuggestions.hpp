@@ -8,12 +8,13 @@ namespace Ship {
 
   class ChatSuggestions : public Packet {
    private:
-    uint32_t action;
+    uint32_t action{};
     std::vector<std::string> entries;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    ChatSuggestions() = default;
     ChatSuggestions(uint32_t action, std::vector<std::string> entries) : action(action), entries(std::move(entries)) {
     }
 
@@ -21,11 +22,15 @@ namespace Ship {
 
     static Errorable<ChatSuggestions> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(action, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      uint32_t ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(action, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<ChatSuggestions>(PACKET_ORDINAL))
+      ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<ChatSuggestions>(PACKET_ORDINAL))
+      std::vector<std::string> entries;
       for (int i = 0; i < vectorSize; ++i) {
-         entries.push_back(buffer->ReadString());
+        ProceedErrorable(suggestion, std::string, buffer->ReadString(), InvalidPacketErrorable<ChatSuggestions>(PACKET_ORDINAL))
+        entries.push_back(suggestion);
       }
+
+      return SuccessErrorable<ChatSuggestions>(ChatSuggestions(action, entries));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -37,7 +42,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

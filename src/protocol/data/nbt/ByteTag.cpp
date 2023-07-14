@@ -7,8 +7,9 @@ namespace Ship {
   ByteTag::ByteTag(const std::string& name, uint8_t value) : NBT(name), value(value) {
   }
 
-  void ByteTag::Read(ByteBuffer* buffer) {
-    ProceedErrorable(value, ss, buffer->ReadByte, ss)
+  Errorable<bool> ByteTag::Read(ByteBuffer* buffer) {
+    SetFromErrorable(value, uint8_t, buffer->ReadByte(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<bool>(true);
   }
 
   void ByteTag::Write(ByteBuffer* buffer) {

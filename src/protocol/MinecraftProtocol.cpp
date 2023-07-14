@@ -1,5 +1,7 @@
 #include "MinecraftProtocol.hpp"
 
+#include <utility>
+
 namespace Ship {
   inline const ProtocolVersion MinecraftProtocolVersion::MINECRAFT_1_12_2 = ProtocolVersion(0, 340, "1.12.2");
   inline const ProtocolVersion MinecraftProtocolVersion::MINECRAFT_1_13 = ProtocolVersion(1, 393, "1.13");
@@ -24,11 +26,27 @@ namespace Ship {
   inline const ProtocolVersion MinecraftProtocolVersion::MINECRAFT_1_19_1 = ProtocolVersion(20, 760, "1.19.1 - 1.19.2");
   inline const ProtocolVersion MinecraftProtocolVersion::MINECRAFT_1_19_3 = ProtocolVersion(21, 761, "1.19.3");
 
-  inline const ProtocolVersions MinecraftProtocolVersion::VERSIONS
-    = ProtocolVersions({MinecraftProtocolVersion::MINECRAFT_1_12_2, MinecraftProtocolVersion::MINECRAFT_1_13, MinecraftProtocolVersion::MINECRAFT_1_13_1,
-    MinecraftProtocolVersion::MINECRAFT_1_13_2, MinecraftProtocolVersion::MINECRAFT_1_14, MinecraftProtocolVersion::MINECRAFT_1_14_1, MinecraftProtocolVersion::MINECRAFT_1_14_2,
-    MinecraftProtocolVersion::MINECRAFT_1_14_3, MinecraftProtocolVersion::MINECRAFT_1_14_4, MinecraftProtocolVersion::MINECRAFT_1_15, MinecraftProtocolVersion::MINECRAFT_1_15_1,
-    MinecraftProtocolVersion::MINECRAFT_1_15_2, MinecraftProtocolVersion::MINECRAFT_1_16_2, MinecraftProtocolVersion::MINECRAFT_1_16_3, MinecraftProtocolVersion::MINECRAFT_1_16_4,
-    MinecraftProtocolVersion::MINECRAFT_1_17, MinecraftProtocolVersion::MINECRAFT_1_17_1, MinecraftProtocolVersion::MINECRAFT_1_18, MinecraftProtocolVersion::MINECRAFT_1_18_2,
+  inline const ProtocolVersions MinecraftProtocolVersion::VERSIONS = ProtocolVersions({MinecraftProtocolVersion::MINECRAFT_1_12_2,
+    MinecraftProtocolVersion::MINECRAFT_1_13, MinecraftProtocolVersion::MINECRAFT_1_13_1, MinecraftProtocolVersion::MINECRAFT_1_13_2,
+    MinecraftProtocolVersion::MINECRAFT_1_14, MinecraftProtocolVersion::MINECRAFT_1_14_1, MinecraftProtocolVersion::MINECRAFT_1_14_2,
+    MinecraftProtocolVersion::MINECRAFT_1_14_3, MinecraftProtocolVersion::MINECRAFT_1_14_4, MinecraftProtocolVersion::MINECRAFT_1_15,
+    MinecraftProtocolVersion::MINECRAFT_1_15_1, MinecraftProtocolVersion::MINECRAFT_1_15_2, MinecraftProtocolVersion::MINECRAFT_1_16_2,
+    MinecraftProtocolVersion::MINECRAFT_1_16_3, MinecraftProtocolVersion::MINECRAFT_1_16_4, MinecraftProtocolVersion::MINECRAFT_1_17,
+    MinecraftProtocolVersion::MINECRAFT_1_17_1, MinecraftProtocolVersion::MINECRAFT_1_18, MinecraftProtocolVersion::MINECRAFT_1_18_2,
     MinecraftProtocolVersion::MINECRAFT_1_19, MinecraftProtocolVersion::MINECRAFT_1_19_1, MinecraftProtocolVersion::MINECRAFT_1_19_3});
+
+  GlobalPos::GlobalPos(std::string  dimension, const Position& position) : dimension(std::move(dimension)), position(position) {
+  }
+  const std::string& GlobalPos::GetDimension() const {
+    return dimension;
+  }
+  void GlobalPos::SetDimension(const std::string& dimension) {
+    GlobalPos::dimension = dimension;
+  }
+  const Position& GlobalPos::GetPosition() const {
+    return position;
+  }
+  void GlobalPos::SetPosition(const Position& position) {
+    GlobalPos::position = position;
+  }
 }

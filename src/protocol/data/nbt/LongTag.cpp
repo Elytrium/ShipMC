@@ -7,8 +7,9 @@ namespace Ship {
   LongTag::LongTag(const std::string& name, uint64_t value) : NBT(name), value(value) {
   }
 
-  void LongTag::Read(ByteBuffer* buffer) {
-    ProceedErrorable(value, ss, buffer->ReadLong, ss)
+  Errorable<bool> LongTag::Read(ByteBuffer* buffer) {
+    SetFromErrorable(value, uint64_t, buffer->ReadLong(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<bool>(true);
   }
 
   void LongTag::Write(ByteBuffer* buffer) {

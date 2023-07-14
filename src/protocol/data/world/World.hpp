@@ -259,7 +259,7 @@ namespace Ship {
 
     ~Chunk();
 
-    ChunkSection& GetSection(uint32_t index);
+    Errorable<ChunkSection*> GetSection(uint32_t index);
 
     void SetSkyLight(int32_t posX, int32_t posY, int32_t posZ, uint32_t data);
     void SetBlockLight(int32_t posX, int32_t posY, int32_t posZ, uint32_t data);
@@ -276,6 +276,7 @@ namespace Ship {
     [[nodiscard]] uint32_t GetSectionsAmount() const;
     [[nodiscard]] Dimension* GetDimension() const;
   };
+  CreateInvalidArgumentErrorable(InvalidChunkSectionIndexErrorable, ChunkSection*, "");
 
   class World {
    private:

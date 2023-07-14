@@ -8,25 +8,29 @@ namespace Ship {
 
   class LoginPluginMessage : public Packet {
    private:
-    uint32_t id;
+    uint32_t id{};
     std::string channel;
-    ByteBuffer* data;
+    ByteBuffer* data{};
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    LoginPluginMessage(uint32_t id, std::string  channel, ByteBuffer* data) : id(id), channel(std::move(channel)), data(data) {
+    LoginPluginMessage() = default;
+
+    LoginPluginMessage(uint32_t id, std::string channel, ByteBuffer* data) : id(id), channel(std::move(channel)), data(data) {
     }
 
     static Errorable<LoginPluginMessage> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(channel, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<LoginPluginMessage>(PACKET_ORDINAL))
+      ProceedErrorable(channel, std::string, buffer->ReadString(), InvalidPacketErrorable<LoginPluginMessage>(PACKET_ORDINAL))
       size_t dataLen = holder.GetExpectedSize() - ByteBuffer::VarIntBytes(id) - ByteBuffer::StringBytes(channel);
-      data = new ByteBufferImpl(buffer->ReadBytes(dataLen), dataLen);
+      ProceedErrorable(dataBytes, uint8_t*, buffer->ReadBytes(dataLen), InvalidPacketErrorable<LoginPluginMessage>(PACKET_ORDINAL))
+      ByteBuffer* data = new ByteBufferImpl(dataBytes, dataLen);
+      return SuccessErrorable<LoginPluginMessage>(LoginPluginMessage(id, channel, data));
     }
 
-
     ~LoginPluginMessage() override {
+      delete data;
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -36,7 +40,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
   };

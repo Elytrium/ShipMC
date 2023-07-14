@@ -23,7 +23,7 @@ namespace Ship {
 
     static Errorable<AcknowledgePlayerDigging> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<AcknowledgePlayerDigging>(PACKET_ORDINAL))
+      ProceedErrorable(location, Position, ProtocolUtils::ReadPosition(holder.GetVersion(), buffer), InvalidPacketErrorable<AcknowledgePlayerDigging>(PACKET_ORDINAL))
       ProceedErrorable(block, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<AcknowledgePlayerDigging>(PACKET_ORDINAL))
       ProceedErrorable(status, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<AcknowledgePlayerDigging>(PACKET_ORDINAL))
       ProceedErrorable(successful, bool, buffer->ReadBoolean(), InvalidPacketErrorable<AcknowledgePlayerDigging>(PACKET_ORDINAL))
@@ -33,7 +33,7 @@ namespace Ship {
     ~AcknowledgePlayerDigging() override = default;
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      buffer->WritePosition(location);
+      ProtocolUtils::WritePosition(version, buffer, location);
       buffer->WriteVarInt(block);
       buffer->WriteVarInt(status);
       buffer->WriteBoolean(successful);

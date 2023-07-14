@@ -11,7 +11,8 @@ namespace Ship {
   }
 
   Errorable<PoseMetadataEntry> PoseMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
-    value = (Pose) buffer->ReadVarInt();
+    ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidPoseMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<PoseMetadataEntry>(PoseMetadataEntry((Pose) id));
   }
 
   MetadataEntryType PoseMetadataEntry::GetType() const {

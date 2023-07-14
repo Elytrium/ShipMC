@@ -43,7 +43,7 @@ namespace Ship {
     }
 
     uint32_t packetSize = packet.Size(version);
-    uint32_t packetID = writerRegistry->GetIDByPacket(version, packet);
+    ProceedErrorable(packetID, uint32_t, writerRegistry->GetIDByPacket(version, packet), InvalidSerializableWriteErrorable(packet.GetOrdinal()))
     uint32_t packetSizeWithID = packetSize + ByteBuffer::VarIntBytes(packetID);
     out->WriteVarInt(packetSizeWithID);
     out->WriteVarInt(packetID);

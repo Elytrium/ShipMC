@@ -14,9 +14,11 @@ namespace Ship {
     buffer->WriteBytes((uint8_t*) value.data(), value.size());
   }
 
-  void StringTag::Read(ByteBuffer* buffer) {
-    uint32_t valueLength = buffer->ReadShort();
-    value = (char*) buffer->ReadBytes(valueLength * sizeof(uint16_t));
+  Errorable<bool> StringTag::Read(ByteBuffer* buffer) {
+    ProceedErrorable(valueLength, uint16_t, buffer->ReadShort(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(valueBytes, uint8_t*, buffer->ReadBytes(valueLength * sizeof(uint16_t)), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    value = (char*) valueBytes;
+    return SuccessErrorable<bool>(true);
   }
 
   uint32_t StringTag::GetSize() {

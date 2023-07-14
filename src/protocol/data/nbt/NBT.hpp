@@ -37,7 +37,9 @@ namespace Ship {
 
     virtual ~NBT() = default;
 
-    virtual void Read(ByteBuffer* buffer) {};
+    virtual Errorable<bool> Read(ByteBuffer* buffer) {
+      return SuccessErrorable<bool>(false);
+    };
     virtual void Write(ByteBuffer* buffer) {};
     virtual TagType GetType() = 0;
 
@@ -47,7 +49,7 @@ namespace Ship {
       return counter.GetWriterIndex();
     }
 
-      std::string GetName() {
+    std::string GetName() {
       return name;
     }
 
@@ -56,13 +58,14 @@ namespace Ship {
     }
   };
   CreateInvalidArgumentErrorable(InvalidNBTErrorable, NBT*, "Invalid NBT read");
+  CreateInvalidArgumentErrorable(InvalidNBTTagErrorable, bool, "Invalid NBT tag read");
 
   class EndTag : public NBT {
    public:
     explicit EndTag(const std::string& name);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
   };
@@ -76,7 +79,7 @@ namespace Ship {
     ByteTag(const std::string& name, uint8_t value);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -93,7 +96,7 @@ namespace Ship {
     ShortTag(const std::string& name, uint16_t value);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -110,7 +113,7 @@ namespace Ship {
     IntTag(const std::string& name, uint32_t value);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -127,7 +130,7 @@ namespace Ship {
     LongTag(const std::string& name, uint64_t value);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -144,7 +147,7 @@ namespace Ship {
     FloatTag(const std::string& name, float value);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -161,7 +164,7 @@ namespace Ship {
     DoubleTag(const std::string& name, double value);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -183,7 +186,7 @@ namespace Ship {
     ByteArrayTag(const std::string& name, uint8_t* value, uint32_t valueLength);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -200,10 +203,10 @@ namespace Ship {
     ~StringTag() override = default;
 
     explicit StringTag(const std::string& name);
-    StringTag(const std::string& name, std::string  value);
+    StringTag(const std::string& name, std::string value);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -226,7 +229,7 @@ namespace Ship {
     ListTag(const std::string& name, std::list<NBT*> list);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -248,7 +251,7 @@ namespace Ship {
     CompoundTag(const std::string& name, std::map<std::string, NBT*> list);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -279,7 +282,7 @@ namespace Ship {
     IntArrayTag(const std::string& name, uint32_t* value, uint32_t valueLength);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 
@@ -302,7 +305,7 @@ namespace Ship {
     LongArrayTag(const std::string& name, uint64_t* value, uint32_t valueLength);
 
     void Write(ByteBuffer* buffer) override;
-    void Read(ByteBuffer* buffer) override;
+    Errorable<bool> Read(ByteBuffer* buffer) override;
     uint32_t GetSize() override;
     TagType GetType() override;
 

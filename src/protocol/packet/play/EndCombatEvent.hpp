@@ -7,12 +7,13 @@ namespace Ship {
 
   class EndCombatEvent : public Packet {
    private:
-    uint32_t duration;
-    uint32_t entityId;
+    uint32_t duration{};
+    uint32_t entityId{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    EndCombatEvent() = default;
     EndCombatEvent(uint32_t duration, uint32_t entityId) : duration(duration), entityId(entityId) {
     }
 
@@ -20,8 +21,9 @@ namespace Ship {
 
     static Errorable<EndCombatEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(duration, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      entityId = buffer->ReadInt();
+      ProceedErrorable(duration, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<EndCombatEvent>(PACKET_ORDINAL))
+      ProceedErrorable(entityId, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<EndCombatEvent>(PACKET_ORDINAL))
+      return SuccessErrorable<EndCombatEvent>(EndCombatEvent(duration, entityId));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

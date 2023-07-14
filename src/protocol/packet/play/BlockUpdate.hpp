@@ -20,7 +20,7 @@ namespace Ship {
 
     static Errorable<BlockUpdate> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<BlockUpdate>(PACKET_ORDINAL))
+      ProceedErrorable(location, Position, ProtocolUtils::ReadPosition(holder.GetVersion(), buffer), InvalidPacketErrorable<BlockUpdate>(PACKET_ORDINAL))
       ProceedErrorable(blockId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BlockUpdate>(PACKET_ORDINAL))
       return SuccessErrorable<BlockUpdate>({location, blockId});
     }
@@ -28,7 +28,7 @@ namespace Ship {
     ~BlockUpdate() override = default;
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      buffer->WritePosition(location);
+      ProtocolUtils::WritePosition(version, buffer, location);
       buffer->WriteVarInt(blockId);
       return SuccessErrorable<bool>(true);
     }

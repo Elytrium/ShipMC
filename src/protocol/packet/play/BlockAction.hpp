@@ -23,7 +23,7 @@ namespace Ship {
 
     static Errorable<BlockAction> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<BlockAction>(PACKET_ORDINAL))
+      ProceedErrorable(location, Position, ProtocolUtils::ReadPosition(holder.GetVersion(), buffer), InvalidPacketErrorable<BlockAction>(PACKET_ORDINAL))
       ProceedErrorable(actionId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BlockAction>(PACKET_ORDINAL))
       ProceedErrorable(actionParameter, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BlockAction>(PACKET_ORDINAL))
       ProceedErrorable(blockType, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BlockAction>(PACKET_ORDINAL))
@@ -33,7 +33,7 @@ namespace Ship {
     ~BlockAction() override = default;
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      buffer->WritePosition(location);
+      ProtocolUtils::WritePosition(version, buffer, location);
       buffer->WriteByte(actionId);
       buffer->WriteByte(actionParameter);
       buffer->WriteVarInt(blockType);
@@ -44,7 +44,7 @@ namespace Ship {
       return PACKET_ORDINAL;
     }
 
-    [[nodiscard]] int GetLocation() const {
+    [[nodiscard]] Position GetLocation() const {
       return location;
     }
 

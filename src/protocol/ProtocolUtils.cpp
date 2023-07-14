@@ -40,7 +40,7 @@ namespace Ship {
     return PARTICLE_REGISTRY.GetObjectByID(version, id, buffer);
   }
 
-  Errorable<Metadata> ProtocolUtils::ReadMetadata(const ProtocolVersion* version, ByteBuffer* buffer) {
+  Errorable<Metadata*> ProtocolUtils::ReadMetadata(const ProtocolVersion* version, ByteBuffer* buffer) {
     return Metadata::Instantiate(version, buffer);
   }
 
@@ -99,7 +99,7 @@ namespace Ship {
 
   Errorable<Position> ProtocolUtils::ReadPosition(const ProtocolVersion* version, ByteBuffer* buffer) {
     ProceedErrorable(value, uint64_t, buffer->ReadLong(), InvalidPositionErrorable(buffer->GetReadableBytes()))
-    int x = (int) (value >> 38);
+      int x = (int) (value >> 38);
     int y = (int) (value & 0xFFF);
     int z = (int) (value >> 12) & 0x3FFFFFF;
 
@@ -118,7 +118,32 @@ namespace Ship {
     return SuccessErrorable<Position>({x, y, z});
   }
 
+  Errorable<GlobalPos> ProtocolUtils::ReadGlobalPos(const ProtocolVersion* version, ByteBuffer* buffer) {
+    ProceedErrorable(dimension, std::string, buffer->ReadString(), InvalidGlobalPosErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(position, Position, ProtocolUtils::ReadPosition(version, buffer), InvalidGlobalPosErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<GlobalPos>({dimension, position});
+  }
+
+  Errorable<Rotation> ProtocolUtils::ReadRotation(const Ship::ProtocolVersion* version, Ship::ByteBuffer* buffer) {
+    ProceedErrorable(x, float, buffer->ReadFloat(), InvalidRotationErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(y, float, buffer->ReadFloat(), InvalidRotationErrorable(buffer->GetReadableBytes()))
+    ProceedErrorable(z, float, buffer->ReadFloat(), InvalidRotationErrorable(buffer->GetReadableBytes()))
+
+    return SuccessErrorable<Rotation>({x, y, z});
+  }
+
   void ProtocolUtils::WritePosition(const ProtocolVersion* version, ByteBuffer* buffer, Position position) {
     buffer->WriteLong(((position.GetX() & 0x3FFFFFFULL) << 38) | ((position.GetZ() & 0x3FFFFFFULL) << 12) | (position.GetY() & 0xFFF));
+  }
+
+  void ProtocolUtils::WriteRotation(const ProtocolVersion* version, ByteBuffer* buffer, Rotation rotation) {
+    buffer->WriteFloat(rotation.GetX());
+    buffer->WriteFloat(rotation.GetY());
+    buffer->WriteFloat(rotation.GetZ());
+  }
+
+  void ProtocolUtils::WriteGlobalPos(const ProtocolVersion* version, ByteBuffer* buffer, const GlobalPos& position) {
+    buffer->WriteString(position.GetDimension());
+    ProtocolUtils::WritePosition(version, buffer, position.GetPosition());
   }
 }

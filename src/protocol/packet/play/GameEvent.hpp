@@ -7,12 +7,13 @@ namespace Ship {
 
   class GameEvent : public Packet {
    private:
-    uint8_t event;
-    float value;
+    uint8_t event{};
+    float value{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    GameEvent() = default;
     GameEvent(uint8_t event, float value) : event(event), value(value) {
     }
 
@@ -20,8 +21,9 @@ namespace Ship {
 
     static Errorable<GameEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(event, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(value, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(event, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<GameEvent>(PACKET_ORDINAL))
+      ProceedErrorable(value, float, buffer->ReadFloat(), InvalidPacketErrorable<GameEvent>(PACKET_ORDINAL))
+      return SuccessErrorable<GameEvent>(GameEvent(event, value));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

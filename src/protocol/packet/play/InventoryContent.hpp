@@ -9,14 +9,15 @@ namespace Ship {
 
   class InventoryContent : public Packet {
    private:
-    uint8_t windowId;
-    uint32_t stateId;
+    uint8_t windowId{};
+    uint32_t stateId{};
     std::vector<ItemStack> slots;
     ItemStack carriedItem;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    InventoryContent() = default;
     InventoryContent(uint8_t windowId, uint32_t stateId, std::vector<ItemStack> slots, const ItemStack& carriedItem)
       : windowId(windowId), stateId(stateId), slots(std::move(slots)), carriedItem(carriedItem) {
     }
@@ -26,22 +27,27 @@ namespace Ship {
     static Errorable<InventoryContent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      uint32_t vectorSize;
+      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<InventoryContent>(PACKET_ORDINAL))
+      uint32_t stateId, vectorSize;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17_1) {
-        ProceedErrorable(stateId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(stateId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<InventoryContent>(PACKET_ORDINAL))
+        SetFromErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<InventoryContent>(PACKET_ORDINAL))
       } else {
-        ProceedErrorable(vectorSize, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(vectorSize, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<InventoryContent>(PACKET_ORDINAL))
       }
 
+      std::vector<ItemStack> slots;
       for (int i = 0; i < vectorSize; ++i) {
-        slots.emplace_back(version, buffer);
+        ProceedErrorable(slot, ItemStack, ItemStack::Instantiate(version, buffer), InvalidPacketErrorable<InventoryContent>(PACKET_ORDINAL))
+        slots.push_back(slot);
       }
 
+      ItemStack carriedItem;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17_1) {
-        carriedItem = ItemStack(version, buffer);
+        SetFromErrorable(carriedItem, ItemStack, ItemStack::Instantiate(version, buffer), InvalidPacketErrorable<InventoryContent>(PACKET_ORDINAL))
       }
+
+      return SuccessErrorable<InventoryContent>(InventoryContent(windowId, stateId, slots, carriedItem));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

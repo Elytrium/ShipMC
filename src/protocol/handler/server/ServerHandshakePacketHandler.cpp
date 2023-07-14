@@ -24,7 +24,7 @@ namespace Ship {
         return SuccessErrorable<bool>(true);
     }
 
-    return false;
+    return SuccessErrorable<bool>(false);
   }
 
   ServerHandshakePacketHandler::ServerHandshakePacketHandler(

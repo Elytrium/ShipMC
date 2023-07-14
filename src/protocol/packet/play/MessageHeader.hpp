@@ -7,26 +7,28 @@ namespace Ship {
 
   class MessageHeader : public Packet {
    private:
-    ByteBuffer* precedingSignature;
-    UUID sender;
+    ByteBuffer* precedingSignature{};
+    UUID sender{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    MessageHeader() = default;
     MessageHeader(ByteBuffer* precedingSignature, const UUID& sender) : precedingSignature(precedingSignature), sender(sender) {
     }
 
     static Errorable<MessageHeader> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      delete precedingSignature;
-      ProceedErrorable(hasSignature, bool, buffer->ReadBoolean(), ss)
+      ProceedErrorable(hasSignature, bool, buffer->ReadBoolean(), InvalidPacketErrorable<MessageHeader>(PACKET_ORDINAL))
+      ByteBuffer* precedingSignature;
       if (hasSignature) {
         uint32_t size = buffer->GetReadableBytes() - ByteBuffer::UUID_SIZE;
-        precedingSignature = new ByteBufferImpl(buffer->ReadBytes(size), size);
-      } else {
-        precedingSignature = nullptr;
+        ProceedErrorable(bytes, uint8_t*, buffer->ReadBytes(size), InvalidPacketErrorable<MessageHeader>(PACKET_ORDINAL))
+        precedingSignature = new ByteBufferImpl(bytes, size);
       }
-      ProceedErrorable(sender, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+
+      ProceedErrorable(sender, UUID, buffer->ReadUUID(), InvalidPacketErrorable<MessageHeader>(PACKET_ORDINAL))
+      return SuccessErrorable<MessageHeader>(MessageHeader(precedingSignature, sender));
     }
 
     ~MessageHeader() override {

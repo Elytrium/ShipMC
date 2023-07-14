@@ -9,18 +9,19 @@ namespace Ship {
 
   class Explosion : public Packet {
    private:
-    double x;
-    double y;
-    double z;
-    float strength;
+    double x{};
+    double y{};
+    double z{};
+    float strength{};
     std::vector<std::array<uint8_t, 3>> records;
-    float playerMotionX;
-    float playerMotionY;
-    float playerMotionZ;
+    float playerMotionX{};
+    float playerMotionY{};
+    float playerMotionZ{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    Explosion() = default;
     Explosion(double x, double y, double z, float strength, std::vector<std::array<uint8_t, 3>> records, float playerMotionX, float playerMotionY,
       float playerMotionZ)
       : x(x), y(y), z(z), strength(strength), records(std::move(records)), playerMotionX(playerMotionX), playerMotionY(playerMotionY),
@@ -32,29 +33,35 @@ namespace Ship {
     static Errorable<Explosion> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
+      double x, y, z;
       if (version == &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        ProceedErrorable(x, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(y, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(z, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(x, float, buffer->ReadFloat(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
+        SetFromErrorable(y, float, buffer->ReadFloat(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
+        SetFromErrorable(z, float, buffer->ReadFloat(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
       } else {
-        ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
+        SetFromErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
+        SetFromErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
       }
-      ProceedErrorable(strength, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(strength, float, buffer->ReadFloat(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
+      uint32_t recordsSize;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
-        records.resize(buffer->ReadVarInt());
+        SetFromErrorable(recordsSize, uint32_t , buffer->ReadVarInt(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
       } else {
-        records.resize(buffer->ReadInt());
+        SetFromErrorable(recordsSize, uint32_t , buffer->ReadInt(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
       }
+
+      std::vector<std::array<uint8_t, 3>> records(recordsSize);
       for (std::array<uint8_t, 3>& record : records) {
         for (uint8_t& byte : record) {
-          ProceedErrorable(byte, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(byte, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
         }
       }
-      ProceedErrorable(playerMotionX, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(playerMotionY, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(playerMotionZ, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+
+      ProceedErrorable(playerMotionX, float, buffer->ReadFloat(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
+      ProceedErrorable(playerMotionY, float, buffer->ReadFloat(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
+      ProceedErrorable(playerMotionZ, float, buffer->ReadFloat(), InvalidPacketErrorable<Explosion>(PACKET_ORDINAL))
+      return SuccessErrorable<Explosion>(Explosion(x, y, z, strength, records, playerMotionX, playerMotionY, playerMotionZ));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

@@ -4,20 +4,21 @@ namespace Ship {
   ByteArrayTag::ByteArrayTag(const std::string &name) : NBT(name) {
   }
 
-  ByteArrayTag::ByteArrayTag(const std::string &name, uint8_t *value, uint32_t valueLength)
+  ByteArrayTag::ByteArrayTag(const std::string &name, uint8_t* value, uint32_t valueLength)
     : NBT(name), value((uint8_t *) value), valueLength(valueLength) {
   }
 
-  void ByteArrayTag::Write(ByteBuffer *buffer) {
+  void ByteArrayTag::Write(ByteBuffer* buffer) {
     buffer->WriteInt(valueLength);
     buffer->WriteBytes(value, valueLength);
   }
 
-  void ByteArrayTag::Read(ByteBuffer *buffer) {
+  Errorable<bool> ByteArrayTag::Read(ByteBuffer* buffer) {
     delete[] value;
 
-    valueLength = buffer->ReadInt();
-    value = buffer->ReadBytes(valueLength);
+    SetFromErrorable(valueLength, uint32_t, buffer->ReadInt(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    SetFromErrorable(value, uint8_t*, buffer->ReadBytes(valueLength), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<bool>(true);
   }
 
   uint32_t ByteArrayTag::GetSize() {
@@ -36,7 +37,7 @@ namespace Ship {
     return valueLength;
   }
 
-  void ByteArrayTag::SetValue(uint8_t *newValue, uint32_t newValueLength) {
+  void ByteArrayTag::SetValue(uint8_t* newValue, uint32_t newValueLength) {
     value = newValue;
     valueLength = newValueLength;
   }

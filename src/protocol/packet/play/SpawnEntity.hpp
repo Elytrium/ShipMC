@@ -7,23 +7,24 @@ namespace Ship {
 
   class SpawnEntity : public Packet {
    private:
-    uint32_t entityId;
-    UUID entityUuid;
-    uint32_t type;
-    double x;
-    double y;
-    double z;
-    float pitch;
-    float yaw;
-    float headYaw;
-    uint32_t data;
-    float velocityX;
-    float velocityY;
-    float velocityZ;
+    uint32_t entityId{};
+    UUID entityUuid{};
+    uint32_t type{};
+    double x{};
+    double y{};
+    double z{};
+    float pitch{};
+    float yaw{};
+    float headYaw{};
+    uint32_t data{};
+    float velocityX{};
+    float velocityY{};
+    float velocityZ{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    SpawnEntity() = default;
     SpawnEntity(uint32_t entityId, const UUID& entityUuid, uint32_t type, double x, double y, double z, float pitch, float yaw, float headYaw,
       uint32_t data, float velocityX, float velocityY, float velocityZ)
       : entityId(entityId), entityUuid(entityUuid), type(type), x(x), y(y), z(z), pitch(pitch), yaw(yaw), headYaw(headYaw), data(data),
@@ -35,27 +36,34 @@ namespace Ship {
     static Errorable<SpawnEntity> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(entityUuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      ProceedErrorable(entityUuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      uint32_t type;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
-        ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
       } else {
-        ProceedErrorable(type, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(type, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
       }
-      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      pitch = buffer->ReadAngle();
-      yaw = buffer->ReadAngle();
+      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      ProceedErrorable(y, double, buffer->ReadDouble(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      ProceedErrorable(pitch, float, buffer->ReadAngle(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      ProceedErrorable(yaw, float, buffer->ReadAngle(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      float headYaw;
+      uint32_t data;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
-        headYaw = buffer->ReadAngle();
-        ProceedErrorable(data, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(headYaw, float, buffer->ReadAngle(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+        SetFromErrorable(data, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
       } else {
-        data = buffer->ReadInt();
+        SetFromErrorable(data, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
       }
-      velocityX = (float) buffer->ReadShort() / 8000.0F;
-      velocityY = (float) buffer->ReadShort() / 8000.0F;
-      velocityZ = (float) buffer->ReadShort() / 8000.0F;
+      ProceedErrorable(velocityXShort, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      ProceedErrorable(velocityYShort, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      ProceedErrorable(velocityZShort, uint16_t, buffer->ReadShort(), InvalidPacketErrorable<SpawnEntity>(PACKET_ORDINAL))
+      auto velocityX = (float) velocityXShort / 8000.0F;
+      auto velocityY = (float) velocityYShort / 8000.0F;
+      auto velocityZ = (float) velocityZShort / 8000.0F;
+      return SuccessErrorable<SpawnEntity>(SpawnEntity(entityId, entityUuid, type, x, y, z, pitch, yaw, headYaw, data, velocityX, velocityY, velocityZ));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

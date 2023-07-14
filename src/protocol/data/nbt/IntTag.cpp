@@ -7,8 +7,9 @@ namespace Ship {
   IntTag::IntTag(const std::string& name, uint32_t value) : NBT(name), value(value) {
   }
 
-  void IntTag::Read(ByteBuffer* buffer) {
-    ProceedErrorable(value, ss, buffer->ReadInt, ss)
+  Errorable<bool> IntTag::Read(ByteBuffer* buffer) {
+    SetFromErrorable(value, uint32_t, buffer->ReadInt(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<bool>(true);
   }
 
   void IntTag::Write(ByteBuffer* buffer) {

@@ -8,12 +8,13 @@ namespace Ship {
 
   class CraftRecipeResponse : public Packet {
    private:
-    uint8_t windowId;
+    uint8_t windowId{};
     std::string recipe;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    CraftRecipeResponse() = default;
     CraftRecipeResponse(uint8_t windowId, std::string recipe) : windowId(windowId), recipe(std::move(recipe)) {
     }
 
@@ -21,8 +22,9 @@ namespace Ship {
 
     static Errorable<CraftRecipeResponse> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(recipe, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(windowId, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<CraftRecipeResponse>(PACKET_ORDINAL))
+      ProceedErrorable(recipe, std::string, buffer->ReadString(), InvalidPacketErrorable<CraftRecipeResponse>(PACKET_ORDINAL))
+      return SuccessErrorable<CraftRecipeResponse>(CraftRecipeResponse(windowId, recipe));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

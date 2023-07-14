@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../../utils/exceptions/Exception.hpp"
 #include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 #include <utility>
@@ -14,6 +13,19 @@ namespace Ship {
     [[nodiscard]] virtual uint32_t GetAction() const = 0;
   };
 
+  template<typename T>
+  class InvalidBossBarActionErrorable : public Errorable<T> {
+   public:
+    static inline const uint32_t TYPE_ORDINAL = OrdinalRegistry::ErrorableTypeRegistry.RegisterOrdinal();
+
+    explicit InvalidBossBarActionErrorable(uint32_t action_id) : Errorable<T>(TYPE_ORDINAL, {}, action_id) {
+    }
+
+    void Print(std::ostream o) {
+      o << "Invalid boss bar action received, action id: " << this->GetErrorCode();
+    }
+  };
+
   class BossBarAdd : public BossBarAction {
    private:
     std::string title; // TODO: Chat components
@@ -23,6 +35,8 @@ namespace Ship {
     uint8_t flags {};
 
    public:
+    static inline const uint32_t ACTION_ID = 0;
+
     BossBarAdd() = default;
 
     BossBarAdd(std::string title, float health, uint32_t color, uint32_t division, uint8_t flags)
@@ -33,11 +47,11 @@ namespace Ship {
 
     static Errorable<BossBarAdd> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(title, std::string, buffer->ReadString(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
-      ProceedErrorable(health, float, buffer->ReadFloat(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
-      ProceedErrorable(color, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
-      ProceedErrorable(division, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
-      ProceedErrorable(flags, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BossBarAdd>(PACKET_ORDINAL))
+      ProceedErrorable(title, std::string, buffer->ReadString(), InvalidBossBarActionErrorable<BossBarAdd>(ACTION_ID))
+      ProceedErrorable(health, float, buffer->ReadFloat(), InvalidBossBarActionErrorable<BossBarAdd>(ACTION_ID))
+      ProceedErrorable(color, uint32_t, buffer->ReadVarInt(), InvalidBossBarActionErrorable<BossBarAdd>(ACTION_ID))
+      ProceedErrorable(division, uint32_t, buffer->ReadVarInt(), InvalidBossBarActionErrorable<BossBarAdd>(ACTION_ID))
+      ProceedErrorable(flags, uint8_t, buffer->ReadByte(), InvalidBossBarActionErrorable<BossBarAdd>(ACTION_ID))
       return SuccessErrorable<BossBarAdd>({title, health, color, division, flags});
     }
 
@@ -51,7 +65,7 @@ namespace Ship {
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
-      return 0;
+      return ACTION_ID;
     }
 
     [[nodiscard]] const std::string& GetTitle() const {
@@ -77,17 +91,20 @@ namespace Ship {
 
   class BossBarRemove : public BossBarAction {
    public:
+    static inline const uint32_t ACTION_ID = 1;
+
     static Errorable<BossBarRemove> Instantiate(const PacketHolder& holder) {
+      return SuccessErrorable<BossBarRemove>({});
     }
 
     ~BossBarRemove() override = default;
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-    return SuccessErrorable<bool>(true);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
-      return 1;
+      return ACTION_ID;
     }
   };
 
@@ -96,6 +113,8 @@ namespace Ship {
     float health {};
 
    public:
+    static inline const uint32_t ACTION_ID = 2;
+
     BossBarUpdateHealth() = default;
 
     explicit BossBarUpdateHealth(float health) : health(health) {
@@ -103,19 +122,19 @@ namespace Ship {
 
     static Errorable<BossBarUpdateHealth> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(health, float, buffer->ReadFloat(), InvalidPacketErrorable<BossBarUpdateHealth>(PACKET_ORDINAL))
+      ProceedErrorable(health, float, buffer->ReadFloat(), InvalidBossBarActionErrorable<BossBarUpdateHealth>(ACTION_ID))
       return SuccessErrorable<BossBarUpdateHealth>(BossBarUpdateHealth(health));
     }
 
     ~BossBarUpdateHealth() override = default;
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-    return SuccessErrorable<bool>(true);
       buffer->WriteFloat(health);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
-      return 2;
+      return ACTION_ID;
     }
 
     [[nodiscard]] float GetHealth() const {
@@ -128,6 +147,8 @@ namespace Ship {
     std::string title; // TODO: Chat components
 
    public:
+    static inline const uint32_t ACTION_ID = 3;
+
     BossBarUpdateTitle() = default;
 
     explicit BossBarUpdateTitle(std::string title) : title(std::move(title)) {
@@ -135,19 +156,19 @@ namespace Ship {
 
     static Errorable<BossBarUpdateTitle> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(title, std::string, buffer->ReadString(), InvalidPacketErrorable<BossBarUpdateTitle>(PACKET_ORDINAL))
+      ProceedErrorable(title, std::string, buffer->ReadString(), InvalidBossBarActionErrorable<BossBarUpdateTitle>(ACTION_ID))
       return SuccessErrorable<BossBarUpdateTitle>(BossBarUpdateTitle(title));
     }
 
     ~BossBarUpdateTitle() override = default;
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-    return SuccessErrorable<bool>(true);
       buffer->WriteString(title);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
-      return 3;
+      return ACTION_ID;
     }
 
     [[nodiscard]] const std::string& GetTitle() const {
@@ -161,6 +182,8 @@ namespace Ship {
     uint32_t dividers {};
 
    public:
+    static inline const uint32_t ACTION_ID = 4;
+
     BossBarUpdateStyle() = default;
 
     BossBarUpdateStyle(uint32_t color, uint32_t dividers) : color(color), dividers(dividers) {
@@ -168,21 +191,21 @@ namespace Ship {
 
     static Errorable<BossBarUpdateStyle> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(color, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BossBarUpdateStyle>(PACKET_ORDINAL))
-      ProceedErrorable(dividers, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BossBarUpdateStyle>(PACKET_ORDINAL))
+      ProceedErrorable(color, uint32_t, buffer->ReadVarInt(), InvalidBossBarActionErrorable<BossBarUpdateStyle>(ACTION_ID))
+      ProceedErrorable(dividers, uint32_t, buffer->ReadVarInt(), InvalidBossBarActionErrorable<BossBarUpdateStyle>(ACTION_ID))
       return SuccessErrorable<BossBarUpdateStyle>({color, dividers});
     }
 
     ~BossBarUpdateStyle() override = default;
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-    return SuccessErrorable<bool>(true);
       buffer->WriteVarInt(color);
       buffer->WriteVarInt(dividers);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
-      return 4;
+      return ACTION_ID;
     }
 
     [[nodiscard]] uint32_t GetColor() const {
@@ -196,9 +219,11 @@ namespace Ship {
 
   class BossBarUpdateFlags : public BossBarAction {
    private:
-    uint8_t flags;
+    uint8_t flags{};
 
    public:
+    static inline const uint32_t ACTION_ID = 5;
+
     BossBarUpdateFlags() = default;
 
     explicit BossBarUpdateFlags(uint8_t flags) : flags(flags) {
@@ -206,17 +231,17 @@ namespace Ship {
 
     static Errorable<BossBarUpdateFlags> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(flags, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BossBarUpdateFlags>(PACKET_ORDINAL))
+      ProceedErrorable(flags, uint8_t, buffer->ReadByte(), InvalidBossBarActionErrorable<BossBarUpdateFlags>(ACTION_ID))
       return SuccessErrorable<BossBarUpdateFlags>(BossBarUpdateFlags(flags));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-    return SuccessErrorable<bool>(true);
       buffer->WriteByte(flags);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetAction() const override {
-      return 5;
+      return ACTION_ID;
     }
 
     [[nodiscard]] uint8_t GetFlags() const {
@@ -226,57 +251,25 @@ namespace Ship {
 
   class BossBar : public Packet {
    private:
-    UUID uuid;
-    BossBarAction* action;
+    UUID uuid{};
+    BossBarAction* action{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    BossBar() = default;
     BossBar(const UUID& uuid, BossBarAction* action) : uuid(uuid), action(action) {
     }
 
-    static Errorable<BossBar> Instantiate(const PacketHolder& holder) {
-      ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(actionId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-
-      switch (actionId) {
-        case 0:
-          action = new BossBarAdd(holder);
-          break;
-
-        case 1:
-          action = new BossBarRemove(holder);
-          break;
-
-        case 2:
-          action = new BossBarUpdateHealth(holder);
-          break;
-
-        case 3:
-          action = new BossBarUpdateTitle(holder);
-          break;
-
-        case 4:
-          action = new BossBarUpdateStyle(holder);
-          break;
-
-        case 5:
-          action = new BossBarUpdateFlags(holder);
-          break;
-
-        default:
-          throw Exception("Unknown boss bar action");
-      }
-    }
+    static Errorable<BossBar> Instantiate(const PacketHolder& holder);
 
     ~BossBar() override = default;
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-    return SuccessErrorable<bool>(true);
       buffer->WriteUUID(uuid);
       buffer->WriteVarInt(action->GetAction());
       action->Write(version, buffer);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {
@@ -291,4 +284,41 @@ namespace Ship {
       return action;
     }
   };
+  CreateInvalidArgumentErrorable(UnknownBossBarActionErrorable, BossBar, "Unknown boss bar action");
+
+  Errorable<BossBar> BossBar::Instantiate(const PacketHolder& holder) {
+    ByteBuffer* buffer = holder.GetCurrentBuffer();
+    ProceedErrorable(uuid, UUID, buffer->ReadUUID(), InvalidPacketErrorable<BossBar>(PACKET_ORDINAL))
+    ProceedErrorable(actionID, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BossBar>(PACKET_ORDINAL))
+
+    switch (actionID) {
+      case BossBarAdd::ACTION_ID: {
+        ProceedErrorable(action, BossBarAdd, BossBarAdd::Instantiate(holder), InvalidPacketErrorable<BossBar>(PACKET_ORDINAL))
+        return SuccessErrorable<BossBar>(BossBar(uuid, &action));
+      }
+      case BossBarRemove::ACTION_ID: {
+        ProceedErrorable(action, BossBarRemove, BossBarRemove::Instantiate(holder), InvalidPacketErrorable<BossBar>(PACKET_ORDINAL))
+        return SuccessErrorable<BossBar>(BossBar(uuid, &action));
+      }
+      case BossBarUpdateHealth::ACTION_ID: {
+        ProceedErrorable(action, BossBarUpdateHealth, BossBarUpdateHealth::Instantiate(holder), InvalidPacketErrorable<BossBar>(PACKET_ORDINAL))
+        return SuccessErrorable<BossBar>(BossBar(uuid, &action));
+      }
+      case BossBarUpdateTitle::ACTION_ID: {
+        ProceedErrorable(action, BossBarUpdateTitle, BossBarUpdateTitle::Instantiate(holder), InvalidPacketErrorable<BossBar>(PACKET_ORDINAL))
+        return SuccessErrorable<BossBar>(BossBar(uuid, &action));
+      }
+      case BossBarUpdateStyle::ACTION_ID: {
+        ProceedErrorable(action, BossBarUpdateStyle, BossBarUpdateStyle::Instantiate(holder), InvalidPacketErrorable<BossBar>(PACKET_ORDINAL))
+        return SuccessErrorable<BossBar>(BossBar(uuid, &action));
+      }
+      case BossBarUpdateFlags::ACTION_ID: {
+        ProceedErrorable(action, BossBarUpdateFlags, BossBarUpdateFlags::Instantiate(holder), InvalidPacketErrorable<BossBar>(PACKET_ORDINAL))
+        return SuccessErrorable<BossBar>(BossBar(uuid, &action));
+      }
+      default: {
+        return UnknownBossBarActionErrorable(actionID);
+      }
+    }
+  }
 }

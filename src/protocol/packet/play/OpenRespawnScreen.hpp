@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../lib/ShipNet/src/protocol/packet/Packet.hpp"
 #include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include <string>
 

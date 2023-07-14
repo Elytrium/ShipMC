@@ -25,7 +25,7 @@ namespace Ship {
     static Errorable<BlockEntityData> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<BlockEntityData>(PACKET_ORDINAL))
+      ProceedErrorable(location, Position, ProtocolUtils::ReadPosition(holder.GetVersion(), buffer), InvalidPacketErrorable<BlockEntityData>(PACKET_ORDINAL))
       uint32_t type;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_18) {
         SetFromErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BlockEntityData>(PACKET_ORDINAL))
@@ -33,7 +33,7 @@ namespace Ship {
         SetFromErrorable(type, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BlockEntityData>(PACKET_ORDINAL))
       }
 
-      NBT* data = ProtocolUtils::ReadNBT(buffer);
+      ProceedErrorable(data, NBT*, ProtocolUtils::ReadNBT(buffer), InvalidPacketErrorable<BlockEntityData>(PACKET_ORDINAL));
       return SuccessErrorable<BlockEntityData>({location, type, data});
     }
 
@@ -42,7 +42,7 @@ namespace Ship {
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      buffer->WritePosition(location);
+      ProtocolUtils::WritePosition(version, buffer, location);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_18) {
         buffer->WriteVarInt(type);
       } else {

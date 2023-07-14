@@ -7,18 +7,19 @@ namespace Ship {
 
   class InitializeWorldBorder : public Packet {
    private:
-    double x;
-    double z;
-    double oldDiameter;
-    double newDiameter;
-    uint64_t speed;
-    uint32_t portalTeleportBoundary;
-    uint32_t warningBlocks;
-    uint32_t warningTime;
+    double x{};
+    double z{};
+    double oldDiameter{};
+    double newDiameter{};
+    uint64_t speed{};
+    uint32_t portalTeleportBoundary{};
+    uint32_t warningBlocks{};
+    uint32_t warningTime{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    InitializeWorldBorder() = default;
     InitializeWorldBorder(double x, double z, double oldDiameter, double newDiameter, uint64_t speed, uint32_t portalTeleportBoundary,
       uint32_t warningBlocks, uint32_t warningTime)
       : x(x), z(z), oldDiameter(oldDiameter), newDiameter(newDiameter), speed(speed), portalTeleportBoundary(portalTeleportBoundary),
@@ -29,14 +30,15 @@ namespace Ship {
 
     static Errorable<InitializeWorldBorder> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(oldDiameter, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(newDiameter, double, buffer->ReadDouble(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      speed = buffer->ReadVarLong();
-      ProceedErrorable(portalTeleportBoundary, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(warningBlocks, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(warningTime, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(x, double, buffer->ReadDouble(), InvalidPacketErrorable<InitializeWorldBorder>(PACKET_ORDINAL))
+      ProceedErrorable(z, double, buffer->ReadDouble(), InvalidPacketErrorable<InitializeWorldBorder>(PACKET_ORDINAL))
+      ProceedErrorable(oldDiameter, double, buffer->ReadDouble(), InvalidPacketErrorable<InitializeWorldBorder>(PACKET_ORDINAL))
+      ProceedErrorable(newDiameter, double, buffer->ReadDouble(), InvalidPacketErrorable<InitializeWorldBorder>(PACKET_ORDINAL))
+      ProceedErrorable(speed, uint64_t, buffer->ReadVarLong(), InvalidPacketErrorable<InitializeWorldBorder>(PACKET_ORDINAL))
+      ProceedErrorable(portalTeleportBoundary, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<InitializeWorldBorder>(PACKET_ORDINAL))
+      ProceedErrorable(warningBlocks, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<InitializeWorldBorder>(PACKET_ORDINAL))
+      ProceedErrorable(warningTime, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<InitializeWorldBorder>(PACKET_ORDINAL))
+      return SuccessErrorable<InitializeWorldBorder>(InitializeWorldBorder(x, z, oldDiameter, newDiameter, speed, portalTeleportBoundary, warningBlocks, warningTime));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -51,7 +53,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

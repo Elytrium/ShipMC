@@ -7,25 +7,26 @@ namespace Ship {
 
   class OpenSignEditor : public Packet {
    private:
-    int locationX;
-    int locationY;
-    int locationZ;
+    Position location{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
-    OpenSignEditor(int locationX, int locationY, int locationZ) : locationX(locationX), locationY(locationY), locationZ(locationZ) {
+    OpenSignEditor() = default;
+
+    explicit OpenSignEditor(Position location) : location(location) {
     }
 
     ~OpenSignEditor() override = default;
 
     static Errorable<OpenSignEditor> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      buffer->ReadPosition(locationX, locationY, locationZ);
+      ProceedErrorable(location, Position, ProtocolUtils::ReadPosition(holder.GetVersion(), buffer), InvalidPacketErrorable<OpenSignEditor>(PACKET_ORDINAL))
+      return SuccessErrorable<OpenSignEditor>(OpenSignEditor(location));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-      buffer->WritePosition(locationX, locationY, locationZ);
+      ProtocolUtils::WritePosition(version, buffer, location);
       return SuccessErrorable<bool>(true);
     }
 
@@ -33,16 +34,8 @@ namespace Ship {
       return PACKET_ORDINAL;
     }
 
-    [[nodiscard]] int GetLocationX() const {
-      return locationX;
-    }
-
-    [[nodiscard]] int GetLocationY() const {
-      return locationY;
-    }
-
-    [[nodiscard]] int GetLocationZ() const {
-      return locationZ;
+    [[nodiscard]] Position GetLocation() const {
+      return location;
     }
   };
 }

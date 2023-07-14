@@ -31,4 +31,31 @@ namespace Ship {
 
   const EnumRegistry<VillagerType> VILLAGER_TYPE_REGISTRY = GetVillagerTypeRegistry();
   const EnumRegistry<VillagerProfession> VILLAGER_PROFESSION_REGISTRY = GetVillagerProfessionRegistry();
+
+  VillagerData::VillagerData(VillagerType type, VillagerProfession profession, uint32_t level) : type(type), profession(profession), level(level) {
+  }
+
+  VillagerType VillagerData::GetType() const {
+    return type;
+  }
+
+  void VillagerData::SetType(VillagerType newType) {
+    VillagerData::type = newType;
+  }
+
+  VillagerProfession VillagerData::GetProfession() const {
+    return profession;
+  }
+
+  void VillagerData::SetProfession(VillagerProfession newProfession) {
+    VillagerData::profession = newProfession;
+  }
+
+  uint32_t VillagerData::GetLevel() const {
+    return level;
+  }
+
+  void VillagerData::SetLevel(uint32_t newLevel) {
+    VillagerData::level = newLevel;
+  }
 }

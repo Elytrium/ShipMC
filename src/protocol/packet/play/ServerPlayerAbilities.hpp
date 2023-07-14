@@ -17,11 +17,16 @@ namespace Ship {
 
       uint8_t value;
     } flags {};
-    float flyingSpeed;
-    float fovModifier;
+    float flyingSpeed{};
+    float fovModifier{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
+
+    ServerPlayerAbilities() = default;
+
+    ServerPlayerAbilities(uint8_t flags, float flyingSpeed, float fovModifier) : flags({.value = flags}), flyingSpeed(flyingSpeed), fovModifier(fovModifier) {
+    }
 
     ServerPlayerAbilities(bool invulnerable, bool flying, bool allowFlying, bool creativeMode, float flyingSpeed, float fovModifier)
       : flags {.invulnerable = invulnerable, .flying = flying, .allowFlying = allowFlying, .creativeMode = creativeMode}, flyingSpeed(flyingSpeed),
@@ -32,9 +37,10 @@ namespace Ship {
 
     static Errorable<ServerPlayerAbilities> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      flags.ProceedErrorable(value, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(flyingSpeed, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(fovModifier, float, buffer->ReadFloat(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(flags, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<ServerPlayerAbilities>(PACKET_ORDINAL))
+      ProceedErrorable(flyingSpeed, float, buffer->ReadFloat(), InvalidPacketErrorable<ServerPlayerAbilities>(PACKET_ORDINAL))
+      ProceedErrorable(fovModifier, float, buffer->ReadFloat(), InvalidPacketErrorable<ServerPlayerAbilities>(PACKET_ORDINAL))
+      return SuccessErrorable<ServerPlayerAbilities>(ServerPlayerAbilities(flags, flyingSpeed, fovModifier));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

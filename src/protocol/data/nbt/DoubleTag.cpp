@@ -7,8 +7,9 @@ namespace Ship {
   DoubleTag::DoubleTag(const std::string& name, double value) : NBT(name), value(value) {
   }
 
-  void DoubleTag::Read(ByteBuffer* buffer) {
-    ProceedErrorable(value, ss, buffer->ReadDouble, ss)
+  Errorable<bool> DoubleTag::Read(ByteBuffer* buffer) {
+    SetFromErrorable(value, double, buffer->ReadDouble(), InvalidNBTTagErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<bool>(true);
   }
 
   void DoubleTag::Write(ByteBuffer* buffer) {

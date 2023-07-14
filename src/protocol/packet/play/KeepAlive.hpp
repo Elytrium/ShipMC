@@ -7,11 +7,12 @@ namespace Ship {
 
   class KeepAlive : public Packet {
    private:
-    uint64_t id;
+    uint64_t id{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    KeepAlive() = default;
     explicit KeepAlive(uint64_t id) : id(id) {
     }
 
@@ -19,7 +20,8 @@ namespace Ship {
 
     static Errorable<KeepAlive> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      ProceedErrorable(id, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(id, uint64_t, buffer->ReadLong(), InvalidPacketErrorable<KeepAlive>(PACKET_ORDINAL))
+      return SuccessErrorable<KeepAlive>(KeepAlive(id));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

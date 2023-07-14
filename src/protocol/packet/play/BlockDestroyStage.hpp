@@ -23,7 +23,7 @@ namespace Ship {
     static Errorable<BlockDestroyStage> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       ProceedErrorable(entityId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<BlockDestroyStage>(PACKET_ORDINAL))
-      ProceedErrorable(location, Position, buffer->ReadPosition(), InvalidPacketErrorable<BlockDestroyStage>(PACKET_ORDINAL))
+      ProceedErrorable(location, Position, ProtocolUtils::ReadPosition(holder.GetVersion(), buffer), InvalidPacketErrorable<BlockDestroyStage>(PACKET_ORDINAL))
       ProceedErrorable(destroyStage, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<BlockDestroyStage>(PACKET_ORDINAL))
 
       return SuccessErrorable<BlockDestroyStage>({entityId, location, destroyStage});
@@ -33,7 +33,7 @@ namespace Ship {
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteVarInt(entityId);
-      buffer->WritePosition(location);
+      ProtocolUtils::WritePosition(version, buffer, location);
       buffer->WriteByte(destroyStage);
       return SuccessErrorable<bool>(true);
     }

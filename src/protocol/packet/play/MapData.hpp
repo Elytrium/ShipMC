@@ -8,42 +8,28 @@ namespace Ship {
 
   class MapIcon {
    private:
-    uint32_t type;
-    uint8_t x;
-    uint8_t z;
-    uint8_t direction;
+    uint32_t type{};
+    uint8_t x{};
+    uint8_t z{};
+    uint8_t direction{};
     std::optional<std::string> displayName;
 
    public:
+    MapIcon() = default;
+
+    MapIcon(uint32_t type, uint8_t x, uint8_t z, uint8_t direction)
+      : type(type), x(x), z(z), direction(direction) {
+    }
+
+    MapIcon(uint32_t type, uint8_t x, uint8_t z, uint8_t direction, std::string displayName)
+      : type(type), x(x), z(z), direction(direction), displayName(std::move(displayName)) {
+    }
+
     MapIcon(uint32_t type, uint8_t x, uint8_t z, uint8_t direction, std::optional<std::string> displayName)
       : type(type), x(x), z(z), direction(direction), displayName(std::move(displayName)) {
     }
 
-    MapIcon() : MapIcon(0, 0, 0, 0, {}) {
-    }
-
-    static Errorable<MapIcon> Instantiate(const PacketHolder& holder) {
-      ByteBuffer* buffer = holder.GetCurrentBuffer();
-      const ProtocolVersion* version = holder.GetVersion();
-      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
-        ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(x, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(z, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(direction, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        if (buffer->ReadBoolean()) {
-          ProceedErrorable(displayName, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        } else {
-          displayName = std::nullopt;
-        }
-      } else {
-        uint8_t ProceedErrorable(directionAndType, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        direction = directionAndType & 0xF;
-        type = (directionAndType & 0xF) >> 4;
-        ProceedErrorable(x, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(z, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        displayName = std::nullopt;
-      }
-    }
+    static Errorable<MapIcon> Instantiate(const PacketHolder& holder);
 
     [[nodiscard]] uint32_t GetType() const {
       return type;
@@ -86,22 +72,55 @@ namespace Ship {
     }
   };
 
+  CreateInvalidArgumentErrorable(InvalidMapIconErrorable, MapIcon, "Invalid MapIcon read");
+  
+  Errorable<MapIcon> MapIcon::Instantiate(const PacketHolder& holder) {
+    ByteBuffer* buffer = holder.GetCurrentBuffer();
+    const ProtocolVersion* version = holder.GetVersion();
+    if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
+      ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidMapIconErrorable(buffer->GetReadableBytes()))
+      ProceedErrorable(x, uint8_t, buffer->ReadByte(), InvalidMapIconErrorable(buffer->GetReadableBytes()))
+      ProceedErrorable(z, uint8_t, buffer->ReadByte(), InvalidMapIconErrorable(buffer->GetReadableBytes()))
+      ProceedErrorable(direction, uint8_t, buffer->ReadByte(), InvalidMapIconErrorable(buffer->GetReadableBytes()))
+      std::optional<std::string> displayName;
+
+      ProceedErrorable(hasDisplayName, bool, buffer->ReadBoolean(), InvalidMapIconErrorable(buffer->GetReadableBytes()))
+      if (hasDisplayName) {
+        SetFromErrorable(displayName, std::string, buffer->ReadString(), InvalidMapIconErrorable(buffer->GetReadableBytes()))
+      }
+
+      return SuccessErrorable<MapIcon>(MapIcon(type, x, z, direction, displayName));
+    } else {
+      ProceedErrorable(directionAndType, uint8_t, buffer->ReadByte(), InvalidMapIconErrorable(buffer->GetReadableBytes()))
+      uint8_t direction = directionAndType & 0xF;
+      uint32_t type = (directionAndType & 0xF) >> 4;
+      ProceedErrorable(x, uint8_t, buffer->ReadByte(), InvalidMapIconErrorable(buffer->GetReadableBytes()))
+      ProceedErrorable(z, uint8_t, buffer->ReadByte(), InvalidMapIconErrorable(buffer->GetReadableBytes()))
+      return SuccessErrorable<MapIcon>(MapIcon(type, x, z, direction, std::nullopt));
+    }
+  }
+
   class MapData : public Packet {
    private:
-    uint32_t mapId;
-    uint8_t scale;
-    bool locked;
-    bool trackingPosition;
+    uint32_t mapId{};
+    uint8_t scale{};
+    bool locked{};
+    bool trackingPosition{};
     std::vector<MapIcon> icons;
-    uint8_t columns;
-    uint8_t rows;
-    uint8_t x;
-    uint8_t z;
-    uint32_t length;
-    uint8_t* data;
+    uint8_t columns{};
+    uint8_t rows{};
+    uint8_t x{};
+    uint8_t z{};
+    uint32_t length{};
+    uint8_t* data{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
+
+    MapData() = default;
+    MapData(uint32_t mapId, uint8_t scale, bool locked, bool trackingPosition, std::vector<MapIcon> icons)
+      : mapId(mapId), scale(scale), locked(locked), trackingPosition(trackingPosition), icons(std::move(icons)) {
+    }
 
     MapData(uint32_t mapId, uint8_t scale, bool locked, bool trackingPosition, std::vector<MapIcon> icons, uint8_t columns, uint8_t rows, uint8_t x,
       uint8_t z, uint32_t length, uint8_t* data)
@@ -116,29 +135,38 @@ namespace Ship {
     static Errorable<MapData> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
-      ProceedErrorable(mapId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-      ProceedErrorable(scale, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(mapId, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
+      ProceedErrorable(scale, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
+
+      bool locked;
+      bool trackingPosition;
+      std::vector<MapIcon> icons;
+
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_17) {
-        ProceedErrorable(locked, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(trackingPosition, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(locked, bool, buffer->ReadBoolean(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
+        SetFromErrorable(trackingPosition, bool, buffer->ReadBoolean(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
       } else {
-        ProceedErrorable(trackingPosition, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(trackingPosition, bool, buffer->ReadBoolean(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
         if (version >= &MinecraftProtocolVersion::MINECRAFT_1_14) {
-          ProceedErrorable(locked, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+          SetFromErrorable(locked, bool, buffer->ReadBoolean(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
         }
       }
-      uint32_t ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+
+      ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
       for (int i = 0; i < vectorSize; ++i) {
-        icons.emplace_back(holder);
+        ProceedErrorable(icon, MapIcon, MapIcon::Instantiate(holder), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
+        icons.push_back(icon);
       }
-      ProceedErrorable(columns, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(columns, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
       if (columns) {
-        ProceedErrorable(rows, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(x, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(z, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(length, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        delete[] data;
-        ProceedErrorable(data, uint8_t*, buffer->ReadBytes(length), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        ProceedErrorable(rows, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
+        ProceedErrorable(x, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
+        ProceedErrorable(z, uint8_t, buffer->ReadByte(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
+        ProceedErrorable(length, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
+        ProceedErrorable(data, uint8_t*, buffer->ReadBytes(length), InvalidPacketErrorable<MapData>(PACKET_ORDINAL))
+        return SuccessErrorable<MapData>(MapData(mapId, scale, locked, trackingPosition, icons, columns, rows, x, z, length, data));
+      } else {
+        return SuccessErrorable<MapData>(MapData(mapId, scale, locked, trackingPosition, icons));
       }
     }
 

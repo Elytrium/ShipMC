@@ -7,11 +7,12 @@ namespace Ship {
 
   class Ping : public Packet {
    private:
-    uint32_t id;
+    uint32_t id{};
     
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    Ping() = default;
     explicit Ping(uint32_t id) : id(id) {
     }
 
@@ -19,7 +20,8 @@ namespace Ship {
 
     static Errorable<Ping> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      id = buffer->ReadInt();
+      ProceedErrorable(id, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<Ping>(PACKET_ORDINAL))
+      return SuccessErrorable<Ping>(Ping(id));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {

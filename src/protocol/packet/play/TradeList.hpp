@@ -117,7 +117,6 @@ namespace Ship {
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-    return SuccessErrorable<bool>(true);
       buffer->WriteVarInt(windowId);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_19) {
         buffer->WriteVarInt(trades.size());
@@ -142,6 +141,7 @@ namespace Ship {
       buffer->WriteVarInt(experience);
       buffer->WriteBoolean(regularVillager);
       buffer->WriteBoolean(canRestock);
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

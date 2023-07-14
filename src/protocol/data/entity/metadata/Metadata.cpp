@@ -5,8 +5,8 @@ namespace Ship {
   Metadata::Metadata(std::map<uint8_t, MetadataEntry*> entries) : entries(std::move(entries)) {
   }
 
-  Errorable<Metadata> Metadata::Instantiate(const Ship::ProtocolVersion* version, Ship::ByteBuffer* buffer) {
-    Metadata metadata;
+  Errorable<Metadata*> Metadata::Instantiate(const Ship::ProtocolVersion* version, Ship::ByteBuffer* buffer) {
+    auto* metadata = new Metadata();
     while (true) {
       ProceedErrorable(index, uint8_t, buffer->ReadByte(), InvalidMetadataErrorable(buffer->GetReadableBytes()))
       if (index == 0xFF) {
@@ -15,10 +15,10 @@ namespace Ship {
 
       ProceedErrorable(type, uint32_t, buffer->ReadVarInt(), InvalidMetadataErrorable(buffer->GetReadableBytes()))
       ProceedErrorable(entry, MetadataEntry*, METADATA_ENTRY_REGISTRY.GetObjectByID(version, type, buffer), InvalidMetadataErrorable(buffer->GetReadableBytes()))
-      metadata.Set(index, entry);
+      metadata->Set(index, entry);
     }
 
-    return SuccessErrorable<Metadata>(metadata);
+    return SuccessErrorable<Metadata*>(metadata);
   }
 
   Errorable<bool> Metadata::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
@@ -55,354 +55,347 @@ namespace Ship {
     entries[index] = value;
   }
 
-  std::optional<uint8_t> Metadata::GetByte(uint8_t index) const {
+  Errorable<uint8_t> Metadata::GetByte(uint8_t index) const {
     auto* entry = Get<ByteMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchByteMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::BYTE) {
-      throw Exception("The requested type (Byte) doesn't match the actual type");
+      return MismatchByteMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<uint8_t>(entry->GetValue());
   }
 
-  std::optional<uint32_t> Metadata::GetVarInt(uint8_t index) const {
+  Errorable<uint32_t> Metadata::GetVarInt(uint8_t index) const {
     auto* entry = Get<VarIntMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchVarIntMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::VARINT) {
-      throw Exception("The requested type (VarInt) doesn't match the actual type");
+      return MismatchVarIntMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<uint32_t>(entry->GetValue());
   }
 
-  std::optional<uint64_t> Metadata::GetLong(uint8_t index) const {
+  Errorable<uint64_t> Metadata::GetLong(uint8_t index) const {
     auto* entry = Get<LongMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchLongMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::LONG) {
-      throw Exception("The requested type (Long) doesn't match the actual type");
+      return MismatchLongMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<uint64_t>(entry->GetValue());
   }
 
-  std::optional<float> Metadata::GetFloat(uint8_t index) const {
+  Errorable<float> Metadata::GetFloat(uint8_t index) const {
     auto* entry = Get<FloatMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchFloatMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::FLOAT) {
-      throw Exception("The requested type (Float) doesn't match the actual type");
+      return MismatchFloatMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<float>(entry->GetValue());
   }
 
-  std::optional<std::string> Metadata::GetString(uint8_t index) const {
+  Errorable<std::string> Metadata::GetString(uint8_t index) const {
     auto* entry = Get<StringMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchStringMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::STRING) {
-      throw Exception("The requested type (String) doesn't match the actual type");
+      return MismatchStringMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<std::string>(entry->GetValue());
   }
 
-  std::optional<std::string> Metadata::GetChat(uint8_t index) const {
+  Errorable<std::string> Metadata::GetChat(uint8_t index) const {
     auto* entry = Get<ChatMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchChatMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::CHAT) {
-      throw Exception("The requested type (Chat) doesn't match the actual type");
+      return MismatchChatMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<std::string>(entry->GetValue());
   }
 
-  std::optional<std::optional<std::string>> Metadata::GetOptChat(uint8_t index) const {
+  Errorable<std::optional<std::string>> Metadata::GetOptChat(uint8_t index) const {
     auto* entry = Get<OptChatMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchOptChatMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::OPT_CHAT) {
-      throw Exception("The requested type (OptChat) doesn't match the actual type");
+      return MismatchOptChatMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<std::optional<std::string>>(entry->GetValue());
   }
 
-  std::optional<ItemStack> Metadata::GetItemStack(uint8_t index) const {
+  Errorable<ItemStack> Metadata::GetItemStack(uint8_t index) const {
     auto* entry = Get<ItemStackMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchItemStackMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::ITEM_STACK) {
-      throw Exception("The requested type (ItemStack) doesn't match the actual type");
+      return MismatchItemStackMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<ItemStack>(entry->GetValue());
   }
 
-  std::optional<bool> Metadata::GetBoolean(uint8_t index) const {
+  Errorable<bool> Metadata::GetBoolean(uint8_t index) const {
     auto* entry = Get<BooleanMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchBooleanMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::BOOLEAN) {
-      throw Exception("The requested type (Boolean) doesn't match the actual type");
+      return MismatchBooleanMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<bool>(entry->GetValue());
   }
 
-  bool Metadata::GetRotation(uint8_t index, float& x, float& y, float& z) const {
+  Errorable<Rotation> Metadata::GetRotation(uint8_t index) const {
     auto* entry = Get<RotationMetadataEntry>(index);
     if (!entry) {
-      return false;
+      return NoSuchRotationMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::ROTATION) {
-      throw Exception("The requested type (Rotation) doesn't match the actual type");
+      return MismatchRotationMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    entry->Get(x, y, z);
-    return true;
+    return SuccessErrorable<Rotation>(entry->GetValue());
   }
 
-  bool Metadata::GetPosition(uint8_t index, int& x, int& y, int& z) const {
+  Errorable<Position> Metadata::GetPosition(uint8_t index) const {
     auto* entry = Get<PositionMetadataEntry>(index);
     if (!entry) {
-      return false;
+      return NoSuchPositionMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::POSITION) {
-      throw Exception("The requested type (Position) doesn't match the actual type");
+      return MismatchPositionMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    entry->Get(x, y, z);
-    return true;
+    return SuccessErrorable<Position>(entry->GetValue());
   }
 
-  bool Metadata::GetOptPosition(uint8_t index, bool& present, int& x, int& y, int& z) const {
+  Errorable<std::optional<Position>> Metadata::GetOptPosition(uint8_t index) const {
     auto* entry = Get<OptPositionMetadataEntry>(index);
     if (!entry) {
-      return false;
+      return NoSuchOptPositionMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::OPT_POSITION) {
-      throw Exception("The requested type (OptPosition) doesn't match the actual type");
+      return MismatchOptPositionMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    entry->Get(present, x, y, z);
-    return true;
+    return SuccessErrorable<std::optional<Position>>(entry->GetValue());
   }
 
-  std::optional<Direction> Metadata::GetDirection(uint8_t index) const {
+  Errorable<Direction> Metadata::GetDirection(uint8_t index) const {
     auto* entry = Get<DirectionMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchDirectionMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::DIRECTION) {
-      throw Exception("The requested type (Direction) doesn't match the actual type");
+      return MismatchDirectionMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<Direction>(entry->GetValue());
   }
 
-  std::optional<std::optional<UUID>> Metadata::GetOptUUID(uint8_t index) const {
+  Errorable<std::optional<UUID>> Metadata::GetOptUUID(uint8_t index) const {
     auto* entry = Get<OptUUIDMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchOptUUIDMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::OPT_UUID) {
-      throw Exception("The requested type (OptUUID) doesn't match the actual type");
+      return MismatchOptUUIDMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<std::optional<UUID>>(entry->GetValue());
   }
 
-  std::optional<uint32_t> Metadata::GetBlockID(uint8_t index) const {
+  Errorable<uint32_t> Metadata::GetBlockID(uint8_t index) const {
     auto* entry = Get<BlockIDMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchBlockIDMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::BLOCK_ID) {
-      throw Exception("The requested type (BlockID) doesn't match the actual type");
+      return MismatchBlockIDMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<uint32_t>(entry->GetValue());
   }
 
-  std::optional<NBT*> Metadata::GetNBT(uint8_t index) const {
+  Errorable<NBT*> Metadata::GetNBT(uint8_t index) const {
     auto* entry = Get<NBTMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchNBTMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::NBT) {
-      throw Exception("The requested type (NBT) doesn't match the actual type");
+      return MismatchNBTMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<NBT*>(entry->GetValue());
   }
 
-  std::optional<AbstractParticle*> Metadata::GetParticle(uint8_t index) const {
+  Errorable<AbstractParticle*> Metadata::GetParticle(uint8_t index) const {
     auto* entry = Get<ParticleMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchParticleMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::PARTICLE) {
-      throw Exception("The requested type (Particle) doesn't match the actual type");
+      return MismatchParticleMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<AbstractParticle*>(entry->GetValue());
   }
 
-  bool Metadata::GetVillagerData(uint8_t index, VillagerType& type, VillagerProfession& profession, uint32_t& level) const {
+  Errorable<VillagerData> Metadata::GetVillagerData(uint8_t index) const {
     auto* entry = Get<VillagerDataMetadataEntry>(index);
     if (!entry) {
-      return false;
+      return NoSuchVillagerDataMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::VILLAGER_DATA) {
-      throw Exception("The requested type (VillagerData) doesn't match the actual type");
+      return MismatchVillagerDataMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    type = entry->GetVillagerType();
-    profession = entry->GetProfession();
-    level = entry->GetLevel();
-    return true;
+    return SuccessErrorable<VillagerData>(entry->GetValue());
   }
 
-  std::optional<std::optional<uint32_t>> Metadata::GetOptVarInt(uint8_t index) const {
+  Errorable<std::optional<uint32_t>> Metadata::GetOptVarInt(uint8_t index) const {
     auto* entry = Get<OptVarIntMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchOptVarIntMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::OPT_VARINT) {
-      throw Exception("The requested type (OptVarInt) doesn't match the actual type");
+      return MismatchOptVarIntMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<std::optional<uint32_t>>(entry->GetValue());
   }
 
-  std::optional<Pose> Metadata::GetPose(uint8_t index) const {
+  Errorable<Pose> Metadata::GetPose(uint8_t index) const {
     auto* entry = Get<PoseMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchPoseMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::POSE) {
-      throw Exception("The requested type (Pose) doesn't match the actual type");
+      return MismatchPoseMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<Pose>(entry->GetValue());
   }
 
-  std::optional<CatVariant> Metadata::GetCatVariant(uint8_t index) const {
+  Errorable<CatVariant> Metadata::GetCatVariant(uint8_t index) const {
     auto* entry = Get<CatVariantMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchCatVariantMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::CAT_VARIANT) {
-      throw Exception("The requested type (CatVariant) doesn't match the actual type");
+      return MismatchCatVariantMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<CatVariant>(entry->GetValue());
   }
 
-  std::optional<FrogVariant> Metadata::GetFrogVariant(uint8_t index) const {
+  Errorable<FrogVariant> Metadata::GetFrogVariant(uint8_t index) const {
     auto* entry = Get<FrogVariantMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchFrogVariantMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::FROG_VARIANT) {
-      throw Exception("The requested type (FrogVariant) doesn't match the actual type");
+      return MismatchFrogVariantMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<FrogVariant>(entry->GetValue());
   }
 
-  bool Metadata::GetGlobalPos(uint8_t index, std::string& dimension, int& x, int& y, int& z) const {
+  Errorable<GlobalPos> Metadata::GetGlobalPos(uint8_t index) const {
     auto* entry = Get<GlobalPosMetadataEntry>(index);
     if (!entry) {
-      return false;
+      return NoSuchGlobalPosMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::GLOBAL_POS) {
-      throw Exception("The requested type (GlobalPos) doesn't match the actual type");
+      return MismatchGlobalPosMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    entry->Get(dimension, x, y, z);
-    return true;
+    return SuccessErrorable<GlobalPos>(entry->GetValue());
   }
 
-  std::optional<PaintingVariant> Metadata::GetPaintingVariant(uint8_t index) const {
+  Errorable<PaintingVariant> Metadata::GetPaintingVariant(uint8_t index) const {
     auto* entry = Get<PaintingVariantMetadataEntry>(index);
     if (!entry) {
-      return std::nullopt;
+      return NoSuchPaintingVariantMetadataEntryErrorable(index);
     }
 
     if (entry->GetType() != MetadataEntryType::PAINTING_VARIANT) {
-      throw Exception("The requested type (PaintingVariant) doesn't match the actual type");
+      return MismatchPaintingVariantMetadataEntryErrorable((uint64_t) entry->GetType());
     }
 
-    return entry->GetValue();
+    return SuccessErrorable<PaintingVariant>(entry->GetValue());
   }
 
   ConstructorRegistry<MetadataEntry> GetMetadataRegistry() {
     ConstructorRegistry<MetadataEntry> dataRegistry(MinecraftProtocolVersion::VERSIONS, {MinecraftProtocolVersion::MINECRAFT_1_12_2, MinecraftProtocolVersion::MINECRAFT_1_13, MinecraftProtocolVersion::MINECRAFT_1_14,
       MinecraftProtocolVersion::MINECRAFT_1_19, MinecraftProtocolVersion::MINECRAFT_1_19_1, MinecraftProtocolVersion::MINECRAFT_1_19_3});
 
-    dataRegistry.RegisterConstructor(ByteMetadataEntry::ORDINAL, CreateConstructor<ByteMetadataEntry>());
-    dataRegistry.RegisterConstructor(VarIntMetadataEntry::ORDINAL, CreateConstructor<VarIntMetadataEntry>());
-    dataRegistry.RegisterConstructor(LongMetadataEntry::ORDINAL, CreateConstructor<LongMetadataEntry>());
-    dataRegistry.RegisterConstructor(FloatMetadataEntry::ORDINAL, CreateConstructor<FloatMetadataEntry>());
-    dataRegistry.RegisterConstructor(StringMetadataEntry::ORDINAL, CreateConstructor<StringMetadataEntry>());
-    dataRegistry.RegisterConstructor(ChatMetadataEntry::ORDINAL, CreateConstructor<ChatMetadataEntry>());
-    dataRegistry.RegisterConstructor(OptChatMetadataEntry::ORDINAL, CreateConstructor<OptChatMetadataEntry>());
-    dataRegistry.RegisterConstructor(ItemStackMetadataEntry::ORDINAL, CreateConstructor<ItemStackMetadataEntry>());
-    dataRegistry.RegisterConstructor(BooleanMetadataEntry::ORDINAL, CreateConstructor<BooleanMetadataEntry>());
-    dataRegistry.RegisterConstructor(RotationMetadataEntry::ORDINAL, CreateConstructor<RotationMetadataEntry>());
-    dataRegistry.RegisterConstructor(PositionMetadataEntry::ORDINAL, CreateConstructor<PositionMetadataEntry>());
-    dataRegistry.RegisterConstructor(OptPositionMetadataEntry::ORDINAL, CreateConstructor<OptPositionMetadataEntry>());
-    dataRegistry.RegisterConstructor(DirectionMetadataEntry::ORDINAL, CreateConstructor<DirectionMetadataEntry>());
-    dataRegistry.RegisterConstructor(OptUUIDMetadataEntry::ORDINAL, CreateConstructor<OptUUIDMetadataEntry>());
-    dataRegistry.RegisterConstructor(BlockIDMetadataEntry::ORDINAL, CreateConstructor<BlockIDMetadataEntry>());
-    dataRegistry.RegisterConstructor(NBTMetadataEntry::ORDINAL, CreateConstructor<NBTMetadataEntry>());
-    dataRegistry.RegisterConstructor(ParticleMetadataEntry::ORDINAL, CreateConstructor<ParticleMetadataEntry>());
+    dataRegistry.RegisterConstructor(ByteMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, ByteMetadataEntry>());
+    dataRegistry.RegisterConstructor(VarIntMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, VarIntMetadataEntry>());
+    dataRegistry.RegisterConstructor(LongMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, LongMetadataEntry>());
+    dataRegistry.RegisterConstructor(FloatMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, FloatMetadataEntry>());
+    dataRegistry.RegisterConstructor(StringMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, StringMetadataEntry>());
+    dataRegistry.RegisterConstructor(ChatMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, ChatMetadataEntry>());
+    dataRegistry.RegisterConstructor(OptChatMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, OptChatMetadataEntry>());
+    dataRegistry.RegisterConstructor(ItemStackMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, ItemStackMetadataEntry>());
+    dataRegistry.RegisterConstructor(BooleanMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, BooleanMetadataEntry>());
+    dataRegistry.RegisterConstructor(RotationMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, RotationMetadataEntry>());
+    dataRegistry.RegisterConstructor(PositionMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, PositionMetadataEntry>());
+    dataRegistry.RegisterConstructor(OptPositionMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, OptPositionMetadataEntry>());
+    dataRegistry.RegisterConstructor(DirectionMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, DirectionMetadataEntry>());
+    dataRegistry.RegisterConstructor(OptUUIDMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, OptUUIDMetadataEntry>());
+    dataRegistry.RegisterConstructor(BlockIDMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, BlockIDMetadataEntry>());
+    dataRegistry.RegisterConstructor(NBTMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, NBTMetadataEntry>());
+    dataRegistry.RegisterConstructor(ParticleMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, ParticleMetadataEntry>());
     dataRegistry.RegisterConstructor(
-      VillagerDataMetadataEntry::ORDINAL, CreateConstructor<VillagerDataMetadataEntry>());
-    dataRegistry.RegisterConstructor(OptVarIntMetadataEntry::ORDINAL, CreateConstructor<OptVarIntMetadataEntry>());
-    dataRegistry.RegisterConstructor(PoseMetadataEntry::ORDINAL, CreateConstructor<PoseMetadataEntry>());
-    dataRegistry.RegisterConstructor(CatVariantMetadataEntry::ORDINAL, CreateConstructor<CatVariantMetadataEntry>());
-    dataRegistry.RegisterConstructor(FrogVariantMetadataEntry::ORDINAL, CreateConstructor<FrogVariantMetadataEntry>());
-    dataRegistry.RegisterConstructor(GlobalPosMetadataEntry::ORDINAL, CreateConstructor<GlobalPosMetadataEntry>());
-    dataRegistry.RegisterConstructor(PaintingVariantMetadataEntry::ORDINAL, CreateConstructor<PaintingVariantMetadataEntry>());
+      VillagerDataMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, VillagerDataMetadataEntry>());
+    dataRegistry.RegisterConstructor(OptVarIntMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, OptVarIntMetadataEntry>());
+    dataRegistry.RegisterConstructor(PoseMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, PoseMetadataEntry>());
+    dataRegistry.RegisterConstructor(CatVariantMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, CatVariantMetadataEntry>());
+    dataRegistry.RegisterConstructor(FrogVariantMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, FrogVariantMetadataEntry>());
+    dataRegistry.RegisterConstructor(GlobalPosMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, GlobalPosMetadataEntry>());
+    dataRegistry.RegisterConstructor(PaintingVariantMetadataEntry::ORDINAL, WrapConstructor<MetadataEntry, PaintingVariantMetadataEntry>());
 
     dataRegistry.RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_12_2,
       new VersionRegistry({ByteMetadataEntry::ORDINAL, VarIntMetadataEntry::ORDINAL, FloatMetadataEntry::ORDINAL, StringMetadataEntry::ORDINAL,

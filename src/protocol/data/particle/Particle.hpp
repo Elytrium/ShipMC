@@ -3,6 +3,7 @@
 #include "../../../../lib/ShipNet/src/protocol/registry/ConstructorRegistry.hpp"
 #include "../../../../lib/ShipNet/src/utils/ordinal/OrdinalRegistry.hpp"
 #include "../../../utils/ordinal/MinecraftOrdinalRegistry.hpp"
+#include "../../MinecraftProtocol.hpp"
 #include "../ItemStack.hpp"
 
 namespace Ship {
@@ -16,18 +17,20 @@ namespace Ship {
   };
   CreateInvalidArgumentErrorable(InvalidParticleErrorable, AbstractParticle*, "Invalid Particle read");
 
-#define DefineSimpleParticle(ParticleName, Identifier)                                          \
-  class ParticleName : public AbstractParticle {                                                \
-   public:                                                                                      \
-    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal(); \
-                                                                                                \
-    ParticleName(const ProtocolVersion* version, ByteBuffer* buffer) {}                         \
-                                                                                                \
-    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {  \
-      return SuccessErrorable<bool>(true);                                                      \
-    }                                                                                           \
-    [[nodiscard]] std::string GetIdentifier() const override { return Identifier; }             \
-    [[nodiscard]] uint32_t GetOrdinal() const override { return ORDINAL; }                      \
+#define DefineSimpleParticle(ParticleName, Identifier)                                                                 \
+  class ParticleName : public AbstractParticle {                                                                       \
+   public:                                                                                                             \
+    static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();               \
+                                                                                                                       \
+    static Errorable<ParticleName> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {                   \
+      return SuccessErrorable<ParticleName>({});                                                                       \
+    }                                                                                                                  \
+                                                                                                                       \
+    Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {                         \
+      return SuccessErrorable<bool>(true);                                                                             \
+    }                                                                                                                  \
+    [[nodiscard]] std::string GetIdentifier() const override { return Identifier; }                                    \
+    [[nodiscard]] uint32_t GetOrdinal() const override { return ORDINAL; }                                             \
   }
 
   DefineSimpleParticle(AmbientEntityEffectParticle, "minecraft:ambient_entity_effect");
@@ -125,13 +128,14 @@ namespace Ship {
 
   class BlockParticle : public AbstractParticle {
    private:
-    uint32_t blockState;
+    uint32_t blockState{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
+    BlockParticle() = default;
     explicit BlockParticle(uint32_t blockState);
-    BlockParticle(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<BlockParticle> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
@@ -140,16 +144,18 @@ namespace Ship {
     [[nodiscard]] uint32_t GetBlockState() const;
     void SetBlockState(uint32_t newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidBlockParticleErrorable, BlockParticle, "Invalid BlockParticle read");
 
   class BlockMarkerParticle : public AbstractParticle {
    private:
-    uint32_t blockState;
+    uint32_t blockState{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
+    BlockMarkerParticle() = default;
     explicit BlockMarkerParticle(uint32_t blockState);
-    BlockMarkerParticle(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<BlockMarkerParticle> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
@@ -158,19 +164,21 @@ namespace Ship {
     [[nodiscard]] uint32_t GetBlockState() const;
     void SetBlockState(uint32_t newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidBlockMarkerParticleErrorable, BlockMarkerParticle, "Invalid BlockMarkerParticle read");
 
   class DustParticle : public AbstractParticle {
    private:
-    float red;
-    float green;
-    float blue;
-    float scale;
+    float red{};
+    float green{};
+    float blue{};
+    float scale{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
+    DustParticle() = default;
     explicit DustParticle(float red, float green, float blue, float scale);
-    DustParticle(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<DustParticle> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
@@ -185,22 +193,24 @@ namespace Ship {
     [[nodiscard]] float GetScale() const;
     void SetScale(float newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidDustParticleErrorable, DustParticle, "Invalid DustParticle read");
 
   class DustColorTransitionParticle : public AbstractParticle {
    private:
-    float fromRed;
-    float fromGreen;
-    float fromBlue;
-    float scale;
-    float toRed;
-    float toGreen;
-    float toBlue;
+    float fromRed{};
+    float fromGreen{};
+    float fromBlue{};
+    float scale{};
+    float toRed{};
+    float toGreen{};
+    float toBlue{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
+    DustColorTransitionParticle() = default;
     explicit DustColorTransitionParticle(float fromRed, float fromGreen, float fromBlue, float scale, float toRed, float toGreen, float toBlue);
-    DustColorTransitionParticle(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<DustColorTransitionParticle> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
@@ -221,16 +231,18 @@ namespace Ship {
     [[nodiscard]] float GetToBlue() const;
     void SetToBlue(float newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidDustColorTransitionParticleErrorable, DustColorTransitionParticle, "Invalid DustColorTransitionParticle read");
 
   class FallingDustParticle : public AbstractParticle {
    private:
-    uint32_t blockState;
+    uint32_t blockState{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
+    FallingDustParticle() = default;
     explicit FallingDustParticle(uint32_t blockState);
-    FallingDustParticle(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<FallingDustParticle> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
@@ -239,16 +251,18 @@ namespace Ship {
     [[nodiscard]] uint32_t GetBlockState() const;
     void SetBlockState(uint32_t newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidFallingDustParticleErrorable, FallingDustParticle, "Invalid FallingDustParticle read");
 
   class ItemParticle : public AbstractParticle {
    private:
-    ItemStack item;
+    ItemStack item{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
+    ItemParticle() = default;
     explicit ItemParticle(const ItemStack& item);
-    ItemParticle(const ProtocolVersion* version, ByteBuffer* buffer);
+    static Errorable<ItemParticle> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
@@ -257,25 +271,25 @@ namespace Ship {
     [[nodiscard]] ItemStack GetItem() const;
     void SetItem(const ItemStack& newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidItemParticleErrorable, ItemParticle, "Invalid ItemParticle read");
 
   class VibrationParticle : public AbstractParticle {
    private:
     std::string sourceType;
-    int blockX;
-    int blockY;
-    int blockZ;
-    uint32_t entityId;
-    float entityEyeHeight;
-    uint32_t ticks;
+    Position blockPosition{};
+    uint32_t entityId{};
+    float entityEyeHeight{};
+    uint32_t ticks{};
 
    public:
     static inline const uint32_t ORDINAL = MinecraftOrdinalRegistry::ParticleRegistry.RegisterOrdinal();
 
-    VibrationParticle(std::string sourceType, int blockX, int blockY, int blockZ, uint32_t entityId, float entityEyeHeight, uint32_t ticks);
-    VibrationParticle(int blockX, int blockY, int blockZ, uint32_t ticks);
+    VibrationParticle() = default;
+    VibrationParticle(std::string sourceType, Position blockPosition, uint32_t entityId, float entityEyeHeight, uint32_t ticks);
+    VibrationParticle(Position blockPosition, uint32_t ticks);
     VibrationParticle(uint32_t entityId, float entityEyeHeight, uint32_t ticks);
-    VibrationParticle(std::string sourceType, uint32_t ticks);
-    VibrationParticle(const ProtocolVersion* version, ByteBuffer* buffer);
+    VibrationParticle(const std::string& sourceType, uint32_t ticks);
+    static Errorable<VibrationParticle> Instantiate(const ProtocolVersion* version, ByteBuffer* buffer);
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override;
     [[nodiscard]] std::string GetIdentifier() const override;
@@ -283,12 +297,8 @@ namespace Ship {
 
     [[nodiscard]] const std::string& GetSourceType() const;
     void SetSourceType(const std::string& newValue);
-    [[nodiscard]] int GetBlockX() const;
-    void SetBlockX(int newValue);
-    [[nodiscard]] int GetBlockY() const;
-    void SetBlockY(int newValue);
-    [[nodiscard]] int GetBlockZ() const;
-    void SetBlockZ(int newValue);
+    [[nodiscard]] Position GetBlockPosition() const;
+    void SetBlockPosition(Position newValue);
     [[nodiscard]] uint32_t GetEntityId() const;
     void SetEntityId(uint32_t newValue);
     [[nodiscard]] float GetEntityEyeHeight() const;
@@ -296,6 +306,7 @@ namespace Ship {
     [[nodiscard]] uint32_t GetTicks() const;
     void SetTicks(uint32_t newValue);
   };
+  CreateInvalidArgumentErrorable(InvalidVibrationParticleErrorable, VibrationParticle, "Invalid VibrationParticle read");
 
   extern const ConstructorRegistry<AbstractParticle> PARTICLE_REGISTRY;
 }

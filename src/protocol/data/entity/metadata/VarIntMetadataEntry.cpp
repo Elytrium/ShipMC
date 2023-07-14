@@ -11,7 +11,7 @@ namespace Ship {
   }
 
   Errorable<VarIntMetadataEntry> VarIntMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
-    ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), ss)
+    ProceedErrorable(value, uint32_t, buffer->ReadVarInt(), InvalidVarIntMetadataEntryErrorable(buffer->GetReadableBytes()))
     return SuccessErrorable<VarIntMetadataEntry>(VarIntMetadataEntry(value));
   }
 

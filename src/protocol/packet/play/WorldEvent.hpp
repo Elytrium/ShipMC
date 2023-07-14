@@ -7,14 +7,15 @@ namespace Ship {
 
   class WorldEvent : public Packet {
    private:
-    uint32_t event;
-    Position location;
-    uint32_t data;
-    bool disableRelativeVolume;
+    uint32_t event{};
+    Position location{};
+    uint32_t data{};
+    bool disableRelativeVolume{};
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    WorldEvent() = default;
     WorldEvent(uint32_t event, Position location, uint32_t data, bool disableRelativeVolume)
       : event(event), location(location), data(data), disableRelativeVolume(disableRelativeVolume) {
     }
@@ -23,10 +24,11 @@ namespace Ship {
 
     static Errorable<WorldEvent> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
-      event = buffer->ReadInt();
-      ProceedErrorable(location, Position, ProtocolUtils::ReadPosition(holder.GetVersion(), buffer), InvalidPacketErrorable<>(PACKET_ORDINAL));
-      data = buffer->ReadInt();
-      ProceedErrorable(disableRelativeVolume, bool, buffer->ReadBoolean(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(event, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<WorldEvent>(PACKET_ORDINAL))
+      ProceedErrorable(location, Position, ProtocolUtils::ReadPosition(holder.GetVersion(), buffer), InvalidPacketErrorable<WorldEvent>(PACKET_ORDINAL));
+      ProceedErrorable(data, uint32_t, buffer->ReadInt(), InvalidPacketErrorable<WorldEvent>(PACKET_ORDINAL))
+      ProceedErrorable(disableRelativeVolume, bool, buffer->ReadBoolean(), InvalidPacketErrorable<WorldEvent>(PACKET_ORDINAL))
+      return SuccessErrorable<WorldEvent>(WorldEvent(event, location, data, disableRelativeVolume));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
@@ -37,7 +39,7 @@ namespace Ship {
       return SuccessErrorable<bool>(true);
     }
 
-    uint32_t GetOrdinal() const override {
+    [[nodiscard]] uint32_t GetOrdinal() const override {
       return PACKET_ORDINAL;
     }
 

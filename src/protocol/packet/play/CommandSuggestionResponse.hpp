@@ -21,21 +21,7 @@ namespace Ship {
     CommandSuggestion() : CommandSuggestion("") {
     }
 
-    static Errorable<CommandSuggestion> Instantiate(const PacketHolder& holder) {
-      ByteBuffer* buffer = holder.GetCurrentBuffer();
-      const ProtocolVersion* version = holder.GetVersion();
-      ProceedErrorable(match, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-
-      if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
-        if (buffer->ReadBoolean()) {
-          ProceedErrorable(tooltip, std::string, buffer->ReadString(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        } else {
-          tooltip = std::nullopt;
-        }
-      } else {
-        tooltip = std::nullopt;
-      }
-    }
+    static Errorable<CommandSuggestion> Instantiate(const PacketHolder& holder);
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
       buffer->WriteString(match);
@@ -65,16 +51,39 @@ namespace Ship {
     }
   };
 
+  CreateInvalidArgumentErrorable(InvalidCommandSuggestionErrorable, CommandSuggestion, "Invalid CommandSuggestion read");
+
+  Errorable<CommandSuggestion> CommandSuggestion::Instantiate(const PacketHolder& holder) {
+    ByteBuffer* buffer = holder.GetCurrentBuffer();
+    const ProtocolVersion* version = holder.GetVersion();
+    ProceedErrorable(match, std::string, buffer->ReadString(), InvalidCommandSuggestionErrorable(buffer->GetReadableBytes()))
+
+    std::optional<std::string> tooltip;
+    if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
+      ProceedErrorable(hasTooltip, bool, buffer->ReadBoolean(), InvalidCommandSuggestionErrorable(buffer->GetReadableBytes()))
+      if (hasTooltip) {
+        SetFromErrorable(tooltip, std::string, buffer->ReadString(), InvalidCommandSuggestionErrorable(buffer->GetReadableBytes()))
+      } else {
+        tooltip = std::nullopt;
+      }
+    } else {
+      tooltip = std::nullopt;
+    }
+
+    return SuccessErrorable<CommandSuggestion>(CommandSuggestion(match, tooltip));
+  }
+
   class CommandSuggestionResponse : public Packet {
    private:
-    uint32_t id;
-    uint32_t start;
-    uint32_t length;
+    uint32_t id{};
+    uint32_t start{};
+    uint32_t length{};
     std::vector<CommandSuggestion> matches;
 
    public:
     static inline const uint32_t PACKET_ORDINAL = OrdinalRegistry::PacketRegistry.RegisterOrdinal();
 
+    CommandSuggestionResponse() = default;
     CommandSuggestionResponse(uint32_t id, uint32_t start, uint32_t length, std::vector<CommandSuggestion> matches)
       : id(id), start(start), length(length), matches(std::move(matches)) {
     }
@@ -84,20 +93,24 @@ namespace Ship {
     static Errorable<CommandSuggestionResponse> Instantiate(const PacketHolder& holder) {
       ByteBuffer* buffer = holder.GetCurrentBuffer();
       const ProtocolVersion* version = holder.GetVersion();
+      uint32_t id, start, length;
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
-        ProceedErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(start, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
-        ProceedErrorable(length, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+        SetFromErrorable(id, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<CommandSuggestionResponse>(PACKET_ORDINAL))
+        SetFromErrorable(start, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<CommandSuggestionResponse>(PACKET_ORDINAL))
+        SetFromErrorable(length, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<CommandSuggestionResponse>(PACKET_ORDINAL))
       }
 
-      uint32_t ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<>(PACKET_ORDINAL))
+      ProceedErrorable(vectorSize, uint32_t, buffer->ReadVarInt(), InvalidPacketErrorable<CommandSuggestionResponse>(PACKET_ORDINAL))
+      std::vector<CommandSuggestion> matches;
       for (int i = 0; i < vectorSize; ++i) {
-        matches.emplace_back(holder);
+        ProceedErrorable(match, CommandSuggestion, CommandSuggestion::Instantiate(holder), InvalidPacketErrorable<CommandSuggestionResponse>(PACKET_ORDINAL))
+        matches.push_back(match);
       }
+
+      return SuccessErrorable<CommandSuggestionResponse>(CommandSuggestionResponse(id, start, length, matches));
     }
 
     Errorable<bool> Write(const ProtocolVersion* version, ByteBuffer* buffer) const override {
-    return SuccessErrorable<bool>(true);
       if (version >= &MinecraftProtocolVersion::MINECRAFT_1_13) {
         buffer->WriteVarInt(id);
         buffer->WriteVarInt(start);
@@ -110,6 +123,7 @@ namespace Ship {
       for (const CommandSuggestion& match : matches) {
         match.Write(version, buffer);
       }
+      return SuccessErrorable<bool>(true);
     }
 
     [[nodiscard]] uint32_t GetOrdinal() const override {

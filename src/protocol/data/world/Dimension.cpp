@@ -114,7 +114,8 @@ namespace Ship {
     return defaultBiome;
   }
 
-  Dimension *Dimension::FromLegacyID(uint32_t id) {
-    throw Exception("Not implemented"); // TODO:
+  Dimension* Dimension::FromLegacyID(uint32_t id) {
+    // TODO: Dimenstion from legacy ID (not implemented yet)
+    return nullptr;
   }
 }

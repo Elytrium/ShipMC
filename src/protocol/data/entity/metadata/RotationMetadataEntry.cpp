@@ -1,22 +1,19 @@
+#include "../../../ProtocolUtils.hpp"
 #include "Metadata.hpp"
 
 namespace Ship {
 
-  RotationMetadataEntry::RotationMetadataEntry(float x, float y, float z) : x(x), y(y), z(z) {
+  RotationMetadataEntry::RotationMetadataEntry(Rotation rotation) : value(rotation) {
   }
 
   Errorable<bool> RotationMetadataEntry::Write(const ProtocolVersion* version, ByteBuffer* buffer) const {
-    buffer->WriteFloat(x);
-    buffer->WriteFloat(y);
-    buffer->WriteFloat(z);
+    ProtocolUtils::WriteRotation(version, buffer, value);
     return SuccessErrorable<bool>(true);
   }
 
   Errorable<RotationMetadataEntry> RotationMetadataEntry::Instantiate(const ProtocolVersion* version, ByteBuffer* buffer) {
-    ProceedErrorable(x, float, buffer->ReadFloat(), InvalidRotationMetadataEntryErrorable(buffer->GetReadableBytes()))
-    ProceedErrorable(y, float, buffer->ReadFloat(), InvalidRotationMetadataEntryErrorable(buffer->GetReadableBytes()))
-    ProceedErrorable(z, float, buffer->ReadFloat(), InvalidRotationMetadataEntryErrorable(buffer->GetReadableBytes()))
-    return SuccessErrorable<RotationMetadataEntry>(RotationMetadataEntry(x, y, z));
+    ProceedErrorable(value, Rotation, ProtocolUtils::ReadRotation(version, buffer), InvalidRotationMetadataEntryErrorable(buffer->GetReadableBytes()))
+    return SuccessErrorable<RotationMetadataEntry>(RotationMetadataEntry(value));
   }
 
   MetadataEntryType RotationMetadataEntry::GetType() const {
@@ -27,39 +24,11 @@ namespace Ship {
     return ORDINAL;
   }
 
-  float RotationMetadataEntry::GetX() const {
-    return x;
+  Rotation RotationMetadataEntry::GetValue() const {
+    return value;
   }
 
-  void RotationMetadataEntry::SetX(float value) {
-    x = value;
-  }
-
-  float RotationMetadataEntry::GetY() const {
-    return y;
-  }
-
-  void RotationMetadataEntry::SetY(float value) {
-    y = value;
-  }
-
-  float RotationMetadataEntry::GetZ() const {
-    return z;
-  }
-
-  void RotationMetadataEntry::SetZ(float value) {
-    z = value;
-  }
-
-  void RotationMetadataEntry::Get(float& outX, float& outY, float& outZ) const {
-    outX = x;
-    outY = y;
-    outZ = z;
-  }
-
-  void RotationMetadataEntry::Set(float newX, float newY, float newZ) {
-    x = newX;
-    y = newY;
-    z = newZ;
+  void RotationMetadataEntry::SetValue(Rotation newValue) {
+    value = newValue;
   }
 }
