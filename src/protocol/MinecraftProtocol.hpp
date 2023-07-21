@@ -96,7 +96,7 @@ namespace Ship {
 
     [[nodiscard]] const std::string& GetDimension() const;
     void SetDimension(const std::string& dimension);
-    const Position& GetPosition() const;
+    [[nodiscard]] const Position& GetPosition() const;
     void SetPosition(const Position& position);
   };
   CreateInvalidArgumentErrorable(InvalidGlobalPosErrorable, GlobalPos, "Invalid GlobalPos value read");
@@ -125,6 +125,8 @@ namespace Ship {
     static const ProtocolVersion MINECRAFT_1_19;
     static const ProtocolVersion MINECRAFT_1_19_1;
     static const ProtocolVersion MINECRAFT_1_19_3;
+    static const ProtocolVersion MINECRAFT_1_19_4;
+    static const ProtocolVersion MINECRAFT_1_20;
 
     static const ProtocolVersions VERSIONS;
   };

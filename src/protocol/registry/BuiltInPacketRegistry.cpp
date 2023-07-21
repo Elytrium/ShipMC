@@ -30,6 +30,7 @@
 #include "../packet/play/ChatSuggestions.hpp"
 #include "../packet/play/ChunkData.hpp"
 #include "../packet/play/ChunkLight.hpp"
+#include "../packet/play/ChunksBiomes.hpp"
 #include "../packet/play/ClearTitle.hpp"
 #include "../packet/play/ClickInventoryButton.hpp"
 #include "../packet/play/ClickSlot.hpp"
@@ -51,6 +52,7 @@
 #include "../packet/play/CraftRecipeResponse.hpp"
 #include "../packet/play/CreativeSlot.hpp"
 #include "../packet/play/CustomSoundEffect.hpp"
+#include "../packet/play/DamageEvent.hpp"
 #include "../packet/play/DeathCombatEvent.hpp"
 #include "../packet/play/DeclareCommands.hpp"
 #include "../packet/play/DefaultSpawnPosition.hpp"
@@ -89,6 +91,7 @@
 #include "../packet/play/Health.hpp"
 #include "../packet/play/HeldSlot.hpp"
 #include "../packet/play/HideMessage.hpp"
+#include "../packet/play/HurtAnimation.hpp"
 #include "../packet/play/InitializeWorldBorder.hpp"
 #include "../packet/play/InventoryContent.hpp"
 #include "../packet/play/InventoryProperty.hpp"
@@ -116,6 +119,7 @@
 #include "../packet/play/OpenHorseInventory.hpp"
 #include "../packet/play/OpenInventory.hpp"
 #include "../packet/play/OpenSignEditor.hpp"
+#include "../packet/play/PacketBundle.hpp"
 #include "../packet/play/Particle.hpp"
 #include "../packet/play/Passengers.hpp"
 #include "../packet/play/PickItem.hpp"
@@ -470,6 +474,62 @@ namespace Ship {
         PickupItem::PACKET_ORDINAL, EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL, EntityProperties::PACKET_ORDINAL,
         FeatureFlags::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
 
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_19_4,
+      new VersionRegistry({PacketBundle::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL,
+        EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL, AcknowledgeBlockChange::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL,
+        BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL,
+        ServerChangeDifficulty::PACKET_ORDINAL, ChunksBiomes::PACKET_ORDINAL, ClearTitle::PACKET_ORDINAL, CommandSuggestionResponse::PACKET_ORDINAL,
+        DeclareCommands::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL, InventoryContent::PACKET_ORDINAL, InventoryProperty::PACKET_ORDINAL,
+        InventorySlot::PACKET_ORDINAL, Cooldown::PACKET_ORDINAL, ChatSuggestions::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL,
+        DamageEvent::PACKET_ORDINAL, HideMessage::PACKET_ORDINAL, Disconnect::PACKET_ORDINAL, DisguisedChatMessage::PACKET_ORDINAL,
+        EntityEvent::PACKET_ORDINAL, Explosion::PACKET_ORDINAL, UnloadChunk::PACKET_ORDINAL, GameEvent::PACKET_ORDINAL, OpenHorseInventory::PACKET_ORDINAL,
+        HurtAnimation::PACKET_ORDINAL, InitializeWorldBorder::PACKET_ORDINAL, KeepAlive::PACKET_ORDINAL, ChunkData::PACKET_ORDINAL,
+        WorldEvent::PACKET_ORDINAL, Particle::PACKET_ORDINAL, ChunkLight::PACKET_ORDINAL, JoinGame::PACKET_ORDINAL, MapData::PACKET_ORDINAL,
+        TradeList::PACKET_ORDINAL, EntityPosition::PACKET_ORDINAL, EntityPositionAndRotation::PACKET_ORDINAL, EntityRotation::PACKET_ORDINAL,
+        MoveVehicle::PACKET_ORDINAL, OpenBook::PACKET_ORDINAL, OpenInventory::PACKET_ORDINAL, OpenSignEditor::PACKET_ORDINAL, Ping::PACKET_ORDINAL,
+        CraftRecipeResponse::PACKET_ORDINAL, ServerPlayerAbilities::PACKET_ORDINAL, ServerPlayerChat::PACKET_ORDINAL, EndCombatEvent::PACKET_ORDINAL,
+        EnterCombatEvent::PACKET_ORDINAL, DeathCombatEvent::PACKET_ORDINAL, PlayerRemove::PACKET_ORDINAL, PlayerListItem::PACKET_ORDINAL,
+        PlayerFace::PACKET_ORDINAL, PositionRotation::PACKET_ORDINAL, UnlockRecipes::PACKET_ORDINAL, EntityRemove::PACKET_ORDINAL,
+        EntityEffectRemove::PACKET_ORDINAL, ResourcePackRequest::PACKET_ORDINAL, Respawn::PACKET_ORDINAL, EntityLookAt::PACKET_ORDINAL,
+        SectionBlocks::PACKET_ORDINAL, SelectAdvancementsTab::PACKET_ORDINAL, ServerData::PACKET_ORDINAL, ActionBar::PACKET_ORDINAL,
+        BorderCenter::PACKET_ORDINAL, BorderRadiusSpeed::PACKET_ORDINAL, BorderRadius::PACKET_ORDINAL, BorderWarningTime::PACKET_ORDINAL,
+        BorderWarningRadius::PACKET_ORDINAL, Camera::PACKET_ORDINAL, HeldSlot::PACKET_ORDINAL, ViewPosition::PACKET_ORDINAL, ViewDistance::PACKET_ORDINAL,
+        DefaultSpawnPosition::PACKET_ORDINAL, DisplayObjective::PACKET_ORDINAL, EntityMetadata::PACKET_ORDINAL, LeadEntities::PACKET_ORDINAL,
+        EntityVelocity::PACKET_ORDINAL, EntityEquipment::PACKET_ORDINAL, Experience::PACKET_ORDINAL, Health::PACKET_ORDINAL, Objectives::PACKET_ORDINAL,
+        Passengers::PACKET_ORDINAL, Teams::PACKET_ORDINAL, Score::PACKET_ORDINAL, SimulationDistance::PACKET_ORDINAL, Subtitle::PACKET_ORDINAL,
+        WorldTime::PACKET_ORDINAL, Title::PACKET_ORDINAL, TitleTimes::PACKET_ORDINAL, EntitySoundEffect::PACKET_ORDINAL,
+        HardcodedSoundEffect::PACKET_ORDINAL, StopSound::PACKET_ORDINAL, SystemChat::PACKET_ORDINAL, TabHeaderFooter::PACKET_ORDINAL,
+        TagQueryResponse::PACKET_ORDINAL, PickupItem::PACKET_ORDINAL, EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL,
+        EntityProperties::PACKET_ORDINAL, FeatureFlags::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
+
+    clientbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_20,
+      new VersionRegistry({PacketBundle::PACKET_ORDINAL, SpawnEntity::PACKET_ORDINAL, SpawnExperienceOrb::PACKET_ORDINAL, SpawnPlayer::PACKET_ORDINAL,
+        EntityAnimation::PACKET_ORDINAL, AwardStatistics::PACKET_ORDINAL, AcknowledgeBlockChange::PACKET_ORDINAL, BlockDestroyStage::PACKET_ORDINAL,
+        BlockEntityData::PACKET_ORDINAL, BlockAction::PACKET_ORDINAL, BlockUpdate::PACKET_ORDINAL, BossBar::PACKET_ORDINAL,
+        ServerChangeDifficulty::PACKET_ORDINAL, ChunksBiomes::PACKET_ORDINAL, ClearTitle::PACKET_ORDINAL, CommandSuggestionResponse::PACKET_ORDINAL,
+        DeclareCommands::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL, InventoryContent::PACKET_ORDINAL, InventoryProperty::PACKET_ORDINAL,
+        InventorySlot::PACKET_ORDINAL, Cooldown::PACKET_ORDINAL, ChatSuggestions::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL,
+        DamageEvent::PACKET_ORDINAL, HideMessage::PACKET_ORDINAL, Disconnect::PACKET_ORDINAL, DisguisedChatMessage::PACKET_ORDINAL,
+        EntityEvent::PACKET_ORDINAL, Explosion::PACKET_ORDINAL, UnloadChunk::PACKET_ORDINAL, GameEvent::PACKET_ORDINAL, OpenHorseInventory::PACKET_ORDINAL,
+        HurtAnimation::PACKET_ORDINAL, InitializeWorldBorder::PACKET_ORDINAL, KeepAlive::PACKET_ORDINAL, ChunkData::PACKET_ORDINAL,
+        WorldEvent::PACKET_ORDINAL, Particle::PACKET_ORDINAL, ChunkLight::PACKET_ORDINAL, JoinGame::PACKET_ORDINAL, MapData::PACKET_ORDINAL,
+        TradeList::PACKET_ORDINAL, EntityPosition::PACKET_ORDINAL, EntityPositionAndRotation::PACKET_ORDINAL, EntityRotation::PACKET_ORDINAL,
+        MoveVehicle::PACKET_ORDINAL, OpenBook::PACKET_ORDINAL, OpenInventory::PACKET_ORDINAL, OpenSignEditor::PACKET_ORDINAL, Ping::PACKET_ORDINAL,
+        CraftRecipeResponse::PACKET_ORDINAL, ServerPlayerAbilities::PACKET_ORDINAL, ServerPlayerChat::PACKET_ORDINAL, EndCombatEvent::PACKET_ORDINAL,
+        EnterCombatEvent::PACKET_ORDINAL, DeathCombatEvent::PACKET_ORDINAL, PlayerRemove::PACKET_ORDINAL, PlayerListItem::PACKET_ORDINAL,
+        PlayerFace::PACKET_ORDINAL, PositionRotation::PACKET_ORDINAL, UnlockRecipes::PACKET_ORDINAL, EntityRemove::PACKET_ORDINAL,
+        EntityEffectRemove::PACKET_ORDINAL, ResourcePackRequest::PACKET_ORDINAL, Respawn::PACKET_ORDINAL, EntityLookAt::PACKET_ORDINAL,
+        SectionBlocks::PACKET_ORDINAL, SelectAdvancementsTab::PACKET_ORDINAL, ServerData::PACKET_ORDINAL, ActionBar::PACKET_ORDINAL,
+        BorderCenter::PACKET_ORDINAL, BorderRadiusSpeed::PACKET_ORDINAL, BorderRadius::PACKET_ORDINAL, BorderWarningTime::PACKET_ORDINAL,
+        BorderWarningRadius::PACKET_ORDINAL, Camera::PACKET_ORDINAL, HeldSlot::PACKET_ORDINAL, ViewPosition::PACKET_ORDINAL, ViewDistance::PACKET_ORDINAL,
+        DefaultSpawnPosition::PACKET_ORDINAL, DisplayObjective::PACKET_ORDINAL, EntityMetadata::PACKET_ORDINAL, LeadEntities::PACKET_ORDINAL,
+        EntityVelocity::PACKET_ORDINAL, EntityEquipment::PACKET_ORDINAL, Experience::PACKET_ORDINAL, Health::PACKET_ORDINAL, Objectives::PACKET_ORDINAL,
+        Passengers::PACKET_ORDINAL, Teams::PACKET_ORDINAL, Score::PACKET_ORDINAL, SimulationDistance::PACKET_ORDINAL, Subtitle::PACKET_ORDINAL,
+        WorldTime::PACKET_ORDINAL, Title::PACKET_ORDINAL, TitleTimes::PACKET_ORDINAL, EntitySoundEffect::PACKET_ORDINAL,
+        HardcodedSoundEffect::PACKET_ORDINAL, StopSound::PACKET_ORDINAL, SystemChat::PACKET_ORDINAL, TabHeaderFooter::PACKET_ORDINAL,
+        TagQueryResponse::PACKET_ORDINAL, PickupItem::PACKET_ORDINAL, EntityTeleport::PACKET_ORDINAL, Advancements::PACKET_ORDINAL,
+        EntityProperties::PACKET_ORDINAL, FeatureFlags::PACKET_ORDINAL, EntityEffect::PACKET_ORDINAL, Recipes::PACKET_ORDINAL, Tags::PACKET_ORDINAL}));
+
     auto* serverbound = new DirectionRegistry();
     serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_12_2,
       new VersionRegistry(
@@ -610,6 +670,36 @@ namespace Ship {
         HeldSlot::PACKET_ORDINAL, ProgramCommandBlock::PACKET_ORDINAL, ProgramCommandBlockMinecart::PACKET_ORDINAL, CreativeSlot::PACKET_ORDINAL,
         ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL, SwingArm::PACKET_ORDINAL,
         Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
+
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_19_4,
+      new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
+        MessageAcknowledgment::PACKET_ORDINAL, Command::PACKET_ORDINAL, ClientPlayerChat::PACKET_ORDINAL, PlayerChatSession::PACKET_ORDINAL,
+        ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL,
+        ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL,
+        TagQueryRequest::PACKET_ORDINAL, EntityInteract::PACKET_ORDINAL, GenerateStructure::PACKET_ORDINAL, KeepAlive::PACKET_ORDINAL,
+        LockDifficulty::PACKET_ORDINAL, MovePositionOnly::PACKET_ORDINAL, Move::PACKET_ORDINAL, MoveRotationOnly::PACKET_ORDINAL,
+        MoveGroundOnly::PACKET_ORDINAL, MoveVehicle::PACKET_ORDINAL, BoatPaddle::PACKET_ORDINAL, PickItem::PACKET_ORDINAL,
+        CraftRecipeRequest::PACKET_ORDINAL, ClientPlayerAbilities::PACKET_ORDINAL, Digging::PACKET_ORDINAL, EntityAction::PACKET_ORDINAL,
+        PlayerInput::PACKET_ORDINAL, Ping::PACKET_ORDINAL, SeenRecipe::PACKET_ORDINAL, ChangeRecipeBookSettings::PACKET_ORDINAL,
+        RenameItem::PACKET_ORDINAL, ResourcePackResponse::PACKET_ORDINAL, SelectAdvancementsTab::PACKET_ORDINAL, SelectTrade::PACKET_ORDINAL,
+        BeaconEffect::PACKET_ORDINAL, HeldSlot::PACKET_ORDINAL, ProgramCommandBlock::PACKET_ORDINAL, ProgramCommandBlockMinecart::PACKET_ORDINAL,
+        CreativeSlot::PACKET_ORDINAL, ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL,
+        SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
+
+    serverbound->RegisterVersion(&MinecraftProtocolVersion::MINECRAFT_1_20,
+      new VersionRegistry({ConfirmTeleport::PACKET_ORDINAL, BlockTagQueryRequest::PACKET_ORDINAL, ClientChangeDifficulty::PACKET_ORDINAL,
+        MessageAcknowledgment::PACKET_ORDINAL, Command::PACKET_ORDINAL, ClientPlayerChat::PACKET_ORDINAL, PlayerChatSession::PACKET_ORDINAL,
+        ClientAction::PACKET_ORDINAL, ClientSettings::PACKET_ORDINAL, CommandSuggestionRequest::PACKET_ORDINAL, ClickInventoryButton::PACKET_ORDINAL,
+        ClickSlot::PACKET_ORDINAL, CloseInventory::PACKET_ORDINAL, PluginMessage::PACKET_ORDINAL, EditBook::PACKET_ORDINAL,
+        TagQueryRequest::PACKET_ORDINAL, EntityInteract::PACKET_ORDINAL, GenerateStructure::PACKET_ORDINAL, KeepAlive::PACKET_ORDINAL,
+        LockDifficulty::PACKET_ORDINAL, MovePositionOnly::PACKET_ORDINAL, Move::PACKET_ORDINAL, MoveRotationOnly::PACKET_ORDINAL,
+        MoveGroundOnly::PACKET_ORDINAL, MoveVehicle::PACKET_ORDINAL, BoatPaddle::PACKET_ORDINAL, PickItem::PACKET_ORDINAL,
+        CraftRecipeRequest::PACKET_ORDINAL, ClientPlayerAbilities::PACKET_ORDINAL, Digging::PACKET_ORDINAL, EntityAction::PACKET_ORDINAL,
+        PlayerInput::PACKET_ORDINAL, Ping::PACKET_ORDINAL, SeenRecipe::PACKET_ORDINAL, ChangeRecipeBookSettings::PACKET_ORDINAL,
+        RenameItem::PACKET_ORDINAL, ResourcePackResponse::PACKET_ORDINAL, SelectAdvancementsTab::PACKET_ORDINAL, SelectTrade::PACKET_ORDINAL,
+        BeaconEffect::PACKET_ORDINAL, HeldSlot::PACKET_ORDINAL, ProgramCommandBlock::PACKET_ORDINAL, ProgramCommandBlockMinecart::PACKET_ORDINAL,
+        CreativeSlot::PACKET_ORDINAL, ProgramJigsawBlock::PACKET_ORDINAL, ProgramStructureBlock::PACKET_ORDINAL, EditSign::PACKET_ORDINAL,
+        SwingArm::PACKET_ORDINAL, Spectate::PACKET_ORDINAL, PlaceBlock::PACKET_ORDINAL, UseItem::PACKET_ORDINAL}));
 
     return {clientbound, serverbound};
   }

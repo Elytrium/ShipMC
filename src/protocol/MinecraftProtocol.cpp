@@ -25,6 +25,8 @@ namespace Ship {
   inline const ProtocolVersion MinecraftProtocolVersion::MINECRAFT_1_19 = ProtocolVersion(19, 759, "1.19");
   inline const ProtocolVersion MinecraftProtocolVersion::MINECRAFT_1_19_1 = ProtocolVersion(20, 760, "1.19.1 - 1.19.2");
   inline const ProtocolVersion MinecraftProtocolVersion::MINECRAFT_1_19_3 = ProtocolVersion(21, 761, "1.19.3");
+  inline const ProtocolVersion MinecraftProtocolVersion::MINECRAFT_1_19_4 = ProtocolVersion(22, 762, "1.19.4");
+  inline const ProtocolVersion MinecraftProtocolVersion::MINECRAFT_1_20 = ProtocolVersion(23, 763, "1.20 - 1.20.1");
 
   inline const ProtocolVersions MinecraftProtocolVersion::VERSIONS = ProtocolVersions({MinecraftProtocolVersion::MINECRAFT_1_12_2,
     MinecraftProtocolVersion::MINECRAFT_1_13, MinecraftProtocolVersion::MINECRAFT_1_13_1, MinecraftProtocolVersion::MINECRAFT_1_13_2,
@@ -33,20 +35,21 @@ namespace Ship {
     MinecraftProtocolVersion::MINECRAFT_1_15_1, MinecraftProtocolVersion::MINECRAFT_1_15_2, MinecraftProtocolVersion::MINECRAFT_1_16_2,
     MinecraftProtocolVersion::MINECRAFT_1_16_3, MinecraftProtocolVersion::MINECRAFT_1_16_4, MinecraftProtocolVersion::MINECRAFT_1_17,
     MinecraftProtocolVersion::MINECRAFT_1_17_1, MinecraftProtocolVersion::MINECRAFT_1_18, MinecraftProtocolVersion::MINECRAFT_1_18_2,
-    MinecraftProtocolVersion::MINECRAFT_1_19, MinecraftProtocolVersion::MINECRAFT_1_19_1, MinecraftProtocolVersion::MINECRAFT_1_19_3});
+    MinecraftProtocolVersion::MINECRAFT_1_19, MinecraftProtocolVersion::MINECRAFT_1_19_1, MinecraftProtocolVersion::MINECRAFT_1_19_3,
+    MinecraftProtocolVersion::MINECRAFT_1_19_4, MinecraftProtocolVersion::MINECRAFT_1_20});
 
   GlobalPos::GlobalPos(std::string  dimension, const Position& position) : dimension(std::move(dimension)), position(position) {
   }
   const std::string& GlobalPos::GetDimension() const {
     return dimension;
   }
-  void GlobalPos::SetDimension(const std::string& dimension) {
-    GlobalPos::dimension = dimension;
+  void GlobalPos::SetDimension(const std::string& newDimension) {
+    GlobalPos::dimension = newDimension;
   }
   const Position& GlobalPos::GetPosition() const {
     return position;
   }
-  void GlobalPos::SetPosition(const Position& position) {
-    GlobalPos::position = position;
+  void GlobalPos::SetPosition(const Position& newPosition) {
+    GlobalPos::position = newPosition;
   }
 }
